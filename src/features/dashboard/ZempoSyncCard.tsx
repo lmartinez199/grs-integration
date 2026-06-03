@@ -41,7 +41,9 @@ export function ZempoSyncCard() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const list = Array.isArray(schedules.data) ? schedules.data : [];
+  const list = (Array.isArray(schedules.data) ? schedules.data : []).filter(
+    (s) => String(s.competicaoCodigo ?? "").trim() !== "",
+  );
 
   return (
     <Card>
@@ -91,7 +93,7 @@ export function ZempoSyncCard() {
             </li>
           ) : (
             list.map((s) => {
-              const code = String(s.codigo ?? s.id ?? "");
+              const code = String(s.competicaoCodigo ?? "");
               return (
                 <li
                   key={code}

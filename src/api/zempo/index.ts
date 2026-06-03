@@ -7,7 +7,8 @@ import { request } from "@/lib/http";
  */
 
 export interface ZempoSchedule {
-  codigo: string;
+  /** Código de la competición (nombre del campo en el backend zempo). */
+  competicaoCodigo: string;
   [key: string]: unknown;
 }
 

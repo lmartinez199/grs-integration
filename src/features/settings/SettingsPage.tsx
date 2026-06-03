@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Save } from "lucide-react";
+import { Activity, Loader2, Save } from "lucide-react";
 
 import { useSettings, type Settings } from "@/stores/settings.store";
 import {
@@ -10,6 +10,8 @@ import {
   updateArenaBaseUrl,
   updateArenaEventCode,
 } from "@/api/grs/arena";
+import { zempoHealth } from "@/api/grs/zempo-sync";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,6 +74,15 @@ function ConnectionsCard() {
     toast.success("Conexiones guardadas");
   }
 
+  const testZempo = useMutation({
+    mutationFn: zempoHealth,
+    onSuccess: (r) => {
+      if (r.connected) toast.success("Conexión con Zempo OK");
+      else toast.error(`Zempo no responde${r.error ? `: ${r.error}` : ""}`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <Card>
       <CardHeader>
@@ -107,10 +118,30 @@ function ConnectionsCard() {
             </Field>
           </div>
 
-          <Button type="submit" disabled={isSubmitting}>
-            <Save className="size-4" />
-            Guardar conexiones
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="submit" disabled={isSubmitting}>
+              <Save className="size-4" />
+              Guardar conexiones
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={testZempo.isPending}
+              onClick={() => testZempo.mutate()}
+            >
+              {testZempo.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Activity className="size-4" />
+              )}
+              Probar conexión Zempo
+            </Button>
+            {testZempo.data && (
+              <Badge variant={testZempo.data.connected ? "success" : "destructive"}>
+                {testZempo.data.connected ? "Zempo conectado" : "Zempo sin conexión"}
+              </Badge>
+            )}
+          </div>
         </form>
       </CardContent>
     </Card>
