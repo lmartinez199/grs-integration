@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Swords, Timer, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Swords, Hand, Timer, Settings, LogOut, Sun, Moon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/stores/auth.store";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/arena", label: "WRE (lucha)", icon: Swords, end: false },
+  { to: "/judo", label: "JUD (judo)", icon: Hand, end: false },
   { to: "/ath", label: "ATH (atletismo)", icon: Timer, end: false },
   { to: "/settings", label: "Ajustes", icon: Settings, end: false },
 ];

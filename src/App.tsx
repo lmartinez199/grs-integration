@@ -9,6 +9,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
 import { ArenaPage } from "@/features/arena/ArenaPage";
+import { JudPage } from "@/features/judo/JudPage";
 import { AthPage } from "@/features/ath/AthPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 
@@ -49,6 +50,7 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/arena" element={<ArenaPage />} />
+          <Route path="/judo" element={<JudPage />} />
           <Route path="/ath" element={<AthPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
