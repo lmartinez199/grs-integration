@@ -121,3 +121,39 @@ select {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Scrollbars discretas y acordes al tema (sin los botones de flecha
+   clásicos de Windows). Solo se ven cuando realmente hay overflow. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-muted-foreground);
+}
+
+/* Oculta las flechas ▲▼ de la scrollbar (WebView2 / Windows). */
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

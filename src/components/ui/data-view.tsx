@@ -60,11 +60,14 @@ export function DataView({ data, className, showTechnical = false }: DataViewPro
         {entries.map(([key, value]) => {
           const nested = value !== null && typeof value === "object";
           return (
-            <div key={key} className={cn("flex flex-col gap-0.5", nested && "sm:col-span-2")}>
+            <div
+              key={key}
+              className={cn("flex min-w-0 flex-col gap-0.5", nested && "sm:col-span-2")}
+            >
               <dt className="text-xs uppercase tracking-wide text-(--color-muted-foreground)">
                 {humanizeKey(key)}
               </dt>
-              <dd className="text-sm">
+              <dd className="text-sm [overflow-wrap:anywhere]">
                 {nested ? (
                   <div className="mt-1 border-l-2 border-(--color-border) pl-3">
                     <DataView data={value} showTechnical={showTechnical} />

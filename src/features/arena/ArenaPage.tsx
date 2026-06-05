@@ -46,8 +46,8 @@ export function ArenaPage() {
   });
 
   return (
-    <div className="space-y-6 p-6">
-      <header>
+    <div className="flex h-full flex-col gap-6 p-6">
+      <header className="shrink-0">
         <h1 className="text-2xl font-semibold">WRE (lucha)</h1>
         <p className="flex items-center gap-1.5 text-sm text-(--color-muted-foreground)">
           <Radio className="size-3.5 text-(--color-success)" aria-hidden />
@@ -55,6 +55,7 @@ export function ArenaPage() {
         </p>
       </header>
 
+      <div className="min-h-0 flex-1 space-y-6 overflow-auto">
       <Card>
         <CardHeader>
           <CardTitle>Evento actual</CardTitle>
@@ -158,6 +159,7 @@ export function ArenaPage() {
             )}
           </CardContent>
         </Card>
+      </div>
       </div>
     </div>
   );

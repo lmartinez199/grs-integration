@@ -37,18 +37,27 @@ export function JudPage() {
   });
 
   return (
-    <div className="space-y-6 p-6">
-      <header>
+    <div className="flex h-full flex-col gap-6 p-6">
+      <header className="shrink-0">
         <h1 className="text-2xl font-semibold">JUD (judo)</h1>
         <p className="text-sm text-(--color-muted-foreground)">
           Control de sincronización (zempo) y lutas sincronizadas en el GRS.
         </p>
       </header>
 
-      <JudCompeticionBar codigo={codigo} setCodigo={setCodigo} />
+      <div className="shrink-0">
+        <JudCompeticionBar codigo={codigo} setCodigo={setCodigo} />
+      </div>
 
-      <Tabs tabs={TABS} value={tab} onChange={setTab} aria-label="Secciones de judo" />
+      <Tabs
+        tabs={TABS}
+        value={tab}
+        onChange={setTab}
+        aria-label="Secciones de judo"
+        className="shrink-0"
+      />
 
+      <div className="min-h-0 flex-1 overflow-auto">
       {tab === "config" && (
         <div
           role="tabpanel"
@@ -66,7 +75,7 @@ export function JudPage() {
           role="tabpanel"
           id={tabPanelId("lutas")}
           aria-labelledby={tabTriggerId("lutas")}
-          className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1.6fr]"
+          className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[1fr_1.6fr]"
         >
           <Card>
             <CardHeader className="flex-row items-center justify-between space-y-0">
@@ -85,7 +94,7 @@ export function JudPage() {
                   No hay lutas de judo sincronizadas todavía.
                 </p>
               ) : (
-                <ul className="max-h-(--list-h-sidebar) space-y-1 overflow-auto pr-1">
+                <ul className="space-y-1 pr-1">
                   {(categories.data ?? []).map((c) => {
                     const isSel =
                       selected?.sportEvent === c.sportEvent &&
@@ -150,7 +159,7 @@ export function JudPage() {
                   Error al cargar lutas.
                 </p>
               ) : fights.data && fights.data.length > 0 ? (
-                <div className="max-h-(--list-h-content) space-y-2 overflow-auto pr-1">
+                <div className="space-y-2 pr-1">
                   {fights.data.map((f) => (
                     <JudoFightCard key={f.id} fight={f} />
                   ))}
@@ -180,6 +189,7 @@ export function JudPage() {
           <ResultadosCard codigo={codigo} />
         </div>
       )}
+      </div>
     </div>
   );
 }

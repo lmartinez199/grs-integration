@@ -31,7 +31,7 @@ export function JudCompeticionBar({
       <label className="flex items-center gap-2">
         <span className="text-sm font-medium">Competición</span>
         <Input
-          className="max-w-[12rem]"
+          className="max-w-48"
           placeholder="código (ej. jj25)"
           value={codigo}
           onChange={(e) => setCodigo(e.target.value)}
