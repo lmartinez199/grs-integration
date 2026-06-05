@@ -19,12 +19,6 @@ const TYPE_LABEL: Record<string, string> = {
   MatchWin2Tec: "Match",
 };
 
-/** FeedFlag del ODF: "T" = Test, "P" = Producción. */
-const FEED_LABEL: Record<string, { label: string; variant: "success" | "warning" }> = {
-  P: { label: "Producción", variant: "success" },
-  T: { label: "Test", variant: "warning" },
-};
-
 const TYPE_OPTIONS = [
   { value: "", label: "Todos los tipos" },
   { value: "BracketsWin2Tec", label: "Brackets" },
@@ -96,7 +90,6 @@ export function ArcoMonitor() {
                   <tr className="text-left text-xs uppercase tracking-wide text-(--color-muted-foreground)">
                     <th scope="col" className="py-1.5 pr-2 font-medium">Fecha</th>
                     <th scope="col" className="py-1.5 pr-2 font-medium">Tipo</th>
-                    <th scope="col" className="py-1.5 pr-2 font-medium">Origen</th>
                     <th scope="col" className="py-1.5 pr-2 font-medium">Competición</th>
                     <th scope="col" className="py-1.5 pr-3 font-medium">Documento</th>
                   </tr>
@@ -121,15 +114,6 @@ export function ArcoMonitor() {
                           <Badge variant="secondary">
                             {TYPE_LABEL[doc.documentType] ?? doc.documentType}
                           </Badge>
-                        </td>
-                        <td className="py-1.5 pr-2">
-                          {FEED_LABEL[doc.feedFlag] ? (
-                            <Badge variant={FEED_LABEL[doc.feedFlag].variant}>
-                              {FEED_LABEL[doc.feedFlag].label}
-                            </Badge>
-                          ) : (
-                            <span className="text-(--color-muted-foreground)">—</span>
-                          )}
                         </td>
                         <td className="py-1.5 pr-2 font-medium">{doc.competitionCode}</td>
                         <td className="truncate py-1.5 pr-3 font-mono text-xs">{doc.documentCode}</td>
