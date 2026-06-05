@@ -122,8 +122,21 @@ export const getCategoryFights = (categoryId: string | number) =>
 
 // ---- Sync (acciones) -----------------------------------------------------
 
+/**
+ * Resumen de un sync de Arena (espejo de `SyncSummaryResponseDto` del GRS).
+ * Cada endpoint rellena los campos que aplican a su naturaleza; el resto queda
+ * en 0 / [].
+ */
+export interface ArenaSyncSummary {
+  processed: number;
+  created: number;
+  updated: number;
+  skipped: number;
+  errors: string[];
+}
+
 export const triggerFullSync = () =>
-  request<{ ok: boolean }>("grs", "/arena/sync", { method: "POST" });
+  request<ArenaSyncSummary>("grs", "/arena/sync", { method: "POST" });
 
 export const startAutoSync = () =>
   request<{ isEnabled: boolean }>("grs", "/arena/sync/start", { method: "POST" });
@@ -132,25 +145,25 @@ export const stopAutoSync = () =>
   request<{ isEnabled: boolean }>("grs", "/arena/sync/stop", { method: "POST" });
 
 export const syncResults = () =>
-  request<{ ok: boolean }>("grs", "/arena/sync/results", { method: "POST" });
+  request<ArenaSyncSummary>("grs", "/arena/sync/results", { method: "POST" });
 
 /** Re-sincroniza el bracket completo de una categoría (POST /arena/sync/category/:id). */
 export const syncCategory = (categoryId: string | number) =>
-  request<{ ok: boolean }>("grs", `/arena/sync/category/${categoryId}`, {
+  request<ArenaSyncSummary>("grs", `/arena/sync/category/${categoryId}`, {
     method: "POST",
   });
 
 /** Re-sincroniza una sola pelea (POST /arena/sync/fight/:id). */
 export const syncFight = (fightId: string) =>
-  request<{ ok: boolean }>("grs", `/arena/sync/fight/${fightId}`, {
+  request<ArenaSyncSummary>("grs", `/arena/sync/fight/${fightId}`, {
     method: "POST",
   });
 
 export const syncParticipants = () =>
-  request<{ ok: boolean }>("grs", "/arena/sync/participants", { method: "POST" });
+  request<ArenaSyncSummary>("grs", "/arena/sync/participants", { method: "POST" });
 
 export const syncGroups = () =>
-  request<{ ok: boolean }>("grs", "/arena/sync/groups", { method: "POST" });
+  request<ArenaSyncSummary>("grs", "/arena/sync/groups", { method: "POST" });
 
 // ---- Webhooks ------------------------------------------------------------
 

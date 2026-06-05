@@ -7,7 +7,6 @@ import {
   getCategories,
   getCategoryFights,
   syncCategory,
-  triggerFullSync,
   type ArenaCategory,
 } from "@/api/grs/arena";
 import { cn } from "@/lib/utils";
@@ -19,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EventSummary } from "./EventSummary";
 import { FightsByRound } from "./FightsByRound";
 import { WebhookConfig } from "./WebhookConfig";
+import { ArenaLoopCard, ArenaSyncSteps } from "./ArenaSyncSection";
 import { useArenaLive } from "./useArenaLive";
 
 export function ArenaPage() {
@@ -39,15 +39,6 @@ export function ArenaPage() {
 
   const selectedCategory = (categories.data ?? []).find((c) => c.id === selected);
 
-  const fullSync = useMutation({
-    mutationFn: triggerFullSync,
-    onSuccess: () => {
-      toast.success("Sincronización completa disparada");
-      qc.invalidateQueries({ queryKey: ["arena"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
   const categorySync = useMutation({
     mutationFn: (categoryId: string | number) => syncCategory(categoryId),
     onSuccess: () => {
@@ -59,27 +50,12 @@ export function ArenaPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">WRE (lucha)</h1>
-          <p className="flex items-center gap-1.5 text-sm text-[var(--color-muted-foreground)]">
-            <Radio className="size-3.5 text-[var(--color-success)]" aria-hidden />
-            En vivo · se actualiza solo cuando Arena reporta cambios.
-          </p>
-        </div>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => fullSync.mutate()}
-          disabled={fullSync.isPending}
-        >
-          {fullSync.isPending ? (
-            <Loader2 className="size-4 animate-spin" aria-hidden />
-          ) : (
-            <RefreshCw className="size-4" aria-hidden />
-          )}
-          Sync completa
-        </Button>
+      <header>
+        <h1 className="text-2xl font-semibold">WRE (lucha)</h1>
+        <p className="flex items-center gap-1.5 text-sm text-[var(--color-muted-foreground)]">
+          <Radio className="size-3.5 text-[var(--color-success)]" aria-hidden />
+          En vivo · se actualiza solo cuando Arena reporta cambios.
+        </p>
       </header>
 
       <Card>
@@ -99,7 +75,11 @@ export function ArenaPage() {
         </CardContent>
       </Card>
 
+      <ArenaLoopCard />
+
       <WebhookConfig />
+
+      <ArenaSyncSteps />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1.4fr]">
         <Card>

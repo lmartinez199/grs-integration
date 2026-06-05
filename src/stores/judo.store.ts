@@ -1,12 +1,8 @@
 import { create } from "zustand";
 
-import type { ZempoQueued, ZempoSyncSummary } from "@/api/grs/zempo-sync";
+import type { StepResult } from "@/components/integration/setup-steps";
 
-/** Resultado de un paso del setup, persistido entre navegaciones. */
-export type StepResult =
-  | { kind: "summary"; data: ZempoSyncSummary }
-  | { kind: "queued"; data: ZempoQueued }
-  | { kind: "error"; message: string };
+export type { StepResult };
 
 interface JudoState {
   /** Código de competición compartido por toda la página JUD. */
