@@ -7,6 +7,7 @@ import {
   type FightOrderFilters,
   type ZempoOrdemLuta,
 } from "@/api/grs/zempo-sync";
+import { groupFightOrderByArea } from "@/lib/domain/zempo";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -34,7 +35,7 @@ export function OrdemLutasCard({ codigo }: { codigo: string }) {
     enabled: codigo.trim().length > 0,
   });
 
-  const byArea = groupByArea(q.data ?? []);
+  const byArea = groupFightOrderByArea(q.data ?? []);
 
   return (
     <Card>
@@ -138,21 +139,4 @@ function OrdemRow({ luta }: { luta: ZempoOrdemLuta }) {
       </Badge>
     </li>
   );
-}
-
-/** Agrupa por área (numérica si aplica) y ordena lutas por `ordem`. */
-function groupByArea(lutas: ZempoOrdemLuta[]): [string, ZempoOrdemLuta[]][] {
-  const map = new Map<string, ZempoOrdemLuta[]>();
-  for (const l of lutas) {
-    const k = l.area || "—";
-    const arr = map.get(k);
-    if (arr) arr.push(l);
-    else map.set(k, [l]);
-  }
-  const num = (s: string) => {
-    const n = Number(s);
-    return Number.isFinite(n) ? n : Number.POSITIVE_INFINITY;
-  };
-  for (const arr of map.values()) arr.sort((a, b) => num(a.ordem) - num(b.ordem));
-  return [...map.entries()].sort((a, b) => num(a[0]) - num(b[0]));
 }

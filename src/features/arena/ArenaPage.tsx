@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2, ChevronRight, RefreshCw, Radio, Search, Swords } from "lucide-react";
+
+import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 
 import {
   getCurrentEvent,
@@ -13,7 +15,6 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EventSummary } from "./EventSummary";
 import { FightsByRound } from "./FightsByRound";
@@ -24,7 +25,6 @@ import { useArenaLive } from "./useArenaLive";
 export function ArenaPage() {
   const [selected, setSelected] = useState<string | number | null>(null);
   const [catFilter, setCatFilter] = useState("");
-  const qc = useQueryClient();
 
   // Suscripción en vivo (SSE): refresca al cambiar peleas/categorías en Arena.
   useArenaLive();
@@ -39,13 +39,10 @@ export function ArenaPage() {
 
   const selectedCategory = (categories.data ?? []).find((c) => c.id === selected);
 
-  const categorySync = useMutation({
+  const categorySync = useMutationWithToast({
     mutationFn: (categoryId: string | number) => syncCategory(categoryId),
-    onSuccess: () => {
-      toast.success("Categoría sincronizada");
-      qc.invalidateQueries({ queryKey: ["arena", "fights", selected] });
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Categoría sincronizada",
+    invalidateKeys: [["arena", "fights", selected]],
   });
 
   return (
@@ -151,7 +148,7 @@ export function ArenaPage() {
                 Error al cargar peleas.
               </p>
             ) : fights.data && fights.data.length > 0 ? (
-              <div className="max-h-[34rem] overflow-auto pr-1">
+              <div className="max-h-[var(--list-h-content)] overflow-auto pr-1">
                 <FightsByRound fights={fights.data} />
               </div>
             ) : (
@@ -204,7 +201,7 @@ function CategoryList({
           Sin coincidencias.
         </p>
       ) : (
-        <ul className="max-h-[26rem] space-y-1 overflow-auto pr-1">
+        <ul className="max-h-[var(--list-h-sidebar)] space-y-1 overflow-auto pr-1">
           {visible.map((c) => {
             const isSel = selected === c.id;
             return (

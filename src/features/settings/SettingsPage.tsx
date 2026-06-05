@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Activity, Loader2, Save } from "lucide-react";
 
 import { useSettings, type Settings } from "@/stores/settings.store";
@@ -154,8 +155,6 @@ const arenaServerSchema = z.object({
 });
 
 function ArenaServerCard() {
-  const qc = useQueryClient();
-
   const settingsQuery = useQuery({
     queryKey: ["arena", "settings"],
     queryFn: getArenaSettings,
@@ -173,22 +172,16 @@ function ArenaServerCard() {
       : undefined,
   });
 
-  const saveBaseUrl = useMutation({
+  const saveBaseUrl = useMutationWithToast({
     mutationFn: (v: string) => updateArenaBaseUrl(v),
-    onSuccess: () => {
-      toast.success("Base URL de ARENA actualizada");
-      qc.invalidateQueries({ queryKey: ["arena", "settings"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Base URL de ARENA actualizada",
+    invalidateKeys: [["arena", "settings"]],
   });
 
-  const saveEventCode = useMutation({
+  const saveEventCode = useMutationWithToast({
     mutationFn: (v: string) => updateArenaEventCode(v),
-    onSuccess: () => {
-      toast.success("Código de evento actualizado");
-      qc.invalidateQueries({ queryKey: ["arena", "settings"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Código de evento actualizado",
+    invalidateKeys: [["arena", "settings"]],
   });
 
   return (

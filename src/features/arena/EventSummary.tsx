@@ -19,7 +19,7 @@ function ColorSwatch({ label, bg, fg }: { label: string; bg?: string; fg?: strin
   return (
     <div className="flex items-center gap-2">
       <span
-        className="flex size-6 items-center justify-center rounded border text-[10px] font-bold"
+        className="flex size-6 items-center justify-center rounded border text-2xs font-bold"
         style={{ backgroundColor: bg, color: fg ?? "#fff" }}
       >
         A

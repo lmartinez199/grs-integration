@@ -1,36 +1,12 @@
 import { Users } from "lucide-react";
 
 import type { AthStartListEntry } from "@/api/ath";
-
-/**
- * Tipos de prueba donde los "intentos" son medidas con sentido (lanzamientos,
- * saltos horizontales: ej. "38.72"). En salto de altura/pértiga ("Vertical")
- * los intentos son notación por altura (O/X/-) y NO se muestran como lista;
- * en pista y relevos no aplican.
- */
-function showsAttempts(e: AthStartListEntry): boolean {
-  const t = e.Type?.toLowerCase() ?? "";
-  return !["vertical", "pista", "reveza"].includes(t);
-}
-
-/**
- * Marcas de intentos legibles: solo medidas decimales reales (ej. "38.72") y
- * el marcador de nulo "x" (intento fallido en lanzamientos). Descarta basura
- * como "07" o "-".
- */
-function attemptsText(e: AthStartListEntry): string {
-  if (!showsAttempts(e)) return "";
-  const marks = (e.attempts ?? [])
-    .map((a) => a.marca?.trim())
-    .filter((m): m is string => !!m && (/\d[.,]\d/.test(m) || /^x$/i.test(m)));
-  return marks.join(" · ");
-}
-
-function result(e: AthStartListEntry): string | null {
-  if (e.FinalResult && e.FinalResult.trim() !== "") return e.FinalResult;
-  if (e.BestMark && e.BestMark.trim() !== "") return `Mejor: ${e.BestMark}`;
-  return null;
-}
+import {
+  attemptsText,
+  startListResult,
+  isRelay,
+  groupRelayTeams,
+} from "@/lib/domain/ath-start-list";
 
 export function StartList({ entries }: { entries: AthStartListEntry[] }) {
   if (!entries.length) {
@@ -41,8 +17,7 @@ export function StartList({ entries }: { entries: AthStartListEntry[] }) {
     );
   }
 
-  const isRelay = entries[0]?.Type?.toLowerCase() === "reveza";
-  return isRelay ? <RelayList entries={entries} /> : <IndividualList entries={entries} />;
+  return isRelay(entries) ? <RelayList entries={entries} /> : <IndividualList entries={entries} />;
 }
 
 // ---- Pruebas individuales ------------------------------------------------
@@ -52,7 +27,7 @@ function IndividualList({ entries }: { entries: AthStartListEntry[] }) {
     <ul className="space-y-1.5">
       {entries.map((e, i) => {
         const attempts = attemptsText(e);
-        const res = result(e);
+        const res = startListResult(e);
         return (
           <li
             key={`${e.CompetitorName}-${e.Bib}-${i}`}
@@ -86,36 +61,8 @@ function IndividualList({ entries }: { entries: AthStartListEntry[] }) {
 
 // ---- Relevos (agrupados por equipo) --------------------------------------
 
-interface RelayTeam {
-  key: string;
-  club: string;
-  codeClub: string;
-  lane: number;
-  serie: number;
-  result: string | null;
-  athletes: AthStartListEntry[];
-}
-
 function RelayList({ entries }: { entries: AthStartListEntry[] }) {
-  const teams: RelayTeam[] = [];
-  for (const e of entries) {
-    const key = e.CodeClub || `${e.Club}-${e.Lane}-${e.Serie}`;
-    let team = teams.find((t) => t.key === key);
-    if (!team) {
-      team = {
-        key,
-        club: e.Club,
-        codeClub: e.CodeClub,
-        lane: e.Lane,
-        serie: e.Serie,
-        result: result(e),
-        athletes: [],
-      };
-      teams.push(team);
-    }
-    team.athletes.push(e);
-    if (!team.result) team.result = result(e);
-  }
+  const teams = groupRelayTeams(entries);
 
   return (
     <ul className="space-y-2">

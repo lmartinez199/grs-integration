@@ -1,6 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2, Play, Square, RefreshCw, Swords } from "lucide-react";
 
+import { SYNC_INTERVAL } from "@/lib/constants";
+import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import {
   getArenaSettings,
   startAutoSync,
@@ -10,57 +12,44 @@ import {
 } from "@/api/grs/arena";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "@/components/ui/toast";
 import { RetryNotice } from "@/components/ui/retry-notice";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SyncCard } from "@/components/ui/sync-card";
+import { DefinitionRow } from "@/components/ui/definition-row";
 
 export function ArenaSyncCard() {
-  const qc = useQueryClient();
   const settings = useQuery({
     queryKey: ["arena", "settings"],
     queryFn: getArenaSettings,
-    refetchInterval: 15_000,
+    refetchInterval: SYNC_INTERVAL,
   });
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["arena", "settings"] });
-
-  const start = useMutation({
+  const start = useMutationWithToast({
     mutationFn: startAutoSync,
-    onSuccess: () => {
-      toast.success("Sync automática de ARENA activada");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Sync automática de ARENA activada",
+    invalidateKeys: [["arena", "settings"]],
   });
-  const stop = useMutation({
+  const stop = useMutationWithToast({
     mutationFn: stopAutoSync,
-    onSuccess: () => {
-      toast.success("Sync automática de ARENA detenida");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Sync automática de ARENA detenida",
+    invalidateKeys: [["arena", "settings"]],
   });
-  const full = useMutation({
+  const full = useMutationWithToast({
     mutationFn: triggerFullSync,
-    onSuccess: () => toast.success("Sincronización completa disparada"),
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Sincronización completa disparada",
   });
-  const results = useMutation({
+  const results = useMutationWithToast({
     mutationFn: syncResults,
-    onSuccess: () => toast.success("Resultados sincronizados"),
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Resultados sincronizados",
   });
 
   const enabled = settings.data?.isEnabled;
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0">
-        <CardTitle className="flex items-center gap-2">
-          <Swords className="size-4 text-[var(--color-primary)]" />
-          WRE (lucha)
-        </CardTitle>
-        {settings.isLoading ? (
+    <SyncCard
+      title="WRE (lucha)"
+      icon={<Swords className="size-4 text-[var(--color-primary)]" />}
+      status={
+        settings.isLoading ? (
           <Loader2 className="size-4 animate-spin text-[var(--color-muted-foreground)]" />
         ) : settings.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
@@ -68,9 +57,9 @@ export function ArenaSyncCard() {
           <Badge variant="success">auto-sync ON</Badge>
         ) : (
           <Badge variant="secondary">auto-sync OFF</Badge>
-        )}
-      </CardHeader>
-      <CardContent className="space-y-3">
+        )
+      }
+    >
         {settings.isError ? (
           <RetryNotice
             message="No se pudo conectar con el GRS."
@@ -80,8 +69,8 @@ export function ArenaSyncCard() {
         ) : (
         <>
         <dl className="space-y-1 text-sm">
-          <Row label="Evento" value={settings.data?.eventCode || "—"} />
-          <Row label="URL de WRE" value={settings.data?.baseUrl || "—"} />
+          <DefinitionRow label="Evento" value={settings.data?.eventCode || "—"} />
+          <DefinitionRow label="URL de WRE" value={settings.data?.baseUrl || "—"} />
         </dl>
 
         <div className="flex flex-wrap gap-2">
@@ -124,16 +113,6 @@ export function ArenaSyncCard() {
         </div>
         </>
         )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between gap-2">
-      <dt className="text-[var(--color-muted-foreground)]">{label}</dt>
-      <dd className="truncate font-medium">{value}</dd>
-    </div>
+    </SyncCard>
   );
 }

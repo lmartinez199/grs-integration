@@ -1,6 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Play, Square, Timer, Radio } from "lucide-react";
 
+import { SYNC_INTERVAL } from "@/lib/constants";
+import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import {
   getArenaSettings,
   startAutoSync,
@@ -13,7 +15,6 @@ import {
 import { useArenaStore } from "@/stores/arena.store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/toast";
 import {
   Card,
   CardContent,
@@ -36,29 +37,21 @@ import {
 // ---- Loop de sincronización (auto-sync) ----------------------------------
 
 export function ArenaLoopCard() {
-  const qc = useQueryClient();
   const settings = useQuery({
     queryKey: ["arena", "settings"],
     queryFn: getArenaSettings,
-    refetchInterval: 15_000,
+    refetchInterval: SYNC_INTERVAL,
   });
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["arena", "settings"] });
 
-  const start = useMutation({
+  const start = useMutationWithToast({
     mutationFn: startAutoSync,
-    onSuccess: () => {
-      toast.success("Auto-sync de Arena iniciado");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Auto-sync de Arena iniciado",
+    invalidateKeys: [["arena", "settings"]],
   });
-  const stop = useMutation({
+  const stop = useMutationWithToast({
     mutationFn: stopAutoSync,
-    onSuccess: () => {
-      toast.success("Auto-sync detenido");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Auto-sync detenido",
+    invalidateKeys: [["arena", "settings"]],
   });
 
   const active = settings.data?.isEnabled === true;

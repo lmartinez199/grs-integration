@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2, Webhook, Plus, Power, PowerOff, Trash2 } from "lucide-react";
 
 import {
@@ -9,9 +9,9 @@ import {
   removeWebhook,
 } from "@/api/grs/arena";
 import { useSettings } from "@/stores/settings.store";
+import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "@/components/ui/toast";
 import {
   Card,
   CardContent,
@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/card";
 
 export function WebhookConfig() {
-  const qc = useQueryClient();
   const grsBaseUrl = useSettings((s) => s.grsBaseUrl);
   const webhookUrl = `${grsBaseUrl.replace(/\/+$/, "")}/arena/webhook`;
 
@@ -32,34 +31,23 @@ export function WebhookConfig() {
     hooks.find((w) => w.url === webhookUrl) ??
     hooks.find((w) => w.url.includes("/arena/webhook"));
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["arena", "webhooks"] });
-
-  const create = useMutation({
+  const create = useMutationWithToast({
     mutationFn: () => createWebhook({ url: webhookUrl, name: "Integración GRS" }),
-    onSuccess: () => {
-      toast.success("Webhook registrado en Arena");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Webhook registrado en Arena",
+    invalidateKeys: [["arena", "webhooks"]],
   });
 
-  const toggle = useMutation({
+  const toggle = useMutationWithToast({
     mutationFn: (w: { id: number; enabled: boolean }) =>
       w.enabled ? disableWebhook(w.id) : enableWebhook(w.id),
-    onSuccess: () => {
-      toast.success("Webhook actualizado");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Webhook actualizado",
+    invalidateKeys: [["arena", "webhooks"]],
   });
 
-  const remove = useMutation({
+  const remove = useMutationWithToast({
     mutationFn: (id: number) => removeWebhook(id),
-    onSuccess: () => {
-      toast.success("Webhook eliminado");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Webhook eliminado",
+    invalidateKeys: [["arena", "webhooks"]],
   });
 
   const isActive = current?.status === 1;

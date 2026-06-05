@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Medal } from "lucide-react";
 
-import { getZempoResults, type ZempoResultado } from "@/api/grs/zempo-sync";
+import { getZempoResults } from "@/api/grs/zempo-sync";
+import { MEDAL, groupResultsByCategoria } from "@/lib/domain/zempo";
 import {
   Card,
   CardContent,
@@ -10,8 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-const MEDAL: Record<string, string> = { "1º": "🥇", "2º": "🥈", "3º": "🥉" };
-
 export function ResultadosCard({ codigo }: { codigo: string }) {
   const q = useQuery({
     queryKey: ["zempo", "results", codigo],
@@ -19,7 +18,7 @@ export function ResultadosCard({ codigo }: { codigo: string }) {
     enabled: codigo.trim().length > 0,
   });
 
-  const byCategoria = groupByCategoria(q.data ?? []);
+  const byCategoria = groupResultsByCategoria(q.data ?? []);
 
   return (
     <Card>
@@ -82,25 +81,4 @@ export function ResultadosCard({ codigo }: { codigo: string }) {
       </CardContent>
     </Card>
   );
-}
-
-/** Agrupa por categoría y ordena cada pódio por colocación. */
-function groupByCategoria(
-  rows: ZempoResultado[],
-): [string, ZempoResultado[]][] {
-  const map = new Map<string, ZempoResultado[]>();
-  for (const r of rows) {
-    const k = r.id_categoria || r.categoria_peso || "—";
-    const arr = map.get(k);
-    if (arr) arr.push(r);
-    else map.set(k, [r]);
-  }
-  const ord = (s: string) => {
-    const n = Number(s);
-    return Number.isFinite(n) ? n : Number.POSITIVE_INFINITY;
-  };
-  for (const arr of map.values()) {
-    arr.sort((a, b) => ord(a.colocacao_orden) - ord(b.colocacao_orden));
-  }
-  return [...map.entries()];
 }

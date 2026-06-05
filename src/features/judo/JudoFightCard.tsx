@@ -1,8 +1,7 @@
-import { Trophy } from "lucide-react";
-
 import type { JudoCompetitor, JudoFight } from "@/api/grs/judo";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { CompetitorRow } from "@/components/ui/competitor-row";
 
 function ScoreChips({ c }: { c: JudoCompetitor }) {
   const chips: { label: string; value: number; tone: string }[] = [
@@ -33,40 +32,23 @@ function Competitor({ c, decided }: { c: JudoCompetitor | null; decided: boolean
       </div>
     );
   }
-  const isLoser = decided && !c.isWinner;
   return (
-    <div
-      className={cn(
-        "flex items-center gap-3 rounded-md px-2.5 py-2",
-        c.isWinner && "bg-[var(--color-success)]/12",
-      )}
-    >
-      <Trophy
-        className={cn(
-          "size-4 shrink-0",
-          c.isWinner ? "text-[var(--color-success)]" : "text-transparent",
-        )}
-        aria-hidden
-      />
-      <div className="min-w-0 flex-1">
-        <p
-          className={cn(
-            "truncate text-sm leading-tight",
-            c.isWinner ? "font-semibold" : "font-medium",
-            isLoser && "text-[var(--color-muted-foreground)]",
-          )}
-        >
+    <CompetitorRow
+      isWinner={c.isWinner}
+      isLoser={decided && !c.isWinner}
+      name={
+        <>
           {c.name}
           {c.delegation ? (
             <span className="text-[var(--color-muted-foreground)]"> ({c.delegation})</span>
           ) : null}
-        </p>
-        {c.irm ? (
-          <p className="text-xs text-[var(--color-destructive)]">{c.irm}</p>
-        ) : null}
-      </div>
-      <ScoreChips c={c} />
-    </div>
+        </>
+      }
+      secondary={
+        c.irm ? <p className="text-xs text-[var(--color-destructive)]">{c.irm}</p> : undefined
+      }
+      trailing={<ScoreChips c={c} />}
+    />
   );
 }
 
