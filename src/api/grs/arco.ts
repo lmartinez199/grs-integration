@@ -13,6 +13,8 @@ export interface ArcoDocumentSummary {
   /** ISO date string. */
   date: string;
   documentType: string;
+  /** FeedFlag del header ODF: "T" = Test, "P" = Producción (vacío si no viene). */
+  feedFlag: string;
   competitionCode: string;
   documentCode: string;
   version: string;
