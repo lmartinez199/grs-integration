@@ -27,16 +27,20 @@ import {
 
 export function SettingsPage() {
   return (
-    <div className="mx-auto max-w-3xl space-y-6 p-6">
-      <header>
-        <h1 className="text-2xl font-semibold">Ajustes</h1>
-        <p className="text-sm text-(--color-muted-foreground)">
-          Configura las conexiones a los servicios y la integración ARENA.
-        </p>
-      </header>
+    <div className="flex h-full flex-col p-6">
+      <div className="mx-auto flex h-full w-full max-w-3xl flex-col gap-6">
+        <header className="shrink-0">
+          <h1 className="text-2xl font-semibold">Ajustes</h1>
+          <p className="text-sm text-(--color-muted-foreground)">
+            Configura las conexiones a los servicios y la integración ARENA.
+          </p>
+        </header>
 
-      <ConnectionsCard />
-      <ArenaServerCard />
+        <div className="min-h-0 flex-1 space-y-6 overflow-auto">
+          <ConnectionsCard />
+          <ArenaServerCard />
+        </div>
+      </div>
     </div>
   );
 }
