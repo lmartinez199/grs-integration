@@ -7,7 +7,7 @@ export function DashboardPage() {
     <div className="space-y-6 p-6">
       <header>
         <h1 className="text-2xl font-semibold">Panel de sincronización</h1>
-        <p className="text-sm text-[var(--color-muted-foreground)]">
+        <p className="text-sm text-(--color-muted-foreground)">
           Controla y monitorea la sincronización de los tres servicios.
         </p>
       </header>

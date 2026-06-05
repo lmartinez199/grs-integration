@@ -29,12 +29,26 @@ const env = import.meta.env;
 export const DEFAULT_SETTINGS: Settings = {
   grsBaseUrl: env.VITE_GRS_BASE_URL ?? "http://localhost:3010/api",
   zempoBaseUrl: env.VITE_ZEMPO_BASE_URL ?? "http://localhost:3001/zempo",
-  // ath comparte el 3001 con zempo por defecto; se sugiere reasignarlo (p. ej. 3005).
   athBaseUrl: env.VITE_ATH_BASE_URL ?? "http://localhost:3005/api/ath",
   zempoApiKey: env.VITE_ZEMPO_API_KEY ?? "",
   athApiKey: env.VITE_ATH_API_KEY ?? "",
   language: env.VITE_LANGUAGE ?? "spa",
 };
+
+if (env.PROD) {
+  const localhostUrls = [
+    DEFAULT_SETTINGS.grsBaseUrl,
+    DEFAULT_SETTINGS.zempoBaseUrl,
+    DEFAULT_SETTINGS.athBaseUrl,
+  ].filter((url) => url.includes("localhost") || url.includes("127.0.0.1"));
+
+  if (localhostUrls.length > 0) {
+    console.warn(
+      "[settings] Producción con URLs apuntando a localhost — revisa el .env:\n" +
+        localhostUrls.join("\n"),
+    );
+  }
+}
 
 interface SettingsState extends Settings {
   hydrated: boolean;

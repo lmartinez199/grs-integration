@@ -58,8 +58,8 @@ export function LoginPage() {
     <div className="flex h-full items-center justify-center p-6">
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center text-center">
-          <div className="mb-2 flex size-12 items-center justify-center rounded-full bg-[var(--color-primary)]/10">
-            <Swords className="size-6 text-[var(--color-primary)]" />
+          <div className="mb-2 flex size-12 items-center justify-center rounded-full bg-(--color-primary)/10">
+            <Swords className="size-6 text-(--color-primary)" />
           </div>
           <CardTitle className="text-xl">Integración GRS</CardTitle>
           <CardDescription>Inicia sesión en el GRS para continuar</CardDescription>
@@ -70,7 +70,7 @@ export function LoginPage() {
               <Label htmlFor="username">Usuario</Label>
               <Input id="username" autoFocus {...register("username")} />
               {errors.username && (
-                <p className="text-xs text-[var(--color-destructive)]">
+                <p className="text-xs text-(--color-destructive)">
                   {errors.username.message}
                 </p>
               )}
@@ -80,7 +80,7 @@ export function LoginPage() {
               <Label htmlFor="password">Contraseña</Label>
               <Input id="password" type="password" {...register("password")} />
               {errors.password && (
-                <p className="text-xs text-[var(--color-destructive)]">
+                <p className="text-xs text-(--color-destructive)">
                   {errors.password.message}
                 </p>
               )}
@@ -89,7 +89,7 @@ export function LoginPage() {
             {error && (
               <p
                 role="alert"
-                className="rounded-md bg-[var(--color-destructive)]/10 px-3 py-2 text-sm text-[var(--color-destructive)]"
+                className="rounded-md bg-(--color-destructive)/10 px-3 py-2 text-sm text-(--color-destructive)"
               >
                 {error}
               </p>
@@ -100,7 +100,7 @@ export function LoginPage() {
               Iniciar sesión
             </Button>
 
-            <p className="text-center text-xs text-[var(--color-muted-foreground)]">
+            <p className="text-center text-xs text-(--color-muted-foreground)">
               {grsBaseUrl}
             </p>
           </form>

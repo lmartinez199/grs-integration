@@ -161,7 +161,7 @@ export function SetupSteps<Ctx>({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          {icon ?? <ListChecks className="size-4 text-[var(--color-primary)]" aria-hidden />}
+          {icon ?? <ListChecks className="size-4 text-(--color-primary)" aria-hidden />}
           {title}
         </CardTitle>
         {description ? <CardDescription>{description}</CardDescription> : null}
@@ -178,7 +178,7 @@ export function SetupSteps<Ctx>({
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <h3 className="text-sm font-semibold">{meta.title}</h3>
-                  <p className="text-xs text-[var(--color-muted-foreground)]">{meta.desc}</p>
+                  <p className="text-xs text-(--color-muted-foreground)">{meta.desc}</p>
                 </div>
                 {groupSteps.length >= 2 && (
                   <Button
@@ -205,27 +205,27 @@ export function SetupSteps<Ctx>({
                       className={cn(
                         "flex items-center gap-3 rounded-md border px-3 py-2 transition-colors",
                         status === "ok"
-                          ? "border-[var(--color-success)]/40 bg-[var(--color-success)]/5"
+                          ? "border-(--color-success)/40 bg-(--color-success)/5"
                           : status === "error"
-                            ? "border-[var(--color-destructive)]/40"
-                            : "border-[var(--color-border)]",
+                            ? "border-(--color-destructive)/40"
+                            : "border-(--color-border)",
                       )}
                     >
                       <span
                         className={cn(
                           "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
                           status === "ok"
-                            ? "bg-[var(--color-success)] text-[var(--color-success-foreground)]"
+                            ? "bg-(--color-success) text-(--color-success-foreground)"
                             : status === "error"
-                              ? "bg-[var(--color-destructive)] text-[var(--color-destructive-foreground)]"
-                              : "bg-[var(--color-muted)]",
+                              ? "bg-(--color-destructive) text-(--color-destructive-foreground)"
+                              : "bg-(--color-muted)",
                         )}
                       >
                         {status === "ok" ? <Check className="size-4" aria-hidden /> : badge}
                       </span>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium">{step.label}</p>
-                        <p className="truncate text-xs text-[var(--color-muted-foreground)]">
+                        <p className="truncate text-xs text-(--color-muted-foreground)">
                           {step.desc}
                         </p>
                         {res ? <StepResultLine result={res} /> : null}
@@ -259,18 +259,18 @@ export function SetupSteps<Ctx>({
 function StepResultLine({ result }: { result: StepResult }) {
   if (result.kind === "error") {
     return (
-      <p className="mt-0.5 text-xs text-[var(--color-destructive)]">{result.message}</p>
+      <p className="mt-0.5 text-xs text-(--color-destructive)">{result.message}</p>
     );
   }
   if (result.kind === "queued") {
     return (
-      <p className="mt-0.5 text-xs text-[var(--color-success)]">
+      <p className="mt-0.5 text-xs text-(--color-success)">
         Encolado{result.data.jobId ? ` · job ${result.data.jobId}` : ""}
       </p>
     );
   }
   if (result.kind === "ok") {
-    return <p className="mt-0.5 text-xs text-[var(--color-success)]">Hecho ✓</p>;
+    return <p className="mt-0.5 text-xs text-(--color-success)">Hecho ✓</p>;
   }
   const s = result.data;
   const hasError = s.errors.length > 0;
@@ -278,7 +278,7 @@ function StepResultLine({ result }: { result: StepResult }) {
     <p
       className={cn(
         "mt-0.5 text-xs",
-        hasError ? "text-[var(--color-destructive)]" : "text-[var(--color-success)]",
+        hasError ? "text-(--color-destructive)" : "text-(--color-success)",
       )}
     >
       {s.created} creados

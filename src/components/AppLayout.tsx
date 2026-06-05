@@ -29,9 +29,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex h-full">
-      <aside className="flex w-60 shrink-0 flex-col border-r bg-[var(--color-card)]">
+      <aside className="flex w-60 shrink-0 flex-col border-r bg-(--color-card)">
         <div className="flex h-14 items-center gap-2 border-b px-4">
-          <Swords className="size-5 text-[var(--color-primary)]" />
+          <Swords className="size-5 text-(--color-primary)" />
           <span className="font-semibold">Integración GRS</span>
         </div>
 
@@ -45,8 +45,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
-                    : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)] hover:text-[var(--color-foreground)]",
+                    ? "bg-(--color-primary) text-(--color-primary-foreground)"
+                    : "text-(--color-muted-foreground) hover:bg-(--color-muted) hover:text-(--color-foreground)",
                 )
               }
             >
@@ -59,7 +59,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <div className="border-t p-3">
           <div className="mb-2 px-2">
             <p className="truncate text-sm font-medium">{user?.name ?? "—"}</p>
-            <p className="truncate text-xs text-[var(--color-muted-foreground)]">
+            <p className="truncate text-xs text-(--color-muted-foreground)">
               @{user?.username ?? "—"}
             </p>
           </div>

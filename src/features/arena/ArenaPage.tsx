@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2, ChevronRight, RefreshCw, Radio, Search, Swords } from "lucide-react";
+
+import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 
 import {
   getCurrentEvent,
@@ -13,7 +15,6 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EventSummary } from "./EventSummary";
 import { FightsByRound } from "./FightsByRound";
@@ -24,7 +25,6 @@ import { useArenaLive } from "./useArenaLive";
 export function ArenaPage() {
   const [selected, setSelected] = useState<string | number | null>(null);
   const [catFilter, setCatFilter] = useState("");
-  const qc = useQueryClient();
 
   // Suscripción en vivo (SSE): refresca al cambiar peleas/categorías en Arena.
   useArenaLive();
@@ -39,21 +39,18 @@ export function ArenaPage() {
 
   const selectedCategory = (categories.data ?? []).find((c) => c.id === selected);
 
-  const categorySync = useMutation({
+  const categorySync = useMutationWithToast({
     mutationFn: (categoryId: string | number) => syncCategory(categoryId),
-    onSuccess: () => {
-      toast.success("Categoría sincronizada");
-      qc.invalidateQueries({ queryKey: ["arena", "fights", selected] });
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Categoría sincronizada",
+    invalidateKeys: [["arena", "fights", selected]],
   });
 
   return (
     <div className="space-y-6 p-6">
       <header>
         <h1 className="text-2xl font-semibold">WRE (lucha)</h1>
-        <p className="flex items-center gap-1.5 text-sm text-[var(--color-muted-foreground)]">
-          <Radio className="size-3.5 text-[var(--color-success)]" aria-hidden />
+        <p className="flex items-center gap-1.5 text-sm text-(--color-muted-foreground)">
+          <Radio className="size-3.5 text-(--color-success)" aria-hidden />
           En vivo · se actualiza solo cuando Arena reporta cambios.
         </p>
       </header>
@@ -64,9 +61,9 @@ export function ArenaPage() {
         </CardHeader>
         <CardContent>
           {event.isLoading ? (
-            <Loader2 className="size-5 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+            <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" aria-hidden />
           ) : event.isError || !event.data ? (
-            <p role="alert" className="text-sm text-[var(--color-destructive)]">
+            <p role="alert" className="text-sm text-(--color-destructive)">
               No se pudo cargar el evento. Verifica la conexión y el eventCode en Ajustes.
             </p>
           ) : (
@@ -91,9 +88,9 @@ export function ArenaPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             {categories.isLoading ? (
-              <Loader2 className="size-5 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+              <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" aria-hidden />
             ) : categories.isError ? (
-              <p role="alert" className="text-sm text-[var(--color-destructive)]">
+              <p role="alert" className="text-sm text-(--color-destructive)">
                 Error al cargar categorías.
               </p>
             ) : (
@@ -113,7 +110,7 @@ export function ArenaPage() {
             <CardTitle>
               Peleas
               {selectedCategory?.name ? (
-                <span className="ml-2 text-sm font-normal text-[var(--color-muted-foreground)]">
+                <span className="ml-2 text-sm font-normal text-(--color-muted-foreground)">
                   {selectedCategory.name}
                 </span>
               ) : null}
@@ -141,21 +138,21 @@ export function ArenaPage() {
           </CardHeader>
           <CardContent>
             {selected == null ? (
-              <p className="text-sm text-[var(--color-muted-foreground)]">
+              <p className="text-sm text-(--color-muted-foreground)">
                 Selecciona una categoría para ver sus peleas.
               </p>
             ) : fights.isLoading ? (
-              <Loader2 className="size-5 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+              <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" aria-hidden />
             ) : fights.isError ? (
-              <p role="alert" className="text-sm text-[var(--color-destructive)]">
+              <p role="alert" className="text-sm text-(--color-destructive)">
                 Error al cargar peleas.
               </p>
             ) : fights.data && fights.data.length > 0 ? (
-              <div className="max-h-[34rem] overflow-auto pr-1">
+              <div className="max-h-(--list-h-content) overflow-auto pr-1">
                 <FightsByRound fights={fights.data} />
               </div>
             ) : (
-              <p className="text-sm text-[var(--color-muted-foreground)]">
+              <p className="text-sm text-(--color-muted-foreground)">
                 Esta categoría no tiene peleas.
               </p>
             )}
@@ -188,7 +185,7 @@ function CategoryList({
     <div className="space-y-2">
       <div className="relative">
         <Search
-          className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-foreground)]"
+          className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-(--color-muted-foreground)"
           aria-hidden
         />
         <Input
@@ -200,11 +197,11 @@ function CategoryList({
       </div>
 
       {visible.length === 0 ? (
-        <p className="px-1 py-2 text-sm text-[var(--color-muted-foreground)]">
+        <p className="px-1 py-2 text-sm text-(--color-muted-foreground)">
           Sin coincidencias.
         </p>
       ) : (
-        <ul className="max-h-[26rem] space-y-1 overflow-auto pr-1">
+        <ul className="max-h-(--list-h-sidebar) space-y-1 overflow-auto pr-1">
           {visible.map((c) => {
             const isSel = selected === c.id;
             return (
@@ -215,16 +212,16 @@ function CategoryList({
                   className={cn(
                     "group flex w-full items-center gap-3 rounded-md border border-transparent py-2 pl-2 pr-2.5 text-left transition-colors",
                     isSel
-                      ? "border-[var(--color-primary)] bg-[var(--color-primary)]/12"
-                      : "hover:bg-[var(--color-muted)]",
+                      ? "border-(--color-primary) bg-(--color-primary)/12"
+                      : "hover:bg-(--color-muted)",
                   )}
                 >
                   <span
                     className={cn(
                       "flex size-9 shrink-0 items-center justify-center rounded-md text-xs font-semibold",
                       isSel
-                        ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
-                        : "bg-[var(--color-muted)] text-[var(--color-muted-foreground)]",
+                        ? "bg-(--color-primary) text-(--color-primary-foreground)"
+                        : "bg-(--color-muted) text-(--color-muted-foreground)",
                     )}
                   >
                     <Swords className="size-4" aria-hidden />
@@ -233,13 +230,13 @@ function CategoryList({
                     <span
                       className={cn(
                         "block truncate text-sm",
-                        isSel ? "font-semibold text-[var(--color-primary)]" : "font-medium",
+                        isSel ? "font-semibold text-(--color-primary)" : "font-medium",
                       )}
                     >
                       {c.name ?? `Categoría ${c.id}`}
                     </span>
                     {(c.countFights != null || c.countFighters != null) && (
-                      <span className="block text-xs text-[var(--color-muted-foreground)]">
+                      <span className="block text-xs text-(--color-muted-foreground)">
                         {c.countFights != null ? `${c.countFights} peleas` : ""}
                         {c.countFights != null && c.countFighters != null ? " · " : ""}
                         {c.countFighters != null ? `${c.countFighters} atletas` : ""}
@@ -250,8 +247,8 @@ function CategoryList({
                     className={cn(
                       "size-4 shrink-0 transition-transform",
                       isSel
-                        ? "text-[var(--color-primary)]"
-                        : "text-[var(--color-muted-foreground)] group-hover:translate-x-0.5",
+                        ? "text-(--color-primary)"
+                        : "text-(--color-muted-foreground) group-hover:translate-x-0.5",
                     )}
                     aria-hidden
                   />

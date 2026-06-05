@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Loader2, Webhook, Plus, Power, PowerOff, Trash2 } from "lucide-react";
 
 import {
@@ -9,9 +9,9 @@ import {
   removeWebhook,
 } from "@/api/grs/arena";
 import { useSettings } from "@/stores/settings.store";
+import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "@/components/ui/toast";
 import {
   Card,
   CardContent,
@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/card";
 
 export function WebhookConfig() {
-  const qc = useQueryClient();
   const grsBaseUrl = useSettings((s) => s.grsBaseUrl);
   const webhookUrl = `${grsBaseUrl.replace(/\/+$/, "")}/arena/webhook`;
 
@@ -32,34 +31,23 @@ export function WebhookConfig() {
     hooks.find((w) => w.url === webhookUrl) ??
     hooks.find((w) => w.url.includes("/arena/webhook"));
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["arena", "webhooks"] });
-
-  const create = useMutation({
+  const create = useMutationWithToast({
     mutationFn: () => createWebhook({ url: webhookUrl, name: "Integración GRS" }),
-    onSuccess: () => {
-      toast.success("Webhook registrado en Arena");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Webhook registrado en Arena",
+    invalidateKeys: [["arena", "webhooks"]],
   });
 
-  const toggle = useMutation({
+  const toggle = useMutationWithToast({
     mutationFn: (w: { id: number; enabled: boolean }) =>
       w.enabled ? disableWebhook(w.id) : enableWebhook(w.id),
-    onSuccess: () => {
-      toast.success("Webhook actualizado");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Webhook actualizado",
+    invalidateKeys: [["arena", "webhooks"]],
   });
 
-  const remove = useMutation({
+  const remove = useMutationWithToast({
     mutationFn: (id: number) => removeWebhook(id),
-    onSuccess: () => {
-      toast.success("Webhook eliminado");
-      invalidate();
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Webhook eliminado",
+    invalidateKeys: [["arena", "webhooks"]],
   });
 
   const isActive = current?.status === 1;
@@ -69,7 +57,7 @@ export function WebhookConfig() {
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <Webhook className="size-4 text-[var(--color-primary)]" aria-hidden />
+            <Webhook className="size-4 text-(--color-primary)" aria-hidden />
             Webhook de Arena
           </CardTitle>
           <CardDescription>
@@ -77,7 +65,7 @@ export function WebhookConfig() {
           </CardDescription>
         </div>
         {list.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" aria-hidden />
         ) : list.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
         ) : current ? (
@@ -92,16 +80,16 @@ export function WebhookConfig() {
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex flex-col gap-1">
-          <span className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+          <span className="text-xs uppercase tracking-wide text-(--color-muted-foreground)">
             URL del receptor
           </span>
-          <code className="truncate rounded bg-[var(--color-muted)] px-2 py-1 text-xs">
+          <code className="truncate rounded bg-(--color-muted) px-2 py-1 text-xs">
             {webhookUrl}
           </code>
         </div>
 
         {list.isError ? (
-          <p role="alert" className="text-sm text-[var(--color-destructive)]">
+          <p role="alert" className="text-sm text-(--color-destructive)">
             No se pudo consultar los webhooks (revisa la conexión con GRS).
           </p>
         ) : current ? (
@@ -127,7 +115,7 @@ export function WebhookConfig() {
               onClick={() => remove.mutate(current.id)}
               disabled={remove.isPending}
             >
-              <Trash2 className="size-4 text-[var(--color-destructive)]" aria-hidden />
+              <Trash2 className="size-4 text-(--color-destructive)" aria-hidden />
               Eliminar
             </Button>
           </div>

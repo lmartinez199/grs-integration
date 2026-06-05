@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CheckCircle2,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { getStartListDetails, manualSyncMapped, type AthSchedule } from "@/api/ath";
+import { genderLabel } from "@/lib/domain/ath-start-list";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -46,14 +47,14 @@ function ScheduleItem({ s }: { s: AthSchedule }) {
   });
 
   return (
-    <li className="rounded-md border bg-[var(--color-muted)]/40 p-3">
+    <li className="rounded-md border bg-(--color-muted)/40 p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold tabular-nums">{s.Time}</span>
             <span className="truncate text-sm font-medium">{s.TestName}</span>
           </div>
-          <p className="mt-0.5 text-xs text-[var(--color-muted-foreground)]">
+          <p className="mt-0.5 text-xs text-(--color-muted-foreground)">
             {[s.TestType, s.PhaseName, genderLabel(s.Gender)].filter(Boolean).join(" · ")}
           </p>
         </div>
@@ -108,11 +109,11 @@ function ScheduleItem({ s }: { s: AthSchedule }) {
       </div>
 
       {showStartList && (
-        <div className="mt-2 border-t border-[var(--color-border)] pt-2">
+        <div className="mt-2 border-t border-(--color-border) pt-2">
           {startList.isLoading ? (
-            <Loader2 className="size-4 animate-spin text-[var(--color-muted-foreground)]" />
+            <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
           ) : startList.isError ? (
-            <p className="text-sm text-[var(--color-destructive)]">
+            <p className="text-sm text-(--color-destructive)">
               No se pudo cargar la start list.
             </p>
           ) : (
@@ -122,13 +123,6 @@ function ScheduleItem({ s }: { s: AthSchedule }) {
       )}
     </li>
   );
-}
-
-function genderLabel(g: string): string {
-  const v = g?.toUpperCase();
-  if (v === "F") return "Femenino";
-  if (v === "M") return "Masculino";
-  return g || "Mixto";
 }
 
 const yes = (v: string) => v?.toUpperCase() === "S";
@@ -156,7 +150,7 @@ function dateKey(iso: string): string {
 export function ScheduleList({ schedules }: { schedules: AthSchedule[] }) {
   if (!schedules.length) {
     return (
-      <p className="text-sm text-[var(--color-muted-foreground)]">
+      <p className="text-sm text-(--color-muted-foreground)">
         Sin horarios para los filtros seleccionados.
       </p>
     );
@@ -182,6 +176,7 @@ function ScheduleGroups({
 }: {
   groups: { key: string; label: string; items: AthSchedule[] }[];
 }) {
+  const baseId = useId();
   // Por defecto solo el primer día abierto; el resto colapsado para escanear fácil.
   const [open, setOpen] = useState<Set<string>>(() => new Set());
 
@@ -200,22 +195,25 @@ function ScheduleGroups({
 
   return (
     <div className="space-y-2">
-      {groups.map((group) => {
+      {groups.map((group, idx) => {
         const isOpen = open.has(group.key);
+        const panelId = `${baseId}-${idx}`;
         return (
           <div key={group.key} className="rounded-md border">
             <button
               onClick={() => toggle(group.key)}
-              className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-[var(--color-muted)]/50"
+              aria-expanded={isOpen}
+              aria-controls={panelId}
+              className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-(--color-muted)/50"
             >
               <span className="flex items-center gap-2">
                 <ChevronRight
                   className={cn(
-                    "size-4 text-[var(--color-muted-foreground)] transition-transform",
+                    "size-4 text-(--color-muted-foreground) transition-transform",
                     isOpen && "rotate-90",
                   )}
                 />
-                <span className="text-sm font-semibold capitalize text-[var(--color-primary)]">
+                <span className="text-sm font-semibold capitalize text-(--color-primary)">
                   {group.label}
                 </span>
               </span>
@@ -223,7 +221,7 @@ function ScheduleGroups({
             </button>
 
             {isOpen && (
-              <ul className="space-y-2 p-3 pt-0">
+              <ul id={panelId} className="space-y-2 p-3 pt-0">
                 {group.items.map((s, i) => (
                   <ScheduleItem key={`${s.TestId}-${s.PhaseId}-${i}`} s={s} />
                 ))}

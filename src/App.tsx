@@ -38,7 +38,7 @@ export default function App() {
   if (!ready) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Loader2 className="size-6 animate-spin text-[var(--color-muted-foreground)]" />
+        <Loader2 className="size-6 animate-spin text-(--color-muted-foreground)" />
       </div>
     );
   }

@@ -10,9 +10,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { RetryNotice } from "@/components/ui/retry-notice";
-import { SyncCard } from "@/components/ui/sync-card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
-export function ZempoSyncCard() {
+export function JudScheduleControl() {
   const [codigo, setCodigo] = useState("");
 
   const schedules = useQuery({
@@ -23,36 +29,42 @@ export function ZempoSyncCard() {
 
   const start = useMutationWithToast({
     mutationFn: (c: string) => startSchedule(c),
-    successMsg: "Sync de zempo activada",
+    successMsg: "Sincronización de judo activada",
     invalidateKeys: [["zempo", "schedules"]],
     onSuccess: () => setCodigo(""),
   });
-
   const stop = useMutationWithToast({
     mutationFn: (c: string) => stopSchedule(c),
-    successMsg: "Sync de zempo detenida",
+    successMsg: "Sincronización detenida",
     invalidateKeys: [["zempo", "schedules"]],
   });
 
   const list = filterActiveSchedules(schedules.data);
 
   return (
-    <SyncCard
-      title="JUD (judo)"
-      icon={<Activity className="size-4 text-(--color-primary)" />}
-      status={
-        schedules.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
+    <Card>
+      <CardHeader className="flex-row items-center justify-between space-y-0">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="size-4 text-(--color-primary)" aria-hidden />
+            Sincronización (zempo)
+          </CardTitle>
+          <CardDescription>
+            Activa/detén la sincronización periódica de una competición de judo (cada 15s).
+          </CardDescription>
+        </div>
+        {schedules.isLoading ? (
+          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" aria-hidden />
         ) : schedules.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
         ) : (
           <Badge variant="secondary">{list.length} activas</Badge>
-        )
-      }
-    >
+        )}
+      </CardHeader>
+      <CardContent className="space-y-3">
         {schedules.isError && (
           <RetryNotice
-            message="No se pudo conectar con el servicio de judo (JUD)."
+            message="No se pudo conectar con el servicio de judo (zempo)."
             onRetry={() => schedules.refetch()}
             isRetrying={schedules.isFetching}
           />
@@ -65,12 +77,17 @@ export function ZempoSyncCard() {
           }}
         >
           <Input
+            className="max-w-xs"
             placeholder="Código de competición"
             value={codigo}
             onChange={(e) => setCodigo(e.target.value)}
           />
           <Button type="submit" size="sm" disabled={start.isPending}>
-            {start.isPending ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
+            {start.isPending ? (
+              <Loader2 className="size-4 animate-spin" aria-hidden />
+            ) : (
+              <Plus className="size-4" aria-hidden />
+            )}
             Agregar
           </Button>
         </form>
@@ -78,7 +95,7 @@ export function ZempoSyncCard() {
         <ul className="space-y-1">
           {list.length === 0 ? (
             <li className="text-sm text-(--color-muted-foreground)">
-              Sin competiciones en sync.
+              Sin competiciones en sincronización.
             </li>
           ) : (
             list.map((s) => {
@@ -103,6 +120,7 @@ export function ZempoSyncCard() {
             })
           )}
         </ul>
-    </SyncCard>
+      </CardContent>
+    </Card>
   );
 }

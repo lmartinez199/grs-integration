@@ -1,47 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { ChevronRight, Search } from "lucide-react";
 
 import type { ArenaFight } from "@/api/grs/arena";
+import {
+  fightSearchText,
+  matchesFightStatus,
+  type FightStatusFilter,
+} from "@/lib/domain/arena-fight";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FightCard } from "./FightCard";
 
-type Filter = "all" | "done" | "pending";
-
-const FILTERS: { key: Filter; label: string }[] = [
+const FILTERS: { key: FightStatusFilter; label: string }[] = [
   { key: "all", label: "Todas" },
   { key: "done", label: "Finalizadas" },
   { key: "pending", label: "Pendientes" },
 ];
 
-/** Texto buscable de una pelea: id + nombres + equipos. */
-function searchText(f: ArenaFight): string {
-  return [
-    f.id,
-    f.fighter1Name,
-    f.fighter2Name,
-    f.team1Name,
-    f.team2Name,
-    f.team1AlternateName,
-    f.team2AlternateName,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-}
-
 export function FightsByRound({ fights }: { fights: ArenaFight[] }) {
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilter] = useState<FightStatusFilter>("all");
   const [query, setQuery] = useState("");
 
   const q = query.trim().toLowerCase();
   const visible = fights
-    .filter((f) =>
-      filter === "all" ? true : filter === "done" ? f.isCompleted : !f.isCompleted,
-    )
-    .filter((f) => (q ? searchText(f).includes(q) : true));
+    .filter((f) => matchesFightStatus(f, filter))
+    .filter((f) => (q ? fightSearchText(f).includes(q) : true));
 
   // Agrupar por ronda preservando el orden de llegada (bracket).
   const rounds: { name: string; items: ArenaFight[] }[] = [];
@@ -59,7 +44,7 @@ export function FightsByRound({ fights }: { fights: ArenaFight[] }) {
     <div className="space-y-3">
       <div className="relative">
         <Search
-          className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-foreground)]"
+          className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-(--color-muted-foreground)"
           aria-hidden
         />
         <Input
@@ -85,7 +70,7 @@ export function FightsByRound({ fights }: { fights: ArenaFight[] }) {
       </div>
 
       {rounds.length === 0 ? (
-        <p className="text-sm text-[var(--color-muted-foreground)]">
+        <p className="text-sm text-(--color-muted-foreground)">
           {q ? "Sin coincidencias para la búsqueda." : "No hay peleas para este filtro."}
         </p>
       ) : (
@@ -96,6 +81,7 @@ export function FightsByRound({ fights }: { fights: ArenaFight[] }) {
 }
 
 function RoundGroups({ rounds }: { rounds: { name: string; items: ArenaFight[] }[] }) {
+  const baseId = useId();
   const [open, setOpen] = useState<Set<string>>(new Set());
 
   // Abrir todas las rondas por defecto (suelen ser pocas).
@@ -113,24 +99,27 @@ function RoundGroups({ rounds }: { rounds: { name: string; items: ArenaFight[] }
 
   return (
     <div className="space-y-2">
-      {rounds.map((round) => {
+      {rounds.map((round, idx) => {
         const isOpen = open.has(round.name);
         const done = round.items.filter((f) => f.isCompleted).length;
+        const panelId = `${baseId}-${idx}`;
         return (
           <div key={round.name} className="rounded-md border">
             <button
               onClick={() => toggle(round.name)}
-              className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-[var(--color-muted)]/50"
+              aria-expanded={isOpen}
+              aria-controls={panelId}
+              className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-(--color-muted)/50"
             >
               <span className="flex items-center gap-2">
                 <ChevronRight
                   className={cn(
-                    "size-4 text-[var(--color-muted-foreground)] transition-transform",
+                    "size-4 text-(--color-muted-foreground) transition-transform",
                     isOpen && "rotate-90",
                   )}
                   aria-hidden
                 />
-                <span className="text-sm font-semibold text-[var(--color-primary)]">
+                <span className="text-sm font-semibold text-(--color-primary)">
                   {round.name}
                 </span>
               </span>
@@ -139,7 +128,7 @@ function RoundGroups({ rounds }: { rounds: { name: string; items: ArenaFight[] }
               </Badge>
             </button>
             {isOpen && (
-              <div className="space-y-2 p-3 pt-0">
+              <div id={panelId} className="space-y-2 p-3 pt-0">
                 {round.items.map((f, i) => (
                   <FightCard key={f.id ?? `${round.name}-${i}`} fight={f} />
                 ))}

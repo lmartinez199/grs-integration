@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Activity, Loader2, Save } from "lucide-react";
 
 import { useSettings, type Settings } from "@/stores/settings.store";
@@ -29,7 +30,7 @@ export function SettingsPage() {
     <div className="mx-auto max-w-3xl space-y-6 p-6">
       <header>
         <h1 className="text-2xl font-semibold">Ajustes</h1>
-        <p className="text-sm text-[var(--color-muted-foreground)]">
+        <p className="text-sm text-(--color-muted-foreground)">
           Configura las conexiones a los servicios y la integración ARENA.
         </p>
       </header>
@@ -154,8 +155,6 @@ const arenaServerSchema = z.object({
 });
 
 function ArenaServerCard() {
-  const qc = useQueryClient();
-
   const settingsQuery = useQuery({
     queryKey: ["arena", "settings"],
     queryFn: getArenaSettings,
@@ -173,22 +172,16 @@ function ArenaServerCard() {
       : undefined,
   });
 
-  const saveBaseUrl = useMutation({
+  const saveBaseUrl = useMutationWithToast({
     mutationFn: (v: string) => updateArenaBaseUrl(v),
-    onSuccess: () => {
-      toast.success("Base URL de ARENA actualizada");
-      qc.invalidateQueries({ queryKey: ["arena", "settings"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Base URL de ARENA actualizada",
+    invalidateKeys: [["arena", "settings"]],
   });
 
-  const saveEventCode = useMutation({
+  const saveEventCode = useMutationWithToast({
     mutationFn: (v: string) => updateArenaEventCode(v),
-    onSuccess: () => {
-      toast.success("Código de evento actualizado");
-      qc.invalidateQueries({ queryKey: ["arena", "settings"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
+    successMsg: "Código de evento actualizado",
+    invalidateKeys: [["arena", "settings"]],
   });
 
   return (
@@ -201,9 +194,9 @@ function ArenaServerCard() {
       </CardHeader>
       <CardContent>
         {settingsQuery.isLoading ? (
-          <Loader2 className="size-5 animate-spin text-[var(--color-muted-foreground)]" />
+          <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />
         ) : settingsQuery.isError ? (
-          <p className="text-sm text-[var(--color-destructive)]">
+          <p className="text-sm text-(--color-destructive)">
             No se pudo cargar la configuración de ARENA.
           </p>
         ) : (
@@ -250,7 +243,7 @@ function Field({
       <Label>{label}</Label>
       {children}
       {error && (
-        <p role="alert" className="text-xs text-[var(--color-destructive)]">
+        <p role="alert" className="text-xs text-(--color-destructive)">
           {error}
         </p>
       )}
