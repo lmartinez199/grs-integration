@@ -5,9 +5,9 @@ import { CompetitorRow } from "@/components/ui/competitor-row";
 
 function ScoreChips({ c }: { c: JudoCompetitor }) {
   const chips: { label: string; value: number; tone: string }[] = [
-    { label: "I", value: c.ippon, tone: "text-[var(--color-success)]" },
-    { label: "W", value: c.wazaAri, tone: "text-[var(--color-primary)]" },
-    { label: "Y", value: c.yuko, tone: "text-[var(--color-muted-foreground)]" },
+    { label: "I", value: c.ippon, tone: "text-(--color-success)" },
+    { label: "W", value: c.wazaAri, tone: "text-(--color-primary)" },
+    { label: "Y", value: c.yuko, tone: "text-(--color-muted-foreground)" },
   ];
   return (
     <div className="flex items-center gap-1.5 text-xs tabular-nums">
@@ -17,7 +17,7 @@ function ScoreChips({ c }: { c: JudoCompetitor }) {
         </span>
       ))}
       {c.shido > 0 && (
-        <span className="font-semibold text-[var(--color-warning)]">S {c.shido}</span>
+        <span className="font-semibold text-(--color-warning)">S {c.shido}</span>
       )}
     </div>
   );
@@ -26,9 +26,9 @@ function ScoreChips({ c }: { c: JudoCompetitor }) {
 function Competitor({ c, decided }: { c: JudoCompetitor | null; decided: boolean }) {
   if (!c) {
     return (
-      <div className="flex items-center gap-3 rounded-md bg-[var(--color-muted)]/40 px-2.5 py-2">
+      <div className="flex items-center gap-3 rounded-md bg-(--color-muted)/40 px-2.5 py-2">
         <span className="size-4 shrink-0" />
-        <span className="text-sm text-[var(--color-muted-foreground)]">Por definir</span>
+        <span className="text-sm text-(--color-muted-foreground)">Por definir</span>
       </div>
     );
   }
@@ -40,12 +40,12 @@ function Competitor({ c, decided }: { c: JudoCompetitor | null; decided: boolean
         <>
           {c.name}
           {c.delegation ? (
-            <span className="text-[var(--color-muted-foreground)]"> ({c.delegation})</span>
+            <span className="text-(--color-muted-foreground)"> ({c.delegation})</span>
           ) : null}
         </>
       }
       secondary={
-        c.irm ? <p className="text-xs text-[var(--color-destructive)]">{c.irm}</p> : undefined
+        c.irm ? <p className="text-xs text-(--color-destructive)">{c.irm}</p> : undefined
       }
       trailing={<ScoreChips c={c} />}
     />
@@ -61,9 +61,9 @@ function StatusBadge({ status }: { status: JudoFight["status"] }) {
 export function JudoFightCard({ fight }: { fight: JudoFight }) {
   const decided = !!(fight.competitor1?.isWinner || fight.competitor2?.isWinner);
   return (
-    <div className="overflow-hidden rounded-lg border bg-[var(--color-card)]">
-      <div className="flex items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[var(--color-muted)]/30 px-3 py-1.5">
-        <span className="truncate text-xs font-medium text-[var(--color-muted-foreground)]">
+    <div className="overflow-hidden rounded-lg border bg-(--color-card)">
+      <div className="flex items-center justify-between gap-2 border-b border-(--color-border) bg-(--color-muted)/30 px-3 py-1.5">
+        <span className="truncate text-xs font-medium text-(--color-muted-foreground)">
           {fight.round || "Luta"}
           {fight.order ? ` · #${fight.order}` : ""}
         </span>

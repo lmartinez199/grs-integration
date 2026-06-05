@@ -32,7 +32,7 @@ function Competitor({
       name={name}
       secondary={
         team ? (
-          <p className="truncate text-xs text-[var(--color-muted-foreground)]">{team}</p>
+          <p className="truncate text-xs text-(--color-muted-foreground)">{team}</p>
         ) : undefined
       }
       trailing={
@@ -40,8 +40,8 @@ function Competitor({
           className={cn(
             "flex h-8 min-w-8 items-center justify-center rounded-md px-1.5 text-base font-semibold tabular-nums",
             isWinner
-              ? "bg-[var(--color-success)] text-[var(--color-success-foreground)]"
-              : "bg-[var(--color-muted)] text-[var(--color-foreground)]",
+              ? "bg-(--color-success) text-(--color-success-foreground)"
+              : "bg-(--color-muted) text-(--color-foreground)",
             isLoser && "opacity-70",
           )}
         >
@@ -80,9 +80,9 @@ export function FightCard({ fight }: { fight: ArenaFight }) {
   const rounds = roundBreakdown(fight);
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-[var(--color-card)]">
-      <div className="flex items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[var(--color-muted)]/30 px-3 py-1.5">
-        <span className="truncate text-xs font-medium text-[var(--color-muted-foreground)]">
+    <div className="overflow-hidden rounded-lg border bg-(--color-card)">
+      <div className="flex items-center justify-between gap-2 border-b border-(--color-border) bg-(--color-muted)/30 px-3 py-1.5">
+        <span className="truncate text-xs font-medium text-(--color-muted-foreground)">
           {fight.roundFriendlyName}
           {fight.displayOrderInRound ? ` · Pelea ${fight.displayOrderInRound}` : ""}
           {fight.matName ? ` · ${fight.matName}` : ""}
@@ -118,11 +118,11 @@ export function FightCard({ fight }: { fight: ArenaFight }) {
           decided={decided}
         />
         <div className="my-0.5 flex items-center gap-2 px-2.5">
-          <span className="h-px flex-1 bg-[var(--color-border)]" />
-          <span className="text-2xs font-semibold uppercase tracking-wider text-[var(--color-muted-foreground)]">
+          <span className="h-px flex-1 bg-(--color-border)" />
+          <span className="text-2xs font-semibold uppercase tracking-wider text-(--color-muted-foreground)">
             vs
           </span>
-          <span className="h-px flex-1 bg-[var(--color-border)]" />
+          <span className="h-px flex-1 bg-(--color-border)" />
         </div>
         <Competitor
           name={name2}
@@ -134,17 +134,17 @@ export function FightCard({ fight }: { fight: ArenaFight }) {
       </div>
 
       {rounds.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5 border-t border-[var(--color-border)] px-3 py-1.5">
-          <span className="text-2xs font-semibold uppercase tracking-wide text-[var(--color-muted-foreground)]">
+        <div className="flex flex-wrap items-center gap-1.5 border-t border-(--color-border) px-3 py-1.5">
+          <span className="text-2xs font-semibold uppercase tracking-wide text-(--color-muted-foreground)">
             Rounds
           </span>
           {rounds.map((r) => (
             <span
               key={r.n}
-              className="rounded bg-[var(--color-muted)] px-1.5 py-0.5 text-xs tabular-nums"
+              className="rounded bg-(--color-muted) px-1.5 py-0.5 text-xs tabular-nums"
               title={`Round ${r.n}`}
             >
-              <span className="text-[var(--color-muted-foreground)]">R{r.n}</span>{" "}
+              <span className="text-(--color-muted-foreground)">R{r.n}</span>{" "}
               <span className="font-medium">
                 {r.p1}–{r.p2}
               </span>
@@ -154,14 +154,14 @@ export function FightCard({ fight }: { fight: ArenaFight }) {
       )}
 
       {(fight.victoryLabel || fight.result || fight.id) && (
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-[var(--color-border)] px-3 py-1.5">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-(--color-border) px-3 py-1.5">
           {fight.victoryLabel && (
-            <Badge variant="outline" className="border-[var(--color-border)]">
+            <Badge variant="outline" className="border-(--color-border)">
               {fight.victoryLabel}
             </Badge>
           )}
           {fight.result && (
-            <span className="text-xs tabular-nums text-[var(--color-muted-foreground)]">
+            <span className="text-xs tabular-nums text-(--color-muted-foreground)">
               {fight.result}
             </span>
           )}
@@ -169,7 +169,7 @@ export function FightCard({ fight }: { fight: ArenaFight }) {
             <button
               type="button"
               onClick={() => copyId(fight.id!)}
-              className="ml-auto flex items-center gap-1 text-xs text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]"
+              className="ml-auto flex items-center gap-1 text-xs text-(--color-muted-foreground) hover:text-(--color-foreground)"
               title="Copiar ID de la pelea"
             >
               <span className="font-mono">ID {fight.id.slice(0, 8)}…</span>

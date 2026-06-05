@@ -15,7 +15,7 @@ export function AthReadSection() {
       <div className="lg:max-w-sm">
         <LazyReadCard
           title="Categorías del evento"
-          icon={<Layers className="size-4 text-[var(--color-primary)]" />}
+          icon={<Layers className="size-4 text-(--color-primary)" />}
           queryKey={["ath", "event-categories"]}
           queryFn={ath.getEventCategories}
         />
@@ -48,13 +48,13 @@ function LazyReadCard({
       </CardHeader>
       <CardContent>
         {q.isError ? (
-          <p className="text-sm text-[var(--color-destructive)]">No se pudo cargar.</p>
+          <p className="text-sm text-(--color-destructive)">No se pudo cargar.</p>
         ) : q.data !== undefined ? (
           <div className="max-h-72 overflow-auto">
             <DataView data={q.data} />
           </div>
         ) : (
-          <p className="text-sm text-[var(--color-muted-foreground)]">
+          <p className="text-sm text-(--color-muted-foreground)">
             Pulsa "Cargar" para consultar.
           </p>
         )}
@@ -97,7 +97,7 @@ function SchedulesCard() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
-          <CalendarClock className="size-4 text-[var(--color-primary)]" />
+          <CalendarClock className="size-4 text-(--color-primary)" />
           Horarios de competición
         </CardTitle>
       </CardHeader>
@@ -110,7 +110,7 @@ function SchedulesCard() {
                 id={dateFilterId}
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="flex h-9 w-full rounded-md border bg-[var(--color-background)] px-3 text-sm text-[var(--color-foreground)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]"
+                className="flex h-9 w-full rounded-md border bg-(--color-background) px-3 text-sm text-(--color-foreground) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-ring)"
               >
                 <option value="">Todas las fechas ({all.length})</option>
                 {dates.map((d) => (
@@ -127,13 +127,13 @@ function SchedulesCard() {
           </Button>
         </div>
         {q.isError ? (
-          <p className="text-sm text-[var(--color-destructive)]">No se pudo cargar.</p>
+          <p className="text-sm text-(--color-destructive)">No se pudo cargar.</p>
         ) : q.data !== undefined ? (
           <div className="max-h-[40rem] overflow-auto pr-1">
             <ScheduleList schedules={filtered} />
           </div>
         ) : (
-          <p className="text-sm text-[var(--color-muted-foreground)]">
+          <p className="text-sm text-(--color-muted-foreground)">
             Pulsa "Cargar" para ver los horarios.
           </p>
         )}

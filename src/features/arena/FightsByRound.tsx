@@ -44,7 +44,7 @@ export function FightsByRound({ fights }: { fights: ArenaFight[] }) {
     <div className="space-y-3">
       <div className="relative">
         <Search
-          className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-[var(--color-muted-foreground)]"
+          className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-(--color-muted-foreground)"
           aria-hidden
         />
         <Input
@@ -70,7 +70,7 @@ export function FightsByRound({ fights }: { fights: ArenaFight[] }) {
       </div>
 
       {rounds.length === 0 ? (
-        <p className="text-sm text-[var(--color-muted-foreground)]">
+        <p className="text-sm text-(--color-muted-foreground)">
           {q ? "Sin coincidencias para la búsqueda." : "No hay peleas para este filtro."}
         </p>
       ) : (
@@ -109,17 +109,17 @@ function RoundGroups({ rounds }: { rounds: { name: string; items: ArenaFight[] }
               onClick={() => toggle(round.name)}
               aria-expanded={isOpen}
               aria-controls={panelId}
-              className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-[var(--color-muted)]/50"
+              className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-(--color-muted)/50"
             >
               <span className="flex items-center gap-2">
                 <ChevronRight
                   className={cn(
-                    "size-4 text-[var(--color-muted-foreground)] transition-transform",
+                    "size-4 text-(--color-muted-foreground) transition-transform",
                     isOpen && "rotate-90",
                   )}
                   aria-hidden
                 />
-                <span className="text-sm font-semibold text-[var(--color-primary)]">
+                <span className="text-sm font-semibold text-(--color-primary)">
                   {round.name}
                 </span>
               </span>

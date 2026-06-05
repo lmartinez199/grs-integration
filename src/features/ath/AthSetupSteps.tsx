@@ -137,7 +137,7 @@ export function AthSetupSteps() {
   return (
     <SetupSteps<Record<string, never>>
       title="Setup en GRS"
-      icon={<Database className="size-4 text-[var(--color-primary)]" />}
+      icon={<Database className="size-4 text-(--color-primary)" />}
       description="Prepara la estructura del evento y envía los datos del CBAT al GRS."
       steps={ATH_STEPS}
       ctx={ATH_CTX}

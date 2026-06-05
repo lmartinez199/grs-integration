@@ -12,7 +12,7 @@ interface RetryNoticeProps {
 export function RetryNotice({ message, onRetry, isRetrying }: RetryNoticeProps) {
   return (
     <div className="flex flex-col items-start gap-2">
-      <p role="alert" className="flex items-center gap-2 text-sm text-[var(--color-destructive)]">
+      <p role="alert" className="flex items-center gap-2 text-sm text-(--color-destructive)">
         <WifiOff className="size-4" aria-hidden />
         {message}
       </p>

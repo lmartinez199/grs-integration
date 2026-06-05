@@ -47,10 +47,10 @@ export function ArenaSyncCard() {
   return (
     <SyncCard
       title="WRE (lucha)"
-      icon={<Swords className="size-4 text-[var(--color-primary)]" />}
+      icon={<Swords className="size-4 text-(--color-primary)" />}
       status={
         settings.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-[var(--color-muted-foreground)]" />
+          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
         ) : settings.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
         ) : enabled ? (

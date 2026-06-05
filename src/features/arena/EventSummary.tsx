@@ -24,7 +24,7 @@ function ColorSwatch({ label, bg, fg }: { label: string; bg?: string; fg?: strin
       >
         A
       </span>
-      <span className="text-xs text-[var(--color-muted-foreground)]">{label}</span>
+      <span className="text-xs text-(--color-muted-foreground)">{label}</span>
     </div>
   );
 }
@@ -76,9 +76,9 @@ function Fact({
 }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="mt-0.5 text-[var(--color-primary)]">{icon}</span>
+      <span className="mt-0.5 text-(--color-primary)">{icon}</span>
       <div className="min-w-0">
-        <dt className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+        <dt className="text-xs uppercase tracking-wide text-(--color-muted-foreground)">
           {label}
         </dt>
         <dd className="text-sm font-medium">{value}</dd>

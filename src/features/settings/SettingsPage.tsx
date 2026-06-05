@@ -30,7 +30,7 @@ export function SettingsPage() {
     <div className="mx-auto max-w-3xl space-y-6 p-6">
       <header>
         <h1 className="text-2xl font-semibold">Ajustes</h1>
-        <p className="text-sm text-[var(--color-muted-foreground)]">
+        <p className="text-sm text-(--color-muted-foreground)">
           Configura las conexiones a los servicios y la integración ARENA.
         </p>
       </header>
@@ -194,9 +194,9 @@ function ArenaServerCard() {
       </CardHeader>
       <CardContent>
         {settingsQuery.isLoading ? (
-          <Loader2 className="size-5 animate-spin text-[var(--color-muted-foreground)]" />
+          <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />
         ) : settingsQuery.isError ? (
-          <p className="text-sm text-[var(--color-destructive)]">
+          <p className="text-sm text-(--color-destructive)">
             No se pudo cargar la configuración de ARENA.
           </p>
         ) : (
@@ -243,7 +243,7 @@ function Field({
       <Label>{label}</Label>
       {children}
       {error && (
-        <p role="alert" className="text-xs text-[var(--color-destructive)]">
+        <p role="alert" className="text-xs text-(--color-destructive)">
           {error}
         </p>
       )}

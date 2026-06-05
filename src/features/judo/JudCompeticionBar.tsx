@@ -27,7 +27,7 @@ export function JudCompeticionBar({
   });
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] p-3 sm:flex-row sm:items-center">
+    <div className="flex flex-col gap-2 rounded-lg border border-(--color-border) bg-(--color-card) p-3 sm:flex-row sm:items-center">
       <label className="flex items-center gap-2">
         <span className="text-sm font-medium">Competición</span>
         <Input
@@ -39,22 +39,22 @@ export function JudCompeticionBar({
       </label>
       <div className="min-h-5 text-sm sm:ml-2">
         {debounced.length < 3 ? null : preview.isLoading ? (
-          <span className="flex items-center gap-1.5 text-[var(--color-muted-foreground)]">
+          <span className="flex items-center gap-1.5 text-(--color-muted-foreground)">
             <Loader2 className="size-3.5 animate-spin" aria-hidden /> Validando…
           </span>
         ) : preview.isError ? (
-          <span className="text-[var(--color-destructive)]">No se pudo validar el código.</span>
+          <span className="text-(--color-destructive)">No se pudo validar el código.</span>
         ) : preview.data && preview.data.competicaoNome ? (
           <span>
             <span className="font-semibold">{preview.data.competicaoNome}</span>
-            <span className="text-[var(--color-muted-foreground)]">
+            <span className="text-(--color-muted-foreground)">
               {" · "}
               {preview.data.totalCategorias} categorías ({preview.data.sorteadas} sorteadas) ·{" "}
               {preview.data.totalInscritos} inscritos
             </span>
           </span>
         ) : preview.data ? (
-          <span className="text-[var(--color-warning)]">
+          <span className="text-(--color-warning)">
             Código sin categorías o no encontrado en Zempo.
           </span>
         ) : null}

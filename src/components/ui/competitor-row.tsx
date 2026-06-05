@@ -29,14 +29,14 @@ export function CompetitorRow({
     <div
       className={cn(
         "flex items-center gap-3 rounded-md px-2.5 py-2",
-        isWinner && "bg-[var(--color-success)]/12",
+        isWinner && "bg-(--color-success)/12",
         className,
       )}
     >
       <Trophy
         className={cn(
           "size-4 shrink-0",
-          isWinner ? "text-[var(--color-success)]" : "text-transparent",
+          isWinner ? "text-(--color-success)" : "text-transparent",
         )}
         aria-hidden
       />
@@ -45,7 +45,7 @@ export function CompetitorRow({
           className={cn(
             "truncate text-sm leading-tight",
             isWinner ? "font-semibold" : "font-medium",
-            isLoser && "text-[var(--color-muted-foreground)]",
+            isLoser && "text-(--color-muted-foreground)",
           )}
         >
           {name}

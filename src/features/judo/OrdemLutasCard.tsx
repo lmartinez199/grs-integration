@@ -41,7 +41,7 @@ export function OrdemLutasCard({ codigo }: { codigo: string }) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <ListOrdered className="size-4 text-[var(--color-primary)]" aria-hidden />
+          <ListOrdered className="size-4 text-(--color-primary)" aria-hidden />
           Orden de lutas (tatami)
         </CardTitle>
         <CardDescription>
@@ -60,7 +60,7 @@ export function OrdemLutasCard({ codigo }: { codigo: string }) {
             value={turno}
             onChange={(e) => setTurno(e.target.value)}
             aria-label="Turno"
-            className="h-9 rounded-md border border-[var(--color-input)] bg-transparent px-3 text-sm"
+            className="h-9 rounded-md border border-(--color-input) bg-transparent px-3 text-sm"
           >
             <option value="">Todos los turnos</option>
             <option value="matutino">Matutino</option>
@@ -75,17 +75,17 @@ export function OrdemLutasCard({ codigo }: { codigo: string }) {
         </div>
 
         {codigo.trim().length === 0 ? (
-          <p className="text-sm text-[var(--color-muted-foreground)]">
+          <p className="text-sm text-(--color-muted-foreground)">
             Indica un código de competición arriba para ver el orden de lutas.
           </p>
         ) : q.isLoading ? (
-          <Loader2 className="size-5 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+          <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" aria-hidden />
         ) : q.isError ? (
-          <p role="alert" className="text-sm text-[var(--color-destructive)]">
+          <p role="alert" className="text-sm text-(--color-destructive)">
             Error al cargar el orden de lutas.
           </p>
         ) : byArea.length === 0 ? (
-          <p className="text-sm text-[var(--color-muted-foreground)]">
+          <p className="text-sm text-(--color-muted-foreground)">
             No hay lutas para los filtros seleccionados.
           </p>
         ) : (
@@ -94,7 +94,7 @@ export function OrdemLutasCard({ codigo }: { codigo: string }) {
               <div key={areaKey}>
                 <h3 className="mb-1.5 text-sm font-semibold">
                   Área {areaKey}
-                  <span className="ml-2 font-normal text-[var(--color-muted-foreground)]">
+                  <span className="ml-2 font-normal text-(--color-muted-foreground)">
                     {lutas.length} lutas
                   </span>
                 </h3>
@@ -115,8 +115,8 @@ export function OrdemLutasCard({ codigo }: { codigo: string }) {
 function OrdemRow({ luta }: { luta: ZempoOrdemLuta }) {
   const finalizada = luta.encerrada === "1";
   return (
-    <li className="flex items-center gap-3 rounded-md bg-[var(--color-muted)] px-3 py-1.5 text-sm">
-      <span className="w-8 shrink-0 text-center font-semibold text-[var(--color-primary)]">
+    <li className="flex items-center gap-3 rounded-md bg-(--color-muted) px-3 py-1.5 text-sm">
+      <span className="w-8 shrink-0 text-center font-semibold text-(--color-primary)">
         {luta.ordem}
       </span>
       <div className="min-w-0 flex-1">
@@ -124,12 +124,12 @@ function OrdemRow({ luta }: { luta: ZempoOrdemLuta }) {
           <span className={cn(finalizada && luta.vencedor_numero === "1" && "font-semibold")}>
             {luta.competidor1_nome_completo || "—"}
           </span>
-          <span className="text-[var(--color-muted-foreground)]"> vs </span>
+          <span className="text-(--color-muted-foreground)"> vs </span>
           <span className={cn(finalizada && luta.vencedor_numero === "2" && "font-semibold")}>
             {luta.competidor2_nome_completo || "—"}
           </span>
         </p>
-        <p className="truncate text-xs text-[var(--color-muted-foreground)]">
+        <p className="truncate text-xs text-(--color-muted-foreground)">
           {luta.rodada} · {luta.categoria_peso} · {luta.sexo_nome}
           {luta.tecnica_vencedora ? ` · ${luta.tecnica_vencedora}` : ""}
         </p>

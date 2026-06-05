@@ -46,7 +46,7 @@ export function JudScheduleControl() {
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <Activity className="size-4 text-[var(--color-primary)]" aria-hidden />
+            <Activity className="size-4 text-(--color-primary)" aria-hidden />
             Sincronización (zempo)
           </CardTitle>
           <CardDescription>
@@ -54,7 +54,7 @@ export function JudScheduleControl() {
           </CardDescription>
         </div>
         {schedules.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" aria-hidden />
         ) : schedules.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
         ) : (
@@ -94,7 +94,7 @@ export function JudScheduleControl() {
 
         <ul className="space-y-1">
           {list.length === 0 ? (
-            <li className="text-sm text-[var(--color-muted-foreground)]">
+            <li className="text-sm text-(--color-muted-foreground)">
               Sin competiciones en sincronización.
             </li>
           ) : (
@@ -103,7 +103,7 @@ export function JudScheduleControl() {
               return (
                 <li
                   key={code}
-                  className="flex items-center justify-between rounded-md bg-[var(--color-muted)] px-3 py-1.5 text-sm"
+                  className="flex items-center justify-between rounded-md bg-(--color-muted) px-3 py-1.5 text-sm"
                 >
                   <span className="font-medium">{code}</span>
                   <Button
@@ -113,7 +113,7 @@ export function JudScheduleControl() {
                     disabled={stop.isPending}
                     aria-label={`Detener sincronización de ${code}`}
                   >
-                    <Trash2 className="size-4 text-[var(--color-destructive)]" aria-hidden />
+                    <Trash2 className="size-4 text-(--color-destructive)" aria-hidden />
                   </Button>
                 </li>
               );

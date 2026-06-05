@@ -26,13 +26,13 @@ interface DataViewProps {
  */
 export function DataView({ data, className, showTechnical = false }: DataViewProps) {
   if (data === null || data === undefined) {
-    return <p className={cn("text-sm text-[var(--color-muted-foreground)]", className)}>Sin datos.</p>;
+    return <p className={cn("text-sm text-(--color-muted-foreground)", className)}>Sin datos.</p>;
   }
 
   if (Array.isArray(data)) {
     if (data.length === 0) {
       return (
-        <p className={cn("text-sm text-[var(--color-muted-foreground)]", className)}>
+        <p className={cn("text-sm text-(--color-muted-foreground)", className)}>
           Sin elementos.
         </p>
       );
@@ -40,7 +40,7 @@ export function DataView({ data, className, showTechnical = false }: DataViewPro
     return (
       <div className={cn("space-y-2", className)}>
         {data.map((item, i) => (
-          <div key={i} className="rounded-md border bg-[var(--color-muted)]/40 p-3">
+          <div key={i} className="rounded-md border bg-(--color-muted)/40 p-3">
             <DataView data={item} showTechnical={showTechnical} />
           </div>
         ))}
@@ -53,7 +53,7 @@ export function DataView({ data, className, showTechnical = false }: DataViewPro
       ([k]) => showTechnical || !HIDDEN_KEYS.has(k),
     );
     if (entries.length === 0) {
-      return <p className="text-sm text-[var(--color-muted-foreground)]">—</p>;
+      return <p className="text-sm text-(--color-muted-foreground)">—</p>;
     }
     return (
       <dl className={cn("grid grid-cols-1 gap-x-4 gap-y-1.5 sm:grid-cols-2", className)}>
@@ -61,12 +61,12 @@ export function DataView({ data, className, showTechnical = false }: DataViewPro
           const nested = value !== null && typeof value === "object";
           return (
             <div key={key} className={cn("flex flex-col gap-0.5", nested && "sm:col-span-2")}>
-              <dt className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+              <dt className="text-xs uppercase tracking-wide text-(--color-muted-foreground)">
                 {humanizeKey(key)}
               </dt>
               <dd className="text-sm">
                 {nested ? (
-                  <div className="mt-1 border-l-2 border-[var(--color-border)] pl-3">
+                  <div className="mt-1 border-l-2 border-(--color-border) pl-3">
                     <DataView data={value} showTechnical={showTechnical} />
                   </div>
                 ) : (

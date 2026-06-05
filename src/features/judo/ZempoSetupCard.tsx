@@ -140,7 +140,7 @@ export function ZempoSetupCard({ codigo }: { codigo: string }) {
   return (
     <SetupSteps<JudoCtx>
       title="Configuración de la competición (setup)"
-      icon={<ListChecks className="size-4 text-[var(--color-primary)]" aria-hidden />}
+      icon={<ListChecks className="size-4 text-(--color-primary)" aria-hidden />}
       description="Ejecuta el flujo de sincronización por fases desde Zempo hacia el GRS. Cada paso usa tu sesión (JWT); no requiere API key."
       steps={STEPS}
       ctx={ctx}
@@ -149,7 +149,7 @@ export function ZempoSetupCard({ codigo }: { codigo: string }) {
       header={
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <label className="space-y-1">
-            <span className="text-xs text-[var(--color-muted-foreground)]">
+            <span className="text-xs text-(--color-muted-foreground)">
               Código de evento (eventCode)
             </span>
             <Input
@@ -159,7 +159,7 @@ export function ZempoSetupCard({ codigo }: { codigo: string }) {
             />
           </label>
           <label className="space-y-1">
-            <span className="text-xs text-[var(--color-muted-foreground)]">
+            <span className="text-xs text-(--color-muted-foreground)">
               Categoría (equipos, opcional)
             </span>
             <Input

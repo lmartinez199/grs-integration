@@ -39,10 +39,10 @@ export function AthSyncCard() {
   return (
     <SyncCard
       title="ATH (atletismo)"
-      icon={<Timer className="size-4 text-[var(--color-primary)]" />}
+      icon={<Timer className="size-4 text-(--color-primary)" />}
       status={
         status.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-[var(--color-muted-foreground)]" />
+          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
         ) : status.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
         ) : active ? (
@@ -70,7 +70,7 @@ export function AthSyncCard() {
             />
           </dl>
         ) : (
-          <p className="text-sm text-[var(--color-muted-foreground)]">
+          <p className="text-sm text-(--color-muted-foreground)">
             Sin sincronización activa.
           </p>
         )}

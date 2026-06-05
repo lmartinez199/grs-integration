@@ -43,7 +43,7 @@ export function Tabs({ tabs, value, onChange, className, "aria-label": ariaLabel
       role="tablist"
       aria-label={ariaLabel}
       className={cn(
-        "flex gap-1 overflow-x-auto border-b border-[var(--color-border)]",
+        "flex gap-1 overflow-x-auto border-b border-(--color-border)",
         className,
       )}
     >
@@ -63,8 +63,8 @@ export function Tabs({ tabs, value, onChange, className, "aria-label": ariaLabel
             className={cn(
               "-mb-px shrink-0 border-b-2 px-4 py-2 text-sm font-medium transition-colors",
               active
-                ? "border-[var(--color-primary)] text-[var(--color-primary)]"
-                : "border-transparent text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)]",
+                ? "border-(--color-primary) text-(--color-primary)"
+                : "border-transparent text-(--color-muted-foreground) hover:text-(--color-foreground)",
             )}
           >
             {t.label}

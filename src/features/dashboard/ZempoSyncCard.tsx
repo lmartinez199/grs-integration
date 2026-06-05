@@ -39,10 +39,10 @@ export function ZempoSyncCard() {
   return (
     <SyncCard
       title="JUD (judo)"
-      icon={<Activity className="size-4 text-[var(--color-primary)]" />}
+      icon={<Activity className="size-4 text-(--color-primary)" />}
       status={
         schedules.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-[var(--color-muted-foreground)]" />
+          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
         ) : schedules.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
         ) : (
@@ -77,7 +77,7 @@ export function ZempoSyncCard() {
 
         <ul className="space-y-1">
           {list.length === 0 ? (
-            <li className="text-sm text-[var(--color-muted-foreground)]">
+            <li className="text-sm text-(--color-muted-foreground)">
               Sin competiciones en sync.
             </li>
           ) : (
@@ -86,7 +86,7 @@ export function ZempoSyncCard() {
               return (
                 <li
                   key={code}
-                  className="flex items-center justify-between rounded-md bg-[var(--color-muted)] px-3 py-1.5 text-sm"
+                  className="flex items-center justify-between rounded-md bg-(--color-muted) px-3 py-1.5 text-sm"
                 >
                   <span className="font-medium">{code}</span>
                   <Button
@@ -96,7 +96,7 @@ export function ZempoSyncCard() {
                     disabled={stop.isPending}
                     aria-label={`Detener sincronización de ${code}`}
                   >
-                    <Trash2 className="size-4 text-[var(--color-destructive)]" aria-hidden />
+                    <Trash2 className="size-4 text-(--color-destructive)" aria-hidden />
                   </Button>
                 </li>
               );

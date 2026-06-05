@@ -40,7 +40,7 @@ export function JudPage() {
     <div className="space-y-6 p-6">
       <header>
         <h1 className="text-2xl font-semibold">JUD (judo)</h1>
-        <p className="text-sm text-[var(--color-muted-foreground)]">
+        <p className="text-sm text-(--color-muted-foreground)">
           Control de sincronización (zempo) y lutas sincronizadas en el GRS.
         </p>
       </header>
@@ -75,17 +75,17 @@ export function JudPage() {
             </CardHeader>
             <CardContent>
               {categories.isLoading ? (
-                <Loader2 className="size-5 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+                <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" aria-hidden />
               ) : categories.isError ? (
-                <p role="alert" className="text-sm text-[var(--color-destructive)]">
+                <p role="alert" className="text-sm text-(--color-destructive)">
                   Error al cargar categorías de judo.
                 </p>
               ) : (categories.data ?? []).length === 0 ? (
-                <p className="text-sm text-[var(--color-muted-foreground)]">
+                <p className="text-sm text-(--color-muted-foreground)">
                   No hay lutas de judo sincronizadas todavía.
                 </p>
               ) : (
-                <ul className="max-h-[var(--list-h-sidebar)] space-y-1 overflow-auto pr-1">
+                <ul className="max-h-(--list-h-sidebar) space-y-1 overflow-auto pr-1">
                   {(categories.data ?? []).map((c) => {
                     const isSel =
                       selected?.sportEvent === c.sportEvent &&
@@ -99,20 +99,20 @@ export function JudPage() {
                           className={cn(
                             "flex w-full items-center justify-between gap-2 rounded-md border border-transparent px-3 py-2 text-left transition-colors",
                             isSel
-                              ? "border-[var(--color-primary)] bg-[var(--color-primary)]/12"
-                              : "hover:bg-[var(--color-muted)]",
+                              ? "border-(--color-primary) bg-(--color-primary)/12"
+                              : "hover:bg-(--color-muted)",
                           )}
                         >
                           <span
                             className={cn(
                               "truncate text-sm font-medium",
-                              isSel && "text-[var(--color-primary)]",
+                              isSel && "text-(--color-primary)",
                             )}
                           >
                             {c.name}
                           </span>
                           <span className="flex shrink-0 items-center gap-2">
-                            <span className="text-xs text-[var(--color-muted-foreground)]">
+                            <span className="text-xs text-(--color-muted-foreground)">
                               {c.countCompleted}/{c.countFights}
                             </span>
                             <ChevronRight className="size-4" aria-hidden />
@@ -131,7 +131,7 @@ export function JudPage() {
               <CardTitle>
                 Lutas
                 {selected ? (
-                  <span className="ml-2 text-sm font-normal text-[var(--color-muted-foreground)]">
+                  <span className="ml-2 text-sm font-normal text-(--color-muted-foreground)">
                     {selected.name}
                   </span>
                 ) : null}
@@ -140,23 +140,23 @@ export function JudPage() {
             </CardHeader>
             <CardContent>
               {selected == null ? (
-                <p className="text-sm text-[var(--color-muted-foreground)]">
+                <p className="text-sm text-(--color-muted-foreground)">
                   Selecciona una categoría para ver sus lutas.
                 </p>
               ) : fights.isLoading ? (
-                <Loader2 className="size-5 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+                <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" aria-hidden />
               ) : fights.isError ? (
-                <p role="alert" className="text-sm text-[var(--color-destructive)]">
+                <p role="alert" className="text-sm text-(--color-destructive)">
                   Error al cargar lutas.
                 </p>
               ) : fights.data && fights.data.length > 0 ? (
-                <div className="max-h-[var(--list-h-content)] space-y-2 overflow-auto pr-1">
+                <div className="max-h-(--list-h-content) space-y-2 overflow-auto pr-1">
                   {fights.data.map((f) => (
                     <JudoFightCard key={f.id} fight={f} />
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-[var(--color-muted-foreground)]">
+                <p className="text-sm text-(--color-muted-foreground)">
                   Esta categoría no tiene lutas.
                 </p>
               )}

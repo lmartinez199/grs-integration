@@ -61,16 +61,16 @@ export function ArenaLoopCard() {
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <Timer className="size-4 text-[var(--color-primary)]" aria-hidden />
+            <Timer className="size-4 text-(--color-primary)" aria-hidden />
             Loop de sincronización
           </CardTitle>
           <CardDescription className="flex items-center gap-1.5">
-            <Radio className="size-3.5 text-[var(--color-success)]" aria-hidden />
+            <Radio className="size-3.5 text-(--color-success)" aria-hidden />
             Sondea Arena periódicamente como respaldo del webhook en vivo.
           </CardDescription>
         </div>
         {settings.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" aria-hidden />
         ) : settings.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
         ) : active ? (

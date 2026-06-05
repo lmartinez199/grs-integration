@@ -24,7 +24,7 @@ export function ResultadosCard({ codigo }: { codigo: string }) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Medal className="size-4 text-[var(--color-primary)]" aria-hidden />
+          <Medal className="size-4 text-(--color-primary)" aria-hidden />
           Resultados finales (pódio)
         </CardTitle>
         <CardDescription>
@@ -33,17 +33,17 @@ export function ResultadosCard({ codigo }: { codigo: string }) {
       </CardHeader>
       <CardContent>
         {codigo.trim().length === 0 ? (
-          <p className="text-sm text-[var(--color-muted-foreground)]">
+          <p className="text-sm text-(--color-muted-foreground)">
             Indica un código de competición arriba para ver los resultados.
           </p>
         ) : q.isLoading ? (
-          <Loader2 className="size-5 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+          <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" aria-hidden />
         ) : q.isError ? (
-          <p role="alert" className="text-sm text-[var(--color-destructive)]">
+          <p role="alert" className="text-sm text-(--color-destructive)">
             Error al cargar los resultados.
           </p>
         ) : byCategoria.length === 0 ? (
-          <p className="text-sm text-[var(--color-muted-foreground)]">
+          <p className="text-sm text-(--color-muted-foreground)">
             Aún no hay resultados finales para esta competición.
           </p>
         ) : (
@@ -51,7 +51,7 @@ export function ResultadosCard({ codigo }: { codigo: string }) {
             {byCategoria.map(([key, podio]) => (
               <div
                 key={key}
-                className="rounded-md border border-[var(--color-border)] p-3"
+                className="rounded-md border border-(--color-border) p-3"
               >
                 <h3 className="mb-1.5 text-sm font-semibold">
                   {podio[0]?.categoria_peso || key}
@@ -68,7 +68,7 @@ export function ResultadosCard({ codigo }: { codigo: string }) {
                       <span className="min-w-0 flex-1 truncate">
                         {r.atleta_nome_completo}
                       </span>
-                      <span className="shrink-0 text-xs text-[var(--color-muted-foreground)]">
+                      <span className="shrink-0 text-xs text-(--color-muted-foreground)">
                         {r.atleta_federacao_sigla}
                       </span>
                     </li>

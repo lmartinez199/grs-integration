@@ -57,7 +57,7 @@ export function WebhookConfig() {
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <div>
           <CardTitle className="flex items-center gap-2">
-            <Webhook className="size-4 text-[var(--color-primary)]" aria-hidden />
+            <Webhook className="size-4 text-(--color-primary)" aria-hidden />
             Webhook de Arena
           </CardTitle>
           <CardDescription>
@@ -65,7 +65,7 @@ export function WebhookConfig() {
           </CardDescription>
         </div>
         {list.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-[var(--color-muted-foreground)]" aria-hidden />
+          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" aria-hidden />
         ) : list.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
         ) : current ? (
@@ -80,16 +80,16 @@ export function WebhookConfig() {
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex flex-col gap-1">
-          <span className="text-xs uppercase tracking-wide text-[var(--color-muted-foreground)]">
+          <span className="text-xs uppercase tracking-wide text-(--color-muted-foreground)">
             URL del receptor
           </span>
-          <code className="truncate rounded bg-[var(--color-muted)] px-2 py-1 text-xs">
+          <code className="truncate rounded bg-(--color-muted) px-2 py-1 text-xs">
             {webhookUrl}
           </code>
         </div>
 
         {list.isError ? (
-          <p role="alert" className="text-sm text-[var(--color-destructive)]">
+          <p role="alert" className="text-sm text-(--color-destructive)">
             No se pudo consultar los webhooks (revisa la conexión con GRS).
           </p>
         ) : current ? (
@@ -115,7 +115,7 @@ export function WebhookConfig() {
               onClick={() => remove.mutate(current.id)}
               disabled={remove.isPending}
             >
-              <Trash2 className="size-4 text-[var(--color-destructive)]" aria-hidden />
+              <Trash2 className="size-4 text-(--color-destructive)" aria-hidden />
               Eliminar
             </Button>
           </div>

@@ -55,11 +55,11 @@ export function AthLoopSection() {
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <CardTitle className="flex items-center gap-2">
-          <Timer className="size-4 text-[var(--color-primary)]" />
+          <Timer className="size-4 text-(--color-primary)" />
           Loop de sincronización
         </CardTitle>
         {status.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-[var(--color-muted-foreground)]" />
+          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
         ) : status.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
         ) : active ? (
@@ -98,7 +98,7 @@ export function AthLoopSection() {
                   onChange={(e) => setDate(e.target.value)}
                 />
                 {!dateValid && (
-                  <p id={`${dateId}-error`} role="alert" className="text-xs text-[var(--color-destructive)]">
+                  <p id={`${dateId}-error`} role="alert" className="text-xs text-(--color-destructive)">
                     Formato AAAA-MM-DD
                   </p>
                 )}
@@ -115,7 +115,7 @@ export function AthLoopSection() {
                   onChange={(e) => setHour(e.target.value)}
                 />
                 {!hourValid && (
-                  <p id={`${hourId}-error`} role="alert" className="text-xs text-[var(--color-destructive)]">
+                  <p id={`${hourId}-error`} role="alert" className="text-xs text-(--color-destructive)">
                     Formato HH:MM
                   </p>
                 )}
