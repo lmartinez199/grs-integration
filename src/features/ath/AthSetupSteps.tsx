@@ -11,16 +11,29 @@ import {
 
 const n = (v: unknown): number => (typeof v === "number" ? v : 0);
 
+/** Convierte un error del backend (string u objeto) a un mensaje legible. */
+function fmtError(e: unknown): string {
+  if (typeof e === "string") return e;
+  if (e && typeof e === "object") {
+    const o = e as Record<string, unknown>;
+    const msg = o.message ?? o.error ?? o.reason;
+    if (typeof msg === "string") return msg;
+    return JSON.stringify(e);
+  }
+  return String(e);
+}
+
 function summary(
   raw: AthActionResult,
   created: number,
   processed: number,
   skipped: number,
+  updated = 0,
 ): StepRunResult {
-  const list = Array.isArray(raw.errors) ? raw.errors.map(String) : [];
+  const list = Array.isArray(raw.errors) ? raw.errors.map(fmtError) : [];
   const failed = n(raw.failed);
   const errors = list.length === 0 && failed > 0 ? [`${failed} con error`] : list;
-  return { kind: "summary", data: { created, processed, skipped, errors } };
+  return { kind: "summary", data: { created, processed, skipped, updated, errors } };
 }
 
 /**
@@ -63,6 +76,7 @@ const ATH_STEPS: SetupStep<Record<string, never>>[] = [
         r,
         n(r.phaseCodesCreated) + n(r.phasesCreated),
         n(r.processed),
+        0,
         n(r.phaseCodesUpdated),
       );
     },
@@ -113,7 +127,7 @@ const ATH_STEPS: SetupStep<Record<string, never>>[] = [
     group: "entidades",
     run: async () => {
       const r = await ath.syncGroups();
-      return summary(r, n(r.created), n(r.total), n(r.updated));
+      return summary(r, n(r.created), n(r.total), 0, n(r.updated));
     },
   },
   {
