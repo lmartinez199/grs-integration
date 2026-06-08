@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Check, Loader2, Play, ListChecks, PlayCircle } from "lucide-react";
+import { Check, Loader2, Play, ListChecks, PlayCircle, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -122,7 +122,7 @@ export function SetupSteps<Ctx>({
           return false;
         }
         toast.success(
-          `${step.label}: ${s.created} creados${s.updated ? ` · ${s.updated} actualizados` : ""} · ${s.processed} procesados · ${s.skipped} omitidos`,
+          `${step.label}: ${s.created} creados${s.updated ? ` · ${s.updated} actualizados` : ""} · ${s.processed} procesados${s.skipped ? ` · ${s.skipped} omitidos` : ""}`,
         );
       } else if (res.kind === "queued") {
         toast.success(
@@ -256,7 +256,13 @@ export function SetupSteps<Ctx>({
   );
 }
 
+/** Cuántos mensajes de error se listan antes de resumir el resto con «y N más». */
+const MAX_ERRORS_SHOWN = 5;
+
 function StepResultLine({ result }: { result: StepResult }) {
+  const [showErrors, setShowErrors] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+
   if (result.kind === "error") {
     return (
       <p className="mt-0.5 text-xs text-(--color-destructive)">{result.message}</p>
@@ -272,19 +278,61 @@ function StepResultLine({ result }: { result: StepResult }) {
   if (result.kind === "ok") {
     return <p className="mt-0.5 text-xs text-(--color-success)">Hecho ✓</p>;
   }
+
   const s = result.data;
   const hasError = s.errors.length > 0;
+  const visible = showAll ? s.errors : s.errors.slice(0, MAX_ERRORS_SHOWN);
+  const rest = s.errors.length - visible.length;
+  const collapsible = s.errors.length > MAX_ERRORS_SHOWN;
+
   return (
-    <p
-      className={cn(
-        "mt-0.5 text-xs",
-        hasError ? "text-(--color-destructive)" : "text-(--color-success)",
-      )}
-    >
-      {s.created} creados
-      {s.updated ? ` · ${s.updated} actualizados` : ""} · {s.processed} procesados ·{" "}
-      {s.skipped} omitidos
-      {hasError ? ` · ${s.errors.length} con error` : ""}
-    </p>
+    <div className="mt-0.5 space-y-1">
+      <p
+        className={cn(
+          "text-xs",
+          hasError ? "text-(--color-destructive)" : "text-(--color-success)",
+        )}
+      >
+        {s.created} creados
+        {s.updated ? ` · ${s.updated} actualizados` : ""} · {s.processed} procesados
+        {s.skipped ? ` · ${s.skipped} omitidos` : ""}
+        {hasError ? ` · ${s.errors.length} con error` : ""}
+      </p>
+
+      {hasError ? (
+        <div className="text-xs">
+          <button
+            type="button"
+            onClick={() => setShowErrors((v) => !v)}
+            className="inline-flex items-center gap-1 text-(--color-destructive) hover:underline"
+            aria-expanded={showErrors}
+          >
+            <ChevronRight
+              className={cn("size-3 transition-transform", showErrors && "rotate-90")}
+              aria-hidden
+            />
+            {showErrors ? "Ocultar errores" : `Ver errores (${s.errors.length})`}
+          </button>
+          {showErrors ? (
+            <ul className="mt-1 list-disc space-y-0.5 pl-5 text-(--color-muted-foreground)">
+              {visible.map((e, i) => (
+                <li key={i}>{e}</li>
+              ))}
+              {collapsible ? (
+                <li className="list-none">
+                  <button
+                    type="button"
+                    onClick={() => setShowAll((v) => !v)}
+                    className="italic text-(--color-destructive) hover:underline"
+                  >
+                    {showAll ? "Ver menos" : `Ver ${rest} más…`}
+                  </button>
+                </li>
+              ) : null}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 }
