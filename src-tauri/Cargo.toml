@@ -14,6 +14,14 @@ edition = "2021"
 name = "grs_integration_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[features]
+# Por defecto se sirve el frontend embebido (dist/) = modo producción.
+# El "Tauri Development Debug" usa --no-default-features para desactivar
+# custom-protocol y cargar el dev server (devUrl: http://localhost:1420).
+# NO ELIMINAR: sin custom-protocol, Tauri siempre intenta localhost.
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
