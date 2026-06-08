@@ -12,9 +12,8 @@ dist
 dist-ssr
 *.local
 
-# Variables de entorno con secretos. Las .env.example/.development/.production
-# solo tienen URLs y SÍ se versionan; los secretos van en *.local (ya ignorado).
-.env
+# Variables de entorno: no se versionan (incluye .example/.development/.production).
+.env*
 
 # Editor directories and files
 .vscode/*
