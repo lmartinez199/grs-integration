@@ -39,7 +39,7 @@ function summary(
 /**
  * Pasos de ATH. La estructura es granular (el ath-microservice expone un
  * endpoint por nivel) y «Ejecutar todo» del grupo los corre en orden de
- * dependencia: categorías → competiciones → fases → unidades.
+ * dependencia: categorías → sport-events → competiciones → fases → unidades.
  */
 const ATH_STEPS: SetupStep<Record<string, never>>[] = [
   {
@@ -54,8 +54,19 @@ const ATH_STEPS: SetupStep<Record<string, never>>[] = [
     },
   },
   {
-    key: "competitions",
+    key: "sport-events",
     badge: "2",
+    label: "Sport-events",
+    desc: "Crea los sport-events del evento en el catálogo del GRS (incluye marcha, garrocha…).",
+    group: "estructura",
+    run: async () => {
+      const r = await ath.setupSportEvents();
+      return summary(r, n(r.ok), n(r.processed), 0);
+    },
+  },
+  {
+    key: "competitions",
+    badge: "3",
     label: "Competiciones",
     desc: "Crea las competiciones (eventos) en GRS desde el CBAT.",
     group: "estructura",
@@ -66,7 +77,7 @@ const ATH_STEPS: SetupStep<Record<string, never>>[] = [
   },
   {
     key: "phases",
-    badge: "3",
+    badge: "4",
     label: "Fases",
     desc: "Crea los phase codes y las fases (series) de cada competición.",
     group: "estructura",
@@ -83,7 +94,7 @@ const ATH_STEPS: SetupStep<Record<string, never>>[] = [
   },
   {
     key: "units",
-    badge: "4",
+    badge: "5",
     label: "Unidades",
     desc: "Envía las unidades (series) al GRS y elimina las huérfanas.",
     group: "estructura",

@@ -60,6 +60,10 @@ export const setup = () => request<AthActionResult>("ath", "/setup", { method: "
 export const setupCategories = () =>
   request<AthActionResult>("ath", "/setup-categories", { method: "POST" });
 
+/** POST /api/ath/setup-sport-events — crea los sport-events del evento en el catálogo GRS. */
+export const setupSportEvents = () =>
+  request<AthActionResult>("ath", "/setup-sport-events", { method: "POST" });
+
 /** POST /api/ath/setup-phases. */
 export const setupPhases = () =>
   request<AthActionResult>("ath", "/setup-phases", { method: "POST" });
