@@ -60,6 +60,10 @@ export const setup = () => request<AthActionResult>("ath", "/setup", { method: "
 export const setupCategories = () =>
   request<AthActionResult>("ath", "/setup-categories", { method: "POST" });
 
+/** POST /api/ath/setup-sport-events — crea los sport-events del evento en el catálogo GRS. */
+export const setupSportEvents = () =>
+  request<AthActionResult>("ath", "/setup-sport-events", { method: "POST" });
+
 /** POST /api/ath/setup-phases. */
 export const setupPhases = () =>
   request<AthActionResult>("ath", "/setup-phases", { method: "POST" });
@@ -119,6 +123,8 @@ export interface AthSchedule {
   HasInitialList: string; // "S" | "N"
   HasResult: string; // "S" | "N"
   Andamento: string; // "S" | "N" (en curso)
+  /** Rol respecto a la unit en GRS (lo anota el backend). own = genera unit propia. */
+  unitRole?: "own" | "partial" | "merged" | "none";
 }
 
 /** GET /api/ath/competition-schedules — horarios (filtros opcionales). */

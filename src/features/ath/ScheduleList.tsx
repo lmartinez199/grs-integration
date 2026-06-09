@@ -8,6 +8,7 @@ import {
   Users,
   Loader2,
   Send,
+  Layers,
 } from "lucide-react";
 
 import { getStartListDetails, manualSyncMapped, type AthSchedule } from "@/api/ath";
@@ -46,6 +47,14 @@ function ScheduleItem({ s }: { s: AthSchedule }) {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const ownsUnit = !s.unitRole || s.unitRole === "own";
+  const roleLabel =
+    s.unitRole === "partial"
+      ? `parcial · ${s.PhaseName}`
+      : s.unitRole === "merged"
+        ? "se fusiona con la Final"
+        : "no genera unit";
+
   return (
     <li className="rounded-md border bg-(--color-muted)/40 p-3">
       <div className="flex items-start justify-between gap-3">
@@ -62,38 +71,52 @@ function ScheduleItem({ s }: { s: AthSchedule }) {
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-1.5">
-        {yes(s.HasInitialList) && (
-          <Badge variant="secondary" className="gap-1">
-            <ListChecks className="size-3" /> lista
-          </Badge>
-        )}
-        {yes(s.HasResult) && (
-          <Badge variant="success" className="gap-1">
-            <CheckCircle2 className="size-3" /> resultados
-          </Badge>
-        )}
-        {!yes(s.HasInitialList) && !yes(s.HasResult) && !yes(s.Andamento) && (
-          <Badge variant="outline" className="gap-1">
-            <Activity className="size-3" /> programada
+        {ownsUnit ? (
+          <>
+            {yes(s.HasInitialList) && (
+              <Badge variant="secondary" className="gap-1">
+                <ListChecks className="size-3" /> lista
+              </Badge>
+            )}
+            {yes(s.HasResult) && (
+              <Badge variant="success" className="gap-1">
+                <CheckCircle2 className="size-3" /> resultados
+              </Badge>
+            )}
+            {!yes(s.HasInitialList) && !yes(s.HasResult) && !yes(s.Andamento) && (
+              <Badge variant="outline" className="gap-1">
+                <Activity className="size-3" /> programada
+              </Badge>
+            )}
+          </>
+        ) : (
+          <Badge
+            variant="outline"
+            className="gap-1 text-(--color-muted-foreground)"
+            title="Esta fila del programa no genera una unit propia en GRS (va dentro de otra o no es un evento)."
+          >
+            <Layers className="size-3" /> {roleLabel}
           </Badge>
         )}
 
         <div className="ml-auto flex items-center gap-1.5">
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 px-2"
-            onClick={() => sync.mutate()}
-            disabled={sync.isPending}
-            title="Sincronizar esta prueba al GRS"
-          >
-            {sync.isPending ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Send className="size-3.5" />
-            )}
-            Enviar a GRS
-          </Button>
+          {ownsUnit && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2"
+              onClick={() => sync.mutate()}
+              disabled={sync.isPending}
+              title="Sincronizar esta prueba al GRS"
+            >
+              {sync.isPending ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Send className="size-3.5" />
+              )}
+              Enviar a GRS
+            </Button>
+          )}
           {yes(s.HasInitialList) && (
             <Button
               size="sm"
