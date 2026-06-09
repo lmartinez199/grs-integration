@@ -123,6 +123,8 @@ export interface AthSchedule {
   HasInitialList: string; // "S" | "N"
   HasResult: string; // "S" | "N"
   Andamento: string; // "S" | "N" (en curso)
+  /** Rol respecto a la unit en GRS (lo anota el backend). own = genera unit propia. */
+  unitRole?: "own" | "partial" | "merged" | "none";
 }
 
 /** GET /api/ath/competition-schedules — horarios (filtros opcionales). */
