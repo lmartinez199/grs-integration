@@ -1,3 +1,4 @@
+import { useId, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Play, Square, RefreshCw, Timer } from "lucide-react";
 
@@ -32,6 +33,11 @@ export function AthSyncCard() {
     mutationFn: () => manualSyncMapped(),
     successMsg: "Sync manual (mapped) disparada",
   });
+
+  // Opt-in: incluir setup-units en el loop (elimina huérfanas). Apagado por
+  // defecto porque BORRA — solo activar si se confía en los ajustes del proveedor.
+  const reconcileId = useId();
+  const [reconcileUnits, setReconcileUnits] = useState(false);
 
   const data = status.data;
   const active = data?.active === true;
@@ -68,6 +74,16 @@ export function AthSyncCard() {
               label="Resultado última"
               value={data?.lastSyncStatus === "ok" ? "correcta" : data?.lastSyncStatus ?? "—"}
             />
+            {data?.reconcileUnits && (
+              <DefinitionRow
+                label="Sync de units"
+                value={
+                  data?.lastUnitsReconcileAt
+                    ? formatDateTime(data.lastUnitsReconcileAt)
+                    : "pendiente…"
+                }
+              />
+            )}
           </dl>
         ) : (
           <p className="text-sm text-(--color-muted-foreground)">
@@ -75,8 +91,26 @@ export function AthSyncCard() {
           </p>
         )}
 
+        <label htmlFor={reconcileId} className="flex items-start gap-2 text-sm">
+          <input
+            id={reconcileId}
+            type="checkbox"
+            className="mt-0.5 size-4 shrink-0 accent-(--color-primary)"
+            checked={reconcileUnits}
+            disabled={active}
+            onChange={(e) => setReconcileUnits(e.target.checked)}
+          />
+          <span>
+            Incluir sincronización de units
+            <span className="block text-xs text-(--color-muted-foreground)">
+              Refleja ajustes del proveedor eliminando units huérfanas (cada 5 min). Borra
+              datos: actívalo solo si confías en los cambios del programa.
+            </span>
+          </span>
+        </label>
+
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" onClick={() => start.mutate()} disabled={start.isPending}>
+          <Button size="sm" onClick={() => start.mutate({ reconcileUnits })} disabled={start.isPending}>
             <Play className="size-4" /> Iniciar
           </Button>
           <Button
