@@ -36,8 +36,12 @@ export function AthLoopSection() {
   // Filtros opcionales para el sync manual (vacío = defaults del backend).
   const dateId = useId();
   const hourId = useId();
+  const reconcileId = useId();
   const [date, setDate] = useState("");
   const [hour, setHour] = useState("");
+  // Opt-in: incluir setup-units en el loop (elimina units huérfanas). Apagado
+  // por defecto porque BORRA — solo activar si se confía en los ajustes del proveedor.
+  const [reconcileUnits, setReconcileUnits] = useState(false);
   const dateValid = date.trim() === "" || /^\d{4}-\d{2}-\d{2}$/.test(date.trim());
   const hourValid = hour.trim() === "" || /^\d{1,2}:\d{2}$/.test(hour.trim());
   const filtersValid = dateValid && hourValid;
@@ -83,6 +87,16 @@ export function AthLoopSection() {
                 <DefinitionRow label="Hora" value={data?.hour || "todas"} />
                 <DefinitionRow label="Iniciado" value={formatDateTime(data?.startedAt)} />
                 <DefinitionRow label="Última sync" value={formatDateTime(data?.lastSyncAt)} />
+                {data?.reconcileUnits && (
+                  <DefinitionRow
+                    label="Sync de units"
+                    value={
+                      data?.lastUnitsReconcileAt
+                        ? formatDateTime(data.lastUnitsReconcileAt)
+                        : "pendiente…"
+                    }
+                  />
+                )}
               </dl>
             )}
             <div className="flex flex-wrap items-end gap-3">
@@ -122,8 +136,26 @@ export function AthLoopSection() {
               </div>
             </div>
 
+            <label htmlFor={reconcileId} className="flex items-start gap-2 text-sm">
+              <input
+                id={reconcileId}
+                type="checkbox"
+                className="mt-0.5 size-4 shrink-0 accent-(--color-primary)"
+                checked={reconcileUnits}
+                disabled={active}
+                onChange={(e) => setReconcileUnits(e.target.checked)}
+              />
+              <span>
+                Incluir sincronización de units
+                <span className="block text-xs text-(--color-muted-foreground)">
+                  Refleja ajustes del proveedor eliminando units huérfanas (cada 5 min). Borra
+                  datos: actívalo solo si confías en los cambios del programa.
+                </span>
+              </span>
+            </label>
+
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" onClick={() => start.mutate()} disabled={active || start.isPending}>
+              <Button size="sm" onClick={() => start.mutate({ reconcileUnits })} disabled={active || start.isPending}>
                 <Play className="size-4" /> Iniciar
               </Button>
               <Button size="sm" variant="outline" onClick={() => stop.mutate()} disabled={!active || stop.isPending}>

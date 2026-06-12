@@ -16,14 +16,28 @@ export interface AthJobsStatus {
   startedAt?: string;
   lastSyncAt?: string;
   lastSyncStatus?: string;
+  lastGroupsSyncAt?: string;
+  lastGroupsSyncStatus?: string;
+  /** Si el loop reconcilia units (setup-units periódico, elimina huérfanas). */
+  reconcileUnits?: boolean;
+  lastUnitsReconcileAt?: string;
+  lastUnitsReconcileStatus?: string;
+}
+
+export interface StartSyncOptions {
+  date?: string;
+  hour?: string;
+  /** Incluir la sincronización de units (setup-units cada 5 min): refleja
+   * eliminaciones del proveedor BORRANDO units huérfanas. Opt-in. */
+  reconcileUnits?: boolean;
 }
 
 /** GET /api/ath/status-jobs — estado del loop de sincronización. */
 export const getJobsStatus = () => request<AthJobsStatus>("ath", "/status-jobs");
 
 /** POST /api/ath/start-sync-data — inicia el loop automático. */
-export const startSyncData = () =>
-  request<unknown>("ath", "/start-sync-data", { method: "POST" });
+export const startSyncData = (body: StartSyncOptions = {}) =>
+  request<unknown>("ath", "/start-sync-data", { method: "POST", body });
 
 /** POST /api/ath/stop-sync-data — detiene el loop. */
 export const stopSyncData = () =>

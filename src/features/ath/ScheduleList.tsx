@@ -52,7 +52,7 @@ function ScheduleItem({ s }: { s: AthSchedule }) {
     s.unitRole === "partial"
       ? `parcial · ${s.PhaseName}`
       : s.unitRole === "merged"
-        ? "se fusiona con la Final"
+        ? "consolidada · va en la Final por Tempo"
         : "no genera unit";
 
   return (
