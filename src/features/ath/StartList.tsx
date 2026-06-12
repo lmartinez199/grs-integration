@@ -4,6 +4,8 @@ import type { AthStartListEntry } from "@/api/ath";
 import {
   attemptsText,
   startListResult,
+  reactionTime,
+  pointsText,
   isRelay,
   groupRelayTeams,
 } from "@/lib/domain/ath-start-list";
@@ -28,6 +30,8 @@ function IndividualList({ entries }: { entries: AthStartListEntry[] }) {
       {entries.map((e, i) => {
         const attempts = attemptsText(e);
         const res = startListResult(e);
+        const reac = reactionTime(e);
+        const pts = pointsText(e);
         return (
           <li
             key={`${e.CompetitorName}-${e.Bib}-${i}`}
@@ -45,7 +49,19 @@ function IndividualList({ entries }: { entries: AthStartListEntry[] }) {
                   </span>
                 )}
               </div>
-              {res && <span className="shrink-0 text-right text-xs font-semibold tabular-nums">{res}</span>}
+              <div className="flex shrink-0 items-center gap-2 text-right">
+                {reac && (
+                  <span className="rounded bg-(--color-muted) px-1.5 py-0.5 text-xs tabular-nums text-(--color-muted-foreground)">
+                    Reaç {reac}
+                  </span>
+                )}
+                {pts && (
+                  <span className="rounded bg-(--color-muted) px-1.5 py-0.5 text-xs tabular-nums text-(--color-muted-foreground)">
+                    {pts} pts
+                  </span>
+                )}
+                {res && <span className="text-xs font-semibold tabular-nums">{res}</span>}
+              </div>
             </div>
             {attempts && (
               <p className="mt-1 text-xs text-(--color-muted-foreground)">

@@ -42,6 +42,20 @@ export function startListResult(e: AthStartListEntry): string | null {
   return null;
 }
 
+/** Tiempo de reacción legible (ej. "0.199"). Descarta vacío/placeholder en cero. */
+export function reactionTime(e: AthStartListEntry): string | null {
+  // CBAT/ATH puede devolver number o string; coercionar antes de trim.
+  const rt = e.ReactionTime == null ? "" : String(e.ReactionTime).trim();
+  return rt && /[1-9]/.test(rt) ? rt : null;
+}
+
+/** Puntos legibles (combinadas). Descarta vacío/cero. */
+export function pointsText(e: AthStartListEntry): string | null {
+  // `Points` llega como number (ej. 897) en combinadas; coercionar antes de trim.
+  const p = e.Points == null ? "" : String(e.Points).trim();
+  return p && /[1-9]/.test(p) ? p : null;
+}
+
 /** Etiqueta legible del género de una prueba. */
 export function genderLabel(g: string): string {
   const v = g?.toUpperCase();

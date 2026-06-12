@@ -14,6 +14,7 @@ import {
   Activity,
   ChevronRight,
   Users,
+  Trophy,
   Loader2,
   Search,
   Send,
@@ -31,7 +32,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { StartList } from "./StartList";
+import { ResultsDisplay } from "./ResultsDisplay";
 
 const yes = (v: string) => v?.toUpperCase() === "S";
 
@@ -79,11 +82,19 @@ function ScheduleItem({ s }: { s: AthSchedule }) {
   const qc = useQueryClient();
   const { sent: sentMap, isSent, markSent } = useSent();
   const [showStartList, setShowStartList] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   const startList = useQuery({
     queryKey: ["ath", "start-list", s.TestId, s.Time, s.StageId],
     queryFn: () => getStartListDetails(s.TestId, s.Time, s.StageId),
     enabled: showStartList,
   });
+  // Los resultados salen de la misma fuente que la start list (marcas ya pobladas).
+  const results = useQuery({
+    queryKey: ["ath", "start-list", s.TestId, s.Time, s.StageId],
+    queryFn: () => getStartListDetails(s.TestId, s.Time, s.StageId),
+    enabled: showResults,
+  });
+  const hasResults = yes(s.HasResult) || yes(s.Andamento);
 
   const sync = useMutation({
     mutationFn: () => manualSyncMapped(syncBody(s)),
@@ -185,6 +196,17 @@ function ScheduleItem({ s }: { s: AthSchedule }) {
               {showStartList ? "Ocultar start list" : "Ver start list"}
             </Button>
           )}
+          {hasResults && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 px-2"
+              onClick={() => setShowResults((v) => !v)}
+            >
+              <Trophy className="size-3.5" />
+              {showResults ? "Ocultar resultados" : "Ver resultados"}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -197,7 +219,28 @@ function ScheduleItem({ s }: { s: AthSchedule }) {
               No se pudo cargar la start list.
             </p>
           ) : (
-            <StartList entries={startList.data ?? []} />
+            <ErrorBoundary label="start list">
+              <StartList entries={startList.data ?? []} />
+            </ErrorBoundary>
+          )}
+        </div>
+      )}
+
+      {showResults && (
+        <div className="mt-2 border-t border-(--color-border) pt-2">
+          {results.isLoading ? (
+            <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
+          ) : results.isError ? (
+            <p className="text-sm text-(--color-destructive)">
+              No se pudieron cargar los resultados.
+            </p>
+          ) : (
+            <ErrorBoundary label="resultados">
+              <ResultsDisplay
+                entries={results.data ?? []}
+                live={!yes(s.HasResult) && yes(s.Andamento)}
+              />
+            </ErrorBoundary>
           )}
         </div>
       )}

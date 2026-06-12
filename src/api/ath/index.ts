@@ -175,6 +175,10 @@ export interface AthStartListEntry {
   RkPo: number;
   FinalResult: string;
   BestMark: string;
+  /** Tiempo de reacción de salida (tacos), ej. "0.199". Solo pruebas de pista. */
+  ReactionTime?: string | number;
+  /** Puntos (combinadas: decatlón/heptatlón/…). Llega como number desde CBAT. */
+  Points?: string | number;
   CompetitorName: string;
   Club: string;
   CodeClub: string;
