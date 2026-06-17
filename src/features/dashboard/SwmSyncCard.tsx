@@ -14,6 +14,9 @@ import { SyncCard } from "@/components/ui/sync-card";
 
 const fmt = (ts?: number) => (ts ? new Date(ts).toLocaleString() : "—");
 
+/** Ventana para considerar el webhook "activo" según la última entrega. */
+const WEBHOOK_ACTIVE_WINDOW_MS = 10 * 60_000;
+
 export function SwmSyncCard() {
   const [meetId, setMeetId] = useState("");
 
@@ -38,6 +41,9 @@ export function SwmSyncCard() {
   });
 
   const last = webhooks.data?.recent[0];
+  const webhookActive = last
+    ? Date.now() - last.timestamp < WEBHOOK_ACTIVE_WINDOW_MS
+    : false;
 
   return (
     <SyncCard
@@ -48,10 +54,10 @@ export function SwmSyncCard() {
           <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
         ) : health.isError ? (
           <Badge variant="destructive">sin conexión</Badge>
-        ) : health.data?.connected ? (
-          <Badge variant="success">conectado</Badge>
+        ) : webhookActive ? (
+          <Badge variant="success">webhook activo</Badge>
         ) : (
-          <Badge variant="secondary">sin probe</Badge>
+          <Badge variant="secondary">sin actividad</Badge>
         )
       }
     >
