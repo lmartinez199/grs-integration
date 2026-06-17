@@ -2,6 +2,7 @@ import { ArenaSyncCard } from "./ArenaSyncCard";
 import { ZempoSyncCard } from "./ZempoSyncCard";
 import { AthSyncCard } from "./AthSyncCard";
 import { ArcoSyncCard } from "./ArcoSyncCard";
+import { SwmSyncCard } from "./SwmSyncCard";
 
 export function DashboardPage() {
   return (
@@ -19,6 +20,7 @@ export function DashboardPage() {
           <ZempoSyncCard />
           <AthSyncCard />
           <ArcoSyncCard />
+          <SwmSyncCard />
         </div>
       </div>
     </div>
