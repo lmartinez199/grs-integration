@@ -6,10 +6,13 @@ import {
   swmHealth,
   swmInspect,
   swmSyncMeet,
+  swmSyncStage,
   swmValidate,
   swmWebhookLog,
   SWM_RESOURCES,
+  SWM_STAGES,
   type SwmResource,
+  type SwmStage,
 } from "@/api/grs/swimsystem";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +20,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataView } from "@/components/ui/data-view";
 import { Input } from "@/components/ui/input";
-import { Tabs, tabPanelId, tabTriggerId, type TabItem } from "@/components/ui/tabs";
+import {
+  Tabs,
+  tabPanelId,
+  tabTriggerId,
+  type TabItem,
+} from "@/components/ui/tabs";
 
 const TABS: TabItem[] = [
   { value: "estado", label: "Estado" },
@@ -51,14 +59,19 @@ export function SwmPage() {
     successMsg: "Sync de natación (SWM) disparada",
     invalidateKeys: [["swm", "webhooks"]],
   });
+  const stageSync = useMutationWithToast({
+    mutationFn: (stage: SwmStage) => swmSyncStage(id, stage),
+    successMsg: "Etapa de sync disparada",
+    invalidateKeys: [["swm", "webhooks"]],
+  });
 
   return (
     <div className="flex h-full flex-col gap-6 p-6">
       <header className="shrink-0">
         <h1 className="text-2xl font-semibold">SWM (natación)</h1>
         <p className="text-sm text-(--color-muted-foreground)">
-          Operación de la integración con SwimSystem.app: estado del webhook, qué
-          manda el proveedor y disparo del sync.
+          Operación de la integración con SwimSystem.app: estado del webhook,
+          qué manda el proveedor y disparo del sync.
         </p>
       </header>
 
@@ -92,7 +105,10 @@ export function SwmPage() {
                 {health.isLoading ? (
                   <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />
                 ) : health.isError ? (
-                  <p role="alert" className="text-sm text-(--color-destructive)">
+                  <p
+                    role="alert"
+                    className="text-sm text-(--color-destructive)"
+                  >
                     No se pudo consultar el estado.
                   </p>
                 ) : (
@@ -118,7 +134,10 @@ export function SwmPage() {
                 {webhooks.isLoading ? (
                   <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />
                 ) : webhooks.isError ? (
-                  <p role="alert" className="text-sm text-(--color-destructive)">
+                  <p
+                    role="alert"
+                    className="text-sm text-(--color-destructive)"
+                  >
                     No se pudo leer el log de webhook.
                   </p>
                 ) : (
@@ -159,14 +178,18 @@ export function SwmPage() {
               <CardContent>
                 {!id || !resource ? (
                   <p className="text-sm text-(--color-muted-foreground)">
-                    Ingresa un meetId y elige un recurso para inspeccionar lo que
-                    manda el proveedor.
+                    Ingresa un meetId y elige un recurso para inspeccionar lo
+                    que manda el proveedor.
                   </p>
                 ) : inspect.isFetching ? (
                   <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />
                 ) : inspect.isError ? (
-                  <p role="alert" className="text-sm text-(--color-destructive)">
-                    {(inspect.error as Error)?.message ?? "Error al inspeccionar."}
+                  <p
+                    role="alert"
+                    className="text-sm text-(--color-destructive)"
+                  >
+                    {(inspect.error as Error)?.message ??
+                      "Error al inspeccionar."}
                   </p>
                 ) : (
                   <DataView data={inspect.data} showTechnical />
@@ -211,6 +234,44 @@ export function SwmPage() {
                 Validar (mapeo RSC)
               </Button>
             </div>
+
+            <div className="space-y-2">
+              <p className="text-sm text-(--color-muted-foreground)">
+                O por etapa (orden: estructura → participantes → start-lists →
+                resultados):
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {SWM_STAGES.map(({ stage, label }) => (
+                  <Button
+                    key={stage}
+                    size="sm"
+                    variant="outline"
+                    disabled={!id || stageSync.isPending}
+                    onClick={() => stageSync.mutate(stage)}
+                  >
+                    {stageSync.isPending && stageSync.variables === stage ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <RefreshCw className="size-4" />
+                    )}
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {stageSync.data && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>
+                    Resultado de la etapa · {stageSync.data.stage}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <DataView data={stageSync.data} />
+                </CardContent>
+              </Card>
+            )}
 
             {sync.data && (
               <Card>
