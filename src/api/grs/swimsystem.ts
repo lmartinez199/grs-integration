@@ -127,3 +127,33 @@ export const swmSyncMeet = (meetId: string) =>
   request<SwmSyncSummary>("grs", `/swimsystem/sync/${enc(meetId)}`, {
     method: "POST",
   });
+
+/**
+ * Etapas del sync (espejo de los endpoints granulares de grs-backend, patrón
+ * ATH). Tienen orden de dependencia: structure → participants → start-lists →
+ * results. Cada etapa es idempotente y re-asegura la estructura que necesita.
+ */
+export type SwmStage = "structure" | "participants" | "start-lists" | "results";
+
+export const SWM_STAGES: { stage: SwmStage; label: string }[] = [
+  { stage: "structure", label: "1 · Estructura" },
+  { stage: "participants", label: "2 · Participantes" },
+  { stage: "start-lists", label: "3 · Start-lists" },
+  { stage: "results", label: "4 · Resultados" },
+];
+
+/** Resumen de una etapa individual del sync (contadores parciales). */
+export interface SwmStageSummary {
+  meetId: string;
+  stage: SwmStage;
+  clubs?: number;
+  athletes?: number;
+  events?: number;
+  results?: number;
+}
+
+/** POST /swimsystem/sync/:meetId/:stage — dispara una etapa concreta. */
+export const swmSyncStage = (meetId: string, stage: SwmStage) =>
+  request<SwmStageSummary>("grs", `/swimsystem/sync/${enc(meetId)}/${stage}`, {
+    method: "POST",
+  });
