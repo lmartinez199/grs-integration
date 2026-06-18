@@ -133,13 +133,21 @@ export const swmSyncMeet = (meetId: string) =>
  * ATH). Tienen orden de dependencia: structure → participants → start-lists →
  * results. Cada etapa es idempotente y re-asegura la estructura que necesita.
  */
-export type SwmStage = "structure" | "participants" | "start-lists" | "results";
+export type SwmStage =
+  | "organisations"
+  | "structure"
+  | "participants"
+  | "groups"
+  | "start-lists"
+  | "results";
 
 export const SWM_STAGES: { stage: SwmStage; label: string }[] = [
-  { stage: "structure", label: "1 · Estructura" },
-  { stage: "participants", label: "2 · Participantes" },
-  { stage: "start-lists", label: "3 · Start-lists" },
-  { stage: "results", label: "4 · Resultados" },
+  { stage: "organisations", label: "1 · Organizaciones" },
+  { stage: "structure", label: "2 · Estructura" },
+  { stage: "participants", label: "3 · Participantes" },
+  { stage: "groups", label: "4 · Grupos (relevos)" },
+  { stage: "start-lists", label: "5 · Start-lists" },
+  { stage: "results", label: "6 · Resultados" },
 ];
 
 /** Resumen de una etapa individual del sync (contadores parciales). */
@@ -149,6 +157,7 @@ export interface SwmStageSummary {
   clubs?: number;
   athletes?: number;
   events?: number;
+  groups?: number;
   results?: number;
 }
 
