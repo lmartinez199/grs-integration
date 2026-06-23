@@ -1,3 +1,4 @@
+import { getIntegration, updateIntegrationExternalIds } from "@/api/grs/integrations";
 import { request } from "@/lib/http";
 
 // ---- Tipos ARENA ---------------------------------------------------------
@@ -94,21 +95,30 @@ export interface ArenaWebhook {
   status: number; // 1 = enabled, 0 = disabled
 }
 
-// ---- Settings ------------------------------------------------------------
+// ---- Settings (vía colección `integrations`) -----------------------------
+// La config de Arena vive en `integrations/arena` (no en la colección legacy
+// `arena_settings`). Adaptamos la forma del Integration a `ArenaSettings`.
 
-export const getArenaSettings = () => request<ArenaSettings>("grs", "/arena/settings");
+interface ArenaExternalIds {
+  baseUrl?: string;
+  eventCode?: string;
+}
 
-export const updateArenaBaseUrl = (baseUrl: string) =>
-  request<ArenaSettings>("grs", "/arena/settings/base-url", {
-    method: "PUT",
-    body: { baseUrl },
-  });
+export const getArenaSettings = async (): Promise<ArenaSettings> => {
+  const integration = await getIntegration("arena");
+  const ext = integration.externalIds as ArenaExternalIds;
+  return {
+    id: integration.id,
+    baseUrl: ext.baseUrl ?? "",
+    eventCode: ext.eventCode ?? "",
+    isEnabled: integration.enabled,
+    updatedAt: integration.updatedAt,
+  };
+};
 
-export const updateArenaEventCode = (eventCode: string) =>
-  request<ArenaSettings>("grs", "/arena/settings/event-code", {
-    method: "PUT",
-    body: { eventCode },
-  });
+/** Guarda baseUrl + eventCode en un solo PUT (external-ids reemplaza el objeto). */
+export const updateArenaSettings = (baseUrl: string, eventCode: string) =>
+  updateIntegrationExternalIds("arena", { baseUrl, eventCode });
 
 // ---- Sync (lectura) ------------------------------------------------------
 

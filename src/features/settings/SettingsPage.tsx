@@ -1,16 +1,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useMutationWithToast } from "@/hooks/useMutationWithToast";
+import { useMutation } from "@tanstack/react-query";
 import { Activity, Loader2, Save } from "lucide-react";
 
 import { useSettings, type Settings } from "@/stores/settings.store";
-import {
-  getArenaSettings,
-  updateArenaBaseUrl,
-  updateArenaEventCode,
-} from "@/api/grs/arena";
 import { zempoHealth } from "@/api/grs/zempo-sync";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,13 +26,12 @@ export function SettingsPage() {
         <header className="shrink-0">
           <h1 className="text-2xl font-semibold">Ajustes</h1>
           <p className="text-sm text-(--color-muted-foreground)">
-            Configura las conexiones a los servicios y la integración ARENA.
+            Configura las conexiones a los servicios.
           </p>
         </header>
 
         <div className="min-h-0 flex-1 space-y-6 overflow-auto">
           <ConnectionsCard />
-          <ArenaServerCard />
         </div>
       </div>
     </div>
@@ -148,86 +141,6 @@ function ConnectionsCard() {
             )}
           </div>
         </form>
-      </CardContent>
-    </Card>
-  );
-}
-
-const arenaServerSchema = z.object({
-  baseUrl: z.url("URL inválida"),
-  eventCode: z.string().min(1, "Requerido"),
-});
-
-function ArenaServerCard() {
-  const settingsQuery = useQuery({
-    queryKey: ["arena", "settings"],
-    queryFn: getArenaSettings,
-  });
-
-  // `values` sincroniza el form con los datos del servidor sin useEffect+reset.
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<{ baseUrl: string; eventCode: string }>({
-    resolver: zodResolver(arenaServerSchema),
-    values: settingsQuery.data
-      ? { baseUrl: settingsQuery.data.baseUrl, eventCode: settingsQuery.data.eventCode }
-      : undefined,
-  });
-
-  const saveBaseUrl = useMutationWithToast({
-    mutationFn: (v: string) => updateArenaBaseUrl(v),
-    successMsg: "Base URL de ARENA actualizada",
-    invalidateKeys: [["arena", "settings"]],
-  });
-
-  const saveEventCode = useMutationWithToast({
-    mutationFn: (v: string) => updateArenaEventCode(v),
-    successMsg: "Código de evento actualizado",
-    invalidateKeys: [["arena", "settings"]],
-  });
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Integración WRE / lucha (en el GRS)</CardTitle>
-        <CardDescription>
-          Estos valores se guardan en el servidor GRS, no localmente.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {settingsQuery.isLoading ? (
-          <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />
-        ) : settingsQuery.isError ? (
-          <p className="text-sm text-(--color-destructive)">
-            No se pudo cargar la configuración de ARENA.
-          </p>
-        ) : (
-          <form
-            className="space-y-4"
-            onSubmit={handleSubmit((v) => {
-              saveBaseUrl.mutate(v.baseUrl);
-              saveEventCode.mutate(v.eventCode);
-            })}
-          >
-            <Field label="URL del sistema WRE (Arena)" error={errors.baseUrl?.message}>
-              <Input {...register("baseUrl")} placeholder="http://localhost:8080" />
-            </Field>
-            <Field label="Código de evento (eventCode)" error={errors.eventCode?.message}>
-              <Input {...register("eventCode")} placeholder="JJB2026" />
-            </Field>
-            <Button
-              type="submit"
-              disabled={saveBaseUrl.isPending || saveEventCode.isPending}
-            >
-              {(saveBaseUrl.isPending || saveEventCode.isPending) && (
-                <Loader2 className="size-4 animate-spin" />
-              )}
-              Guardar en GRS
-            </Button>
-          </form>
-        )}
       </CardContent>
     </Card>
   );
