@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataView } from "@/components/ui/data-view";
+import { TableView } from "@/components/ui/table-view";
 import { Input } from "@/components/ui/input";
 import {
   Tabs,
@@ -212,7 +213,11 @@ export function SwmPage() {
                   </p>
                 ) : (
                   <div className="max-h-[60vh] overflow-auto pr-1">
-                    <DataView data={inspect.data} />
+                    {Array.isArray(inspect.data) && inspect.data.length > 0 && typeof inspect.data[0] === "object" ? (
+                      <TableView data={inspect.data as Record<string, unknown>[]} />
+                    ) : (
+                      <DataView data={inspect.data} />
+                    )}
                   </div>
                 )}
               </CardContent>
