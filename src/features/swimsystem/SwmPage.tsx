@@ -20,7 +20,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataView } from "@/components/ui/data-view";
-import { TableView } from "@/components/ui/table-view";
 import { Input } from "@/components/ui/input";
 import {
   Tabs,
@@ -39,6 +38,7 @@ export function SwmPage() {
   const [tab, setTab] = useState("estado");
   const [meetId, setMeetId] = useState("");
   const [resource, setResource] = useState<SwmResource | null>(null);
+  const [filter, setFilter] = useState("");
   const id = meetId.trim();
 
   const integration = useQuery({
@@ -50,6 +50,8 @@ export function SwmPage() {
   useEffect(() => {
     if (knownMeetIds.length === 1 && !meetId) setMeetId(knownMeetIds[0]);
   }, [knownMeetIds.length]);
+
+  useEffect(() => { setFilter(""); }, [resource]);
 
   function saveMeetIdIfNew(meetIdToSave: string) {
     if (!meetIdToSave || knownMeetIds.includes(meetIdToSave)) return;
@@ -74,6 +76,12 @@ export function SwmPage() {
     queryFn: () => swmValidate(id),
     enabled: false,
   });
+
+  const q = filter.trim().toLowerCase();
+  const inspectArray = Array.isArray(inspect.data) ? (inspect.data as Record<string, unknown>[]) : null;
+  const filteredData: unknown = inspectArray && q
+    ? inspectArray.filter((item) => JSON.stringify(item).toLowerCase().includes(q))
+    : inspect.data;
   const sync = useMutationWithToast({
     mutationFn: () => swmSyncMeet(id),
     successMsg: "Sync de natación (SWM) disparada",
@@ -193,12 +201,23 @@ export function SwmPage() {
               <CardHeader className="flex-row items-center justify-between space-y-0">
                 <CardTitle>
                   {resource ?? "Proveedor"}
-                  {Array.isArray(inspect.data) && (
+                  {inspectArray && (
                     <span className="ml-2 text-sm font-normal text-(--color-muted-foreground)">
-                      {inspect.data.length} registros
+                      {Array.isArray(filteredData) && filteredData.length !== inspectArray.length
+                        ? `${filteredData.length} / ${inspectArray.length}`
+                        : `${inspectArray.length}`}{" "}
+                      registros
                     </span>
                   )}
                 </CardTitle>
+                {inspectArray && inspectArray.length > 0 && (
+                  <Input
+                    placeholder="Buscar en cualquier campo…"
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                    className="h-7 w-56 text-xs"
+                  />
+                )}
               </CardHeader>
               <CardContent>
                 {!id || !resource ? (
@@ -213,11 +232,7 @@ export function SwmPage() {
                   </p>
                 ) : (
                   <div className="max-h-[60vh] overflow-auto pr-1">
-                    {Array.isArray(inspect.data) && inspect.data.length > 0 && typeof inspect.data[0] === "object" ? (
-                      <TableView data={inspect.data as Record<string, unknown>[]} />
-                    ) : (
-                      <DataView data={inspect.data} />
-                    )}
+                    <DataView data={filteredData} collapsible />
                   </div>
                 )}
               </CardContent>

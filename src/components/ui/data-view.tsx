@@ -17,6 +17,20 @@ interface DataViewProps {
   className?: string;
   /** Mostrar claves técnicas (id, _id, etc.). Por defecto se ocultan. */
   showTechnical?: boolean;
+  /** Items del array son colapsables con <details>. */
+  collapsible?: boolean;
+}
+
+/** Genera un resumen de un objeto para el <summary> del item colapsable. */
+function summarize(item: unknown): string {
+  if (item === null || item === undefined) return "—";
+  if (typeof item !== "object" || Array.isArray(item)) return String(item);
+  const obj = item as Record<string, unknown>;
+  return Object.entries(obj)
+    .filter(([k, v]) => !HIDDEN_KEYS.has(k) && v !== null && typeof v !== "object")
+    .slice(0, 4)
+    .map(([k, v]) => `${humanizeKey(k)}: ${formatPrimitive(v)}`)
+    .join(" · ") || "—";
 }
 
 /**
@@ -24,7 +38,7 @@ interface DataViewProps {
  * objetos como lista etiqueta→valor, arrays como conteo + tarjetas. Evita por
  * completo el JSON crudo con llaves y comillas.
  */
-export function DataView({ data, className, showTechnical = false }: DataViewProps) {
+export function DataView({ data, className, showTechnical = false, collapsible = false }: DataViewProps) {
   if (data === null || data === undefined) {
     return <p className={cn("text-sm text-(--color-muted-foreground)", className)}>Sin datos.</p>;
   }
@@ -39,11 +53,22 @@ export function DataView({ data, className, showTechnical = false }: DataViewPro
     }
     return (
       <div className={cn("space-y-2", className)}>
-        {data.map((item, i) => (
-          <div key={i} className="rounded-md border bg-(--color-muted)/40 p-3">
-            <DataView data={item} showTechnical={showTechnical} />
-          </div>
-        ))}
+        {data.map((item, i) =>
+          collapsible ? (
+            <details key={i} className="rounded-md border bg-(--color-muted)/40">
+              <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium marker:text-(--color-muted-foreground)">
+                {summarize(item)}
+              </summary>
+              <div className="border-t border-(--color-border) p-3">
+                <DataView data={item} showTechnical={showTechnical} />
+              </div>
+            </details>
+          ) : (
+            <div key={i} className="rounded-md border bg-(--color-muted)/40 p-3">
+              <DataView data={item} showTechnical={showTechnical} />
+            </div>
+          ),
+        )}
       </div>
     );
   }
