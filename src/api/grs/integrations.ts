@@ -23,7 +23,7 @@ export const getIntegration = (provider: string) =>
 export const setIntegrationEnabled = (provider: string, enabled: boolean) =>
   request<Integration>("grs", `/integrations/${provider}/enabled`, {
     method: "PUT",
-    body: JSON.stringify({ enabled }),
+    body: { enabled },
   });
 
 export const updateIntegrationExternalIds = (
@@ -32,5 +32,5 @@ export const updateIntegrationExternalIds = (
 ) =>
   request<Integration>("grs", `/integrations/${provider}/external-ids`, {
     method: "PUT",
-    body: JSON.stringify({ externalIds }),
+    body: { externalIds },
   });
