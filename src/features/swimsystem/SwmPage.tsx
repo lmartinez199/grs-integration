@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, RefreshCw, Search } from "lucide-react";
 
-import { getIntegration } from "@/api/grs/integrations";
+import { getIntegration, updateIntegrationExternalIds } from "@/api/grs/integrations";
 import {
   swmHealth,
   swmInspect,
@@ -49,6 +49,13 @@ export function SwmPage() {
   useEffect(() => {
     if (knownMeetIds.length === 1 && !meetId) setMeetId(knownMeetIds[0]);
   }, [knownMeetIds.length]);
+
+  function saveMeetIdIfNew(meetIdToSave: string) {
+    if (!meetIdToSave || knownMeetIds.includes(meetIdToSave)) return;
+    updateIntegrationExternalIds("swimsystem", {
+      meetIds: [...knownMeetIds, meetIdToSave],
+    }).then(() => integration.refetch());
+  }
 
   const health = useQuery({ queryKey: ["swm", "health"], queryFn: swmHealth });
   const webhooks = useQuery({
@@ -174,7 +181,7 @@ export function SwmPage() {
                   size="sm"
                   variant={r === resource ? "default" : "outline"}
                   disabled={!id}
-                  onClick={() => setResource(r)}
+                  onClick={() => { setResource(r); saveMeetIdIfNew(id); }}
                 >
                   {r}
                 </Button>
@@ -222,7 +229,7 @@ export function SwmPage() {
               <Button
                 size="sm"
                 disabled={!id || sync.isPending}
-                onClick={() => sync.mutate()}
+                onClick={() => { saveMeetIdIfNew(id); sync.mutate(); }}
               >
                 {sync.isPending ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -258,7 +265,7 @@ export function SwmPage() {
                     size="sm"
                     variant="outline"
                     disabled={!id || stageSync.isPending}
-                    onClick={() => stageSync.mutate(stage)}
+                    onClick={() => { saveMeetIdIfNew(id); stageSync.mutate(stage); }}
                   >
                     {stageSync.isPending && stageSync.variables === stage ? (
                       <Loader2 className="size-4 animate-spin" />
