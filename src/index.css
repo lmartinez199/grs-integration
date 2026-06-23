@@ -102,7 +102,9 @@ body {
 
 input,
 textarea,
-select {
+select,
+dd,
+summary {
   user-select: text;
 }
 

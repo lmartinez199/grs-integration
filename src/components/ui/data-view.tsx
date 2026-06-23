@@ -56,7 +56,7 @@ export function DataView({ data, className, showTechnical = false, collapsible =
         {data.map((item, i) =>
           collapsible ? (
             <details key={i} className="rounded-md border bg-(--color-muted)/40">
-              <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium marker:text-(--color-muted-foreground)">
+              <summary className="cursor-pointer px-3 py-2 text-sm font-medium marker:text-(--color-muted-foreground)">
                 {summarize(item)}
               </summary>
               <div className="border-t border-(--color-border) p-3">
