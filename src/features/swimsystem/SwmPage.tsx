@@ -188,29 +188,31 @@ export function SwmPage() {
               ))}
             </div>
             <Card>
-              <CardHeader>
+              <CardHeader className="flex-row items-center justify-between space-y-0">
                 <CardTitle>
-                  Crudo del proveedor{resource ? ` · ${resource}` : ""}
+                  {resource ?? "Proveedor"}
+                  {Array.isArray(inspect.data) && (
+                    <span className="ml-2 text-sm font-normal text-(--color-muted-foreground)">
+                      {inspect.data.length} registros
+                    </span>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {!id || !resource ? (
                   <p className="text-sm text-(--color-muted-foreground)">
-                    Ingresa un meetId y elige un recurso para inspeccionar lo
-                    que manda el proveedor.
+                    Elige un recurso para inspeccionar lo que manda el proveedor.
                   </p>
                 ) : inspect.isFetching ? (
                   <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />
                 ) : inspect.isError ? (
-                  <p
-                    role="alert"
-                    className="text-sm text-(--color-destructive)"
-                  >
-                    {(inspect.error as Error)?.message ??
-                      "Error al inspeccionar."}
+                  <p role="alert" className="text-sm text-(--color-destructive)">
+                    {(inspect.error as Error)?.message ?? "Error al inspeccionar."}
                   </p>
                 ) : (
-                  <DataView data={inspect.data} showTechnical />
+                  <div className="max-h-[60vh] overflow-auto pr-1">
+                    <DataView data={inspect.data} />
+                  </div>
                 )}
               </CardContent>
             </Card>
