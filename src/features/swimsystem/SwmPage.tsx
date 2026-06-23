@@ -66,6 +66,7 @@ export function SwmPage() {
     queryKey: ["swm", "inspect", id, resource],
     queryFn: () => swmInspect(id, resource!),
     enabled: Boolean(id) && resource != null,
+    staleTime: 5 * 60 * 1000,
   });
   const validation = useQuery({
     queryKey: ["swm", "validate", id],
@@ -203,7 +204,7 @@ export function SwmPage() {
                   <p className="text-sm text-(--color-muted-foreground)">
                     Elige un recurso para inspeccionar lo que manda el proveedor.
                   </p>
-                ) : inspect.isFetching ? (
+                ) : inspect.isLoading ? (
                   <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />
                 ) : inspect.isError ? (
                   <p role="alert" className="text-sm text-(--color-destructive)">
