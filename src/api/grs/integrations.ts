@@ -17,6 +17,9 @@ export interface Integration {
 export const listIntegrations = () =>
   request<Integration[]>("grs", "/integrations");
 
+export const getIntegration = (provider: string) =>
+  request<Integration>("grs", `/integrations/${provider}`);
+
 export const setIntegrationEnabled = (provider: string, enabled: boolean) =>
   request<Integration>("grs", `/integrations/${provider}/enabled`, {
     method: "PUT",

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, RefreshCw, Search } from "lucide-react";
 
+import { getIntegration } from "@/api/grs/integrations";
 import {
   swmHealth,
   swmInspect,
@@ -38,6 +39,16 @@ export function SwmPage() {
   const [meetId, setMeetId] = useState("");
   const [resource, setResource] = useState<SwmResource | null>(null);
   const id = meetId.trim();
+
+  const integration = useQuery({
+    queryKey: ["integrations", "swimsystem"],
+    queryFn: () => getIntegration("swimsystem"),
+  });
+  const knownMeetIds = (integration.data?.externalIds?.meetIds as string[] | undefined) ?? [];
+
+  useEffect(() => {
+    if (knownMeetIds.length === 1 && !meetId) setMeetId(knownMeetIds[0]);
+  }, [knownMeetIds.length]);
 
   const health = useQuery({ queryKey: ["swm", "health"], queryFn: swmHealth });
   const webhooks = useQuery({
@@ -155,7 +166,7 @@ export function SwmPage() {
             aria-labelledby={tabTriggerId("proveedor")}
             className="space-y-4"
           >
-            <MeetIdInput meetId={meetId} setMeetId={setMeetId} />
+            <MeetIdInput meetId={meetId} setMeetId={setMeetId} knownMeetIds={knownMeetIds} />
             <div className="flex flex-wrap gap-2">
               {SWM_RESOURCES.map((r) => (
                 <Button
@@ -206,7 +217,7 @@ export function SwmPage() {
             aria-labelledby={tabTriggerId("sync")}
             className="space-y-4"
           >
-            <MeetIdInput meetId={meetId} setMeetId={setMeetId} />
+            <MeetIdInput meetId={meetId} setMeetId={setMeetId} knownMeetIds={knownMeetIds} />
             <div className="flex flex-wrap gap-2">
               <Button
                 size="sm"
@@ -304,16 +315,37 @@ export function SwmPage() {
 function MeetIdInput({
   meetId,
   setMeetId,
+  knownMeetIds = [],
 }: {
   meetId: string;
   setMeetId: (v: string) => void;
+  knownMeetIds?: string[];
 }) {
   return (
-    <Input
-      placeholder="meetId de SwimSystem (UUID)"
-      value={meetId}
-      onChange={(e) => setMeetId(e.target.value)}
-      className="max-w-md"
-    />
+    <div className="space-y-2">
+      <Input
+        placeholder="meetId de SwimSystem (UUID)"
+        value={meetId}
+        onChange={(e) => setMeetId(e.target.value)}
+        className="max-w-md"
+      />
+      {knownMeetIds.length > 1 && (
+        <div className="flex flex-wrap gap-2">
+          {knownMeetIds.map((id) => (
+            <button
+              key={id}
+              onClick={() => setMeetId(id)}
+              className={`rounded-md border px-2 py-0.5 font-mono text-xs transition-colors ${
+                id === meetId
+                  ? "border-transparent bg-(--color-primary) text-(--color-primary-foreground)"
+                  : "border-(--color-border) text-(--color-muted-foreground) hover:text-(--color-foreground)"
+              }`}
+            >
+              {id.slice(0, 8)}…
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
