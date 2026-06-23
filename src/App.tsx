@@ -13,6 +13,7 @@ import { JudPage } from "@/features/judo/JudPage";
 import { AthPage } from "@/features/ath/AthPage";
 import { ArcoPage } from "@/features/arco/ArcoPage";
 import { SwmPage } from "@/features/swimsystem/SwmPage";
+import { IntegrationsPage } from "@/features/integrations/IntegrationsPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 
 function ProtectedRoute() {
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="/ath" element={<AthPage />} />
           <Route path="/arco" element={<ArcoPage />} />
           <Route path="/swm" element={<SwmPage />} />
+          <Route path="/integrations" element={<IntegrationsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
