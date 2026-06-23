@@ -336,7 +336,7 @@ function MeetIdInput({
         onChange={(e) => setMeetId(e.target.value)}
         className="max-w-md"
       />
-      {knownMeetIds.length > 1 && (
+      {knownMeetIds.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {knownMeetIds.map((id) => (
             <button
