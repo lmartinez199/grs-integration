@@ -308,8 +308,9 @@ export function SwmPage() {
                     Resultado de la etapa · {stageSync.data.stage}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <DataView data={stageSync.data} />
+                <CardContent className="space-y-3">
+                  <DataView data={omitErrors(stageSync.data)} />
+                  <SyncErrors errors={stageSync.data.errors} />
                 </CardContent>
               </Card>
             )}
@@ -319,8 +320,9 @@ export function SwmPage() {
                 <CardHeader>
                   <CardTitle>Resultado del sync</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <DataView data={sync.data} />
+                <CardContent className="space-y-3">
+                  <DataView data={omitErrors(sync.data)} />
+                  <SyncErrors errors={sync.data.errors} />
                 </CardContent>
               </Card>
             )}
@@ -338,6 +340,29 @@ export function SwmPage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Quita `errors` del resumen para que el DataView no muestre el ruido vacío. */
+function omitErrors<T extends { errors?: string[] }>(data: T): Omit<T, "errors"> {
+  const { errors: _errors, ...rest } = data;
+  return rest;
+}
+
+/** Lista de fallos del sync (rojo), solo cuando hay alguno. */
+function SyncErrors({ errors }: { errors?: string[] }) {
+  if (!errors?.length) return null;
+  return (
+    <div className="rounded-md border border-(--color-destructive)/40 bg-(--color-destructive)/5 p-3">
+      <p className="text-sm font-medium text-(--color-destructive)">
+        {errors.length} con error
+      </p>
+      <ul className="mt-1 list-disc space-y-0.5 pl-5 text-xs text-(--color-muted-foreground)">
+        {errors.map((e, i) => (
+          <li key={i}>{e}</li>
+        ))}
+      </ul>
     </div>
   );
 }

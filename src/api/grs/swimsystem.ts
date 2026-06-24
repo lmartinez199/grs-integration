@@ -84,6 +84,8 @@ export interface SwmSyncSummary {
   athletes: number;
   events: number;
   results: number;
+  /** Fallos de datos del pull (vacío si todo salió bien). */
+  errors: string[];
 }
 
 /** Recursos crudos que expone el proveedor (passthrough). */
@@ -159,6 +161,8 @@ export interface SwmStageSummary {
   events?: number;
   groups?: number;
   results?: number;
+  /** Fallos de datos de la etapa (vacío si todo salió bien). */
+  errors: string[];
 }
 
 /** POST /swimsystem/sync/:meetId/:stage — dispara una etapa concreta. */
