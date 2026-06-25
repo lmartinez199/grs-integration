@@ -221,9 +221,7 @@ function IntegrationCard({ integration }: { integration: Integration }) {
           <SportTechFields ids={externalIds} onChange={setExternalIds} />
         )}
 
-        {integration.provider !== "arena" && (
-          <PollIntervalField integration={integration} />
-        )}
+        <PollIntervalField integration={integration} />
 
         {hasChanges && (
           <Button
