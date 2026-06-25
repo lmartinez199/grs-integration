@@ -276,28 +276,55 @@ export function SwmPage() {
               </Button>
             </div>
 
-            <div className="space-y-2">
-              <p className="text-sm text-(--color-muted-foreground)">
-                O por etapa (orden: estructura → participantes → start-lists →
-                resultados):
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {SWM_STAGES.map(({ stage, label }) => (
-                  <Button
-                    key={stage}
-                    size="sm"
-                    variant="outline"
-                    disabled={!id || stageSync.isPending}
-                    onClick={() => { saveMeetIdIfNew(id); stageSync.mutate(stage); }}
-                  >
-                    {stageSync.isPending && stageSync.variables === stage ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <RefreshCw className="size-4" />
-                    )}
-                    {label}
-                  </Button>
-                ))}
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <p className="text-sm text-(--color-muted-foreground)">
+                  Carga inicial por etapa (orden: organizaciones → estructura →
+                  participantes → grupos → start-lists):
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {SWM_STAGES.filter((s) => s.stage !== "results").map(
+                    ({ stage, label }) => (
+                      <StageButton
+                        key={stage}
+                        label={label}
+                        disabled={!id || stageSync.isPending}
+                        isPending={
+                          stageSync.isPending && stageSync.variables === stage
+                        }
+                        onClick={() => {
+                          saveMeetIdIfNew(id);
+                          stageSync.mutate(stage);
+                        }}
+                      />
+                    ),
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <p className="text-sm text-(--color-muted-foreground)">
+                  Resultados (durante/después de la competencia, no en la carga
+                  inicial):
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {SWM_STAGES.filter((s) => s.stage === "results").map(
+                    ({ stage, label }) => (
+                      <StageButton
+                        key={stage}
+                        label={label}
+                        disabled={!id || stageSync.isPending}
+                        isPending={
+                          stageSync.isPending && stageSync.variables === stage
+                        }
+                        onClick={() => {
+                          saveMeetIdIfNew(id);
+                          stageSync.mutate(stage);
+                        }}
+                      />
+                    ),
+                  )}
+                </div>
               </div>
             </div>
 
@@ -341,6 +368,30 @@ export function SwmPage() {
         )}
       </div>
     </div>
+  );
+}
+
+/** Botón de una etapa del sync (con spinner mientras corre). */
+function StageButton({
+  label,
+  disabled,
+  isPending,
+  onClick,
+}: {
+  label: string;
+  disabled: boolean;
+  isPending: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <Button size="sm" variant="outline" disabled={disabled} onClick={onClick}>
+      {isPending ? (
+        <Loader2 className="size-4 animate-spin" />
+      ) : (
+        <RefreshCw className="size-4" />
+      )}
+      {label}
+    </Button>
   );
 }
 
