@@ -44,18 +44,20 @@ export function SwmPage() {
     queryKey: ["integrations", "swimsystem"],
     queryFn: () => getIntegration("swimsystem"),
   });
-  const knownMeetIds = (integration.data?.externalIds?.meetIds as string[] | undefined) ?? [];
+  // 1 meetId por integración (solo existe 1 por año), igual que SportTech.
+  const savedMeetId =
+    (integration.data?.externalIds?.meetId as string | undefined) ?? "";
 
   useEffect(() => {
-    if (knownMeetIds.length === 1 && !meetId) setMeetId(knownMeetIds[0]);
-  }, [knownMeetIds.length]);
+    if (savedMeetId && !meetId) setMeetId(savedMeetId);
+  }, [savedMeetId]);
 
   useEffect(() => { setFilter(""); }, [resource]);
 
   function saveMeetIdIfNew(meetIdToSave: string) {
-    if (!meetIdToSave || knownMeetIds.includes(meetIdToSave)) return;
+    if (!meetIdToSave || meetIdToSave === savedMeetId) return;
     updateIntegrationExternalIds("swimsystem", {
-      meetIds: [...knownMeetIds, meetIdToSave],
+      meetId: meetIdToSave,
     }).then(() => integration.refetch());
   }
 
@@ -177,7 +179,7 @@ export function SwmPage() {
             aria-labelledby={tabTriggerId("proveedor")}
             className="space-y-4"
           >
-            <MeetIdInput meetId={meetId} setMeetId={setMeetId} knownMeetIds={knownMeetIds} />
+            <MeetIdInput meetId={meetId} setMeetId={setMeetId} savedMeetId={savedMeetId} />
             <div className="flex flex-wrap gap-2">
               {SWM_RESOURCES.map((r) => (
                 <Button
@@ -241,7 +243,7 @@ export function SwmPage() {
             aria-labelledby={tabTriggerId("sync")}
             className="space-y-4"
           >
-            <MeetIdInput meetId={meetId} setMeetId={setMeetId} knownMeetIds={knownMeetIds} />
+            <MeetIdInput meetId={meetId} setMeetId={setMeetId} savedMeetId={savedMeetId} />
             <div className="flex flex-wrap gap-2">
               <Button
                 size="sm"
@@ -327,37 +329,29 @@ function SyncErrors({ errors }: { errors?: string[] }) {
 function MeetIdInput({
   meetId,
   setMeetId,
-  knownMeetIds = [],
+  savedMeetId = "",
 }: {
   meetId: string;
   setMeetId: (v: string) => void;
-  knownMeetIds?: string[];
+  savedMeetId?: string;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-1">
       <Input
         placeholder="meetId de SwimSystem (UUID)"
         value={meetId}
         onChange={(e) => setMeetId(e.target.value)}
         className="max-w-md"
       />
-      {knownMeetIds.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {knownMeetIds.map((id) => (
-            <button
-              key={id}
-              onClick={() => setMeetId(id)}
-              className={`rounded-md border px-2 py-0.5 font-mono text-xs transition-colors ${
-                id === meetId
-                  ? "border-transparent bg-(--color-primary) text-(--color-primary-foreground)"
-                  : "border-(--color-border) text-(--color-muted-foreground) hover:text-(--color-foreground)"
-              }`}
-            >
-              {id.slice(0, 8)}…
-            </button>
-          ))}
-        </div>
-      )}
+      <p className="text-xs text-(--color-muted-foreground)">
+        {savedMeetId ? (
+          <>
+            Meet guardado: <span className="font-mono">{savedMeetId}</span>
+          </>
+        ) : (
+          "Aún no hay meet guardado."
+        )}
+      </p>
     </div>
   );
 }

@@ -33,28 +33,15 @@ function SwimSystemFields({ ids, onChange }: {
   ids: Record<string, unknown>;
   onChange: (next: Record<string, unknown>) => void;
 }) {
-  const meetIds = (ids.meetIds as string[] | undefined) ?? [];
-  const [raw, setRaw] = useState(meetIds.join(", "));
-
   return (
     <div className="space-y-1">
-      <Label htmlFor="swm-meetIds">meetIds (separados por coma)</Label>
+      <Label htmlFor="swm-meetId">meetId (UUID del meet)</Label>
       <Input
-        id="swm-meetIds"
-        value={raw}
-        onChange={(e) => {
-          setRaw(e.target.value);
-          const arr = e.target.value
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean);
-          onChange({ ...ids, meetIds: arr });
-        }}
-        placeholder="uuid1, uuid2, ..."
+        id="swm-meetId"
+        value={String(ids.meetId ?? "")}
+        onChange={(e) => onChange({ ...ids, meetId: e.target.value })}
+        placeholder="uuid del meet (1 por año)"
       />
-      <p className="text-xs text-(--color-muted-foreground)">
-        {meetIds.length} meet{meetIds.length !== 1 ? "s" : ""} configurado{meetIds.length !== 1 ? "s" : ""}
-      </p>
     </div>
   );
 }
