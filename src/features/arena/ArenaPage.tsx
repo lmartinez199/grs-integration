@@ -13,7 +13,9 @@ import {
   type ArenaCategory,
   type ArenaSportEvent,
 } from "@/api/grs/arena";
-import { cn } from "@/lib/utils";
+import { getIntegration } from "@/api/grs/integrations";
+import { cn, formatDateTime } from "@/lib/utils";
+import { RunHistory } from "@/components/integration/run-history";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -213,6 +215,7 @@ export function ArenaPage() {
             <ArenaLoopCard />
             <WebhookConfig />
             <ArenaSyncSteps />
+            <SyncHistoryCard />
           </div>
         )}
       </div>
@@ -303,6 +306,87 @@ function ProveedorRawSection({
           <div className="max-h-[60vh] overflow-auto pr-1">
             <DataView data={data} showTechnical collapsible />
           </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
+ * Último sync + historial de corridas de `integrations/arena`, para no tener que ir
+ * a la página Integraciones. Reusa el `RunHistory` compartido. Botón Refrescar
+ * porque las acciones de sync escriben los runs en el backend (no hay push al front).
+ */
+function SyncHistoryCard() {
+  const integration = useQuery({
+    queryKey: ["integrations", "arena"],
+    queryFn: () => getIntegration("arena"),
+    retry: false,
+  });
+  const data = integration.data;
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between space-y-0">
+        <CardTitle>Historial de sincronización</CardTitle>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => integration.refetch()}
+          disabled={integration.isFetching}
+        >
+          {integration.isFetching ? (
+            <Loader2 className="size-4 animate-spin" aria-hidden />
+          ) : (
+            <RefreshCw className="size-4" aria-hidden />
+          )}
+          Refrescar
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {integration.isLoading ? (
+          <Loader2
+            className="size-5 animate-spin text-(--color-muted-foreground)"
+            aria-hidden
+          />
+        ) : integration.isError || !data ? (
+          <p className="text-sm text-(--color-muted-foreground)">
+            Sin datos de integración.
+          </p>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <span className="text-(--color-muted-foreground)">
+                Último sync:{" "}
+                <span className="text-(--color-foreground)">
+                  {data.lastSyncAt ? formatDateTime(data.lastSyncAt) : "—"}
+                </span>
+              </span>
+              {data.lastSyncStatus && (
+                <Badge
+                  variant={
+                    data.lastSyncStatus === "ok" ? "success" : "destructive"
+                  }
+                  className="text-xs"
+                >
+                  {data.lastSyncStatus}
+                </Badge>
+              )}
+            </div>
+            {data.lastSyncError && (
+              <p className="text-xs text-(--color-destructive)">
+                {data.lastSyncError}
+              </p>
+            )}
+            {data.runs?.length ? (
+              <RunHistory runs={data.runs} />
+            ) : (
+              <p className="text-sm text-(--color-muted-foreground)">
+                Todavía no hay corridas registradas. Dispará un sync para ver el
+                historial.
+              </p>
+            )}
+          </>
         )}
       </CardContent>
     </Card>

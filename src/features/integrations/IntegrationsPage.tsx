@@ -9,11 +9,10 @@ import {
   updateIntegrationExternalIds,
   type Integration,
   type IntegrationEventRef,
-  type IntegrationRun,
 } from "@/api/grs/integrations";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
-import { formatDateTime, humanizeKey } from "@/lib/utils";
 import { EventListEditor } from "@/components/integration/event-list-editor";
+import { RunHistory } from "@/components/integration/run-history";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -268,54 +267,6 @@ function IntegrationCard({ integration }: { integration: Integration }) {
         <RunHistory runs={integration.runs} />
       </CardContent>
     </Card>
-  );
-}
-
-/** Línea de tiempo de las últimas corridas (más reciente arriba). */
-function RunHistory({ runs }: { runs?: IntegrationRun[] }) {
-  if (!runs?.length) return null;
-  const recent = [...runs].reverse();
-  return (
-    <div className="space-y-1">
-      <p className="text-xs font-medium text-(--color-muted-foreground)">
-        Historial ({recent.length})
-      </p>
-      <ul className="space-y-1">
-        {recent.map((run, i) => (
-          <li
-            key={i}
-            className="rounded-md border border-(--color-border) px-2 py-1 text-xs"
-          >
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-              <span className="text-(--color-muted-foreground)">
-                {formatDateTime(run.at)}
-              </span>
-              <span className="font-medium">{run.stage}</span>
-              <Badge
-                variant={run.status === "ok" ? "success" : "destructive"}
-                className="text-[10px]"
-              >
-                {run.status}
-              </Badge>
-              {run.counts && Object.keys(run.counts).length > 0 && (
-                <span className="text-(--color-muted-foreground)">
-                  {Object.entries(run.counts)
-                    .map(([k, v]) => `${humanizeKey(k)} ${v}`)
-                    .join(" · ")}
-                </span>
-              )}
-            </div>
-            {run.errorCount > 0 && run.errors?.length ? (
-              <ul className="mt-0.5 list-disc pl-4 text-(--color-destructive)">
-                {run.errors.map((e, j) => (
-                  <li key={j}>{e}</li>
-                ))}
-              </ul>
-            ) : null}
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
 
