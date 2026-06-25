@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import {
   listIntegrations,
   setIntegrationEnabled,
+  setIntegrationPollInterval,
   updateIntegrationExternalIds,
   type Integration,
   type IntegrationEventRef,
@@ -117,6 +118,52 @@ function ArenaFields({ ids, onChange }: {
   );
 }
 
+/** Editor del intervalo de auto-sync (runner). En segundos; 0 = sin auto-sync. */
+function PollIntervalField({ integration }: { integration: Integration }) {
+  const currentSeconds = Math.round((integration.pollIntervalMs ?? 0) / 1000);
+  const [seconds, setSeconds] = useState(String(currentSeconds));
+  const save = useMutationWithToast({
+    mutationFn: () =>
+      setIntegrationPollInterval(
+        integration.provider,
+        Math.max(0, Math.round(Number(seconds) || 0)) * 1000,
+      ),
+    successMsg: `${integration.provider} — auto-sync actualizado`,
+    invalidateKeys: [["integrations"]],
+  });
+  const dirty = (Number(seconds) || 0) !== currentSeconds;
+  return (
+    <div className="space-y-1">
+      <Label htmlFor={`poll-${integration.provider}`}>
+        Auto-sync cada (segundos · 0 = off)
+      </Label>
+      <div className="flex max-w-xs items-center gap-2">
+        <Input
+          id={`poll-${integration.provider}`}
+          type="number"
+          min={0}
+          value={seconds}
+          onChange={(e) => setSeconds(e.target.value)}
+          className="w-28"
+        />
+        <Button
+          size="sm"
+          variant="secondary"
+          disabled={!dirty || save.isPending}
+          onClick={() => save.mutate()}
+        >
+          {save.isPending ? <Loader2 className="size-3 animate-spin" /> : "Guardar"}
+        </Button>
+        {currentSeconds > 0 && (
+          <span className="text-xs text-(--color-success)">
+            runner activo · cada {currentSeconds}s
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function IntegrationCard({ integration }: { integration: Integration }) {
   const [externalIds, setExternalIds] = useState(integration.externalIds);
 
@@ -172,6 +219,10 @@ function IntegrationCard({ integration }: { integration: Integration }) {
         {(integration.provider === "sporttech-gar" ||
           integration.provider === "sporttech-gry") && (
           <SportTechFields ids={externalIds} onChange={setExternalIds} />
+        )}
+
+        {integration.provider !== "arena" && (
+          <PollIntervalField integration={integration} />
         )}
 
         {hasChanges && (

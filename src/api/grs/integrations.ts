@@ -52,3 +52,13 @@ export const updateIntegrationExternalIds = (
     method: "PUT",
     body: { externalIds },
   });
+
+/** Intervalo de auto-sync del runner en ms (0 = sin auto-sync). */
+export const setIntegrationPollInterval = (
+  provider: string,
+  pollIntervalMs: number,
+) =>
+  request<Integration>("grs", `/integrations/${provider}/poll-interval`, {
+    method: "PUT",
+    body: { pollIntervalMs },
+  });
