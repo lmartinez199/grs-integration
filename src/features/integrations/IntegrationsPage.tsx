@@ -12,6 +12,7 @@ import {
 } from "@/api/grs/integrations";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { EventListEditor } from "@/components/integration/event-list-editor";
+import { runStatusVariant } from "@/components/integration/run-history";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -242,7 +243,7 @@ function IntegrationCard({ integration }: { integration: Integration }) {
           <dd>
             {integration.lastSyncStatus ? (
               <Badge
-                variant={integration.lastSyncStatus === "ok" ? "default" : "destructive"}
+                variant={runStatusVariant(integration.lastSyncStatus)}
                 className="text-xs"
               >
                 {integration.lastSyncStatus}

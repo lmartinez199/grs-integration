@@ -1,6 +1,20 @@
-import type { IntegrationRun } from "@/api/grs/integrations";
+import type {
+  IntegrationRun,
+  IntegrationRunStatus,
+} from "@/api/grs/integrations";
 import { formatDateTime, humanizeKey } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+
+/** Color del badge según el estado de la corrida (ok=verde, skipped=gris, error=rojo). */
+export function runStatusVariant(
+  status?: IntegrationRunStatus,
+): "success" | "secondary" | "destructive" {
+  return status === "ok"
+    ? "success"
+    : status === "skipped"
+      ? "secondary"
+      : "destructive";
+}
 
 /** Línea de tiempo de las últimas corridas (más reciente arriba). */
 export function RunHistory({ runs }: { runs?: IntegrationRun[] }) {
@@ -23,7 +37,7 @@ export function RunHistory({ runs }: { runs?: IntegrationRun[] }) {
               </span>
               <span className="font-medium">{run.stage}</span>
               <Badge
-                variant={run.status === "ok" ? "success" : "destructive"}
+                variant={runStatusVariant(run.status)}
                 className="text-[10px]"
               >
                 {run.status}

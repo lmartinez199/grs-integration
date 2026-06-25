@@ -6,11 +6,14 @@ export interface IntegrationEventRef {
   label?: string;
 }
 
+/** Estado de una corrida: ok | error | skipped (no-op intencional, p.ej. una vía que no aplica al evento). */
+export type IntegrationRunStatus = "ok" | "error" | "skipped";
+
 /** Una corrida de sync de UNA etapa (entrada del historial acotado). */
 export interface IntegrationRun {
   at: string;
   stage: string;
-  status: "ok" | "error";
+  status: IntegrationRunStatus;
   counts?: Record<string, number>;
   errorCount: number;
   errors?: string[];
@@ -25,7 +28,7 @@ export interface Integration {
   pollIntervalMs: number;
   webhookReceiverUrl?: string;
   lastSyncAt?: string;
-  lastSyncStatus?: "ok" | "error";
+  lastSyncStatus?: IntegrationRunStatus;
   lastSyncError?: string;
   /** Historial acotado de las últimas corridas (más reciente al final). */
   runs?: IntegrationRun[];

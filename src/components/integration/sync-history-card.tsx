@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { RunHistory } from "./run-history";
+import { RunHistory, runStatusVariant } from "./run-history";
 
 /**
  * Último sync + historial de corridas de una integración, para verlo en la
@@ -62,9 +62,7 @@ export function SyncHistoryCard({ provider }: { provider: string }) {
               </span>
               {data.lastSyncStatus && (
                 <Badge
-                  variant={
-                    data.lastSyncStatus === "ok" ? "success" : "destructive"
-                  }
+                  variant={runStatusVariant(data.lastSyncStatus)}
                   className="text-xs"
                 >
                   {data.lastSyncStatus}
