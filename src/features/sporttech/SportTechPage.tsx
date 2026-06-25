@@ -8,12 +8,16 @@ import {
 } from "@/api/grs/integrations";
 import {
   sportTechInspectEvent,
+  sportTechRawResource,
+  SPORTTECH_RAW_RESOURCES,
   type SportTechEventInspection,
   type SportTechInspectCompetition,
+  type SportTechRawResource,
 } from "@/api/grs/sporttech";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DataView } from "@/components/ui/data-view";
 import { Input } from "@/components/ui/input";
 import {
   Tabs,
@@ -26,6 +30,7 @@ import { SportTechSyncSteps } from "./SportTechSyncSteps";
 
 const TABS: TabItem[] = [
   { value: "competicion", label: "Competición" },
+  { value: "proveedor", label: "Proveedor" },
   { value: "sync", label: "Sync" },
 ];
 
@@ -38,6 +43,8 @@ export function SportTechPage({
 }) {
   const [tab, setTab] = useState("competicion");
   const [eventId, setEventId] = useState("");
+  const [rawResource, setRawResource] =
+    useState<SportTechRawResource>("athletes");
   const id = eventId.trim();
 
   // Esta disciplina tiene UN solo evento del OVS; se guarda en su integración.
@@ -68,6 +75,20 @@ export function SportTechPage({
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
+
+  // Passthrough crudo del proveedor (lo que el OVS manda, sin interpretación).
+  const raw = useQuery({
+    queryKey: ["sporttech", "raw", id, rawResource],
+    queryFn: () => sportTechRawResource(id, rawResource),
+    enabled: tab === "proveedor" && Boolean(id),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+  // Los atletas vienen como mapa id→atleta; a array para las tarjetas colapsables.
+  const rawDisplay =
+    rawResource === "athletes" && raw.data
+      ? Object.values(raw.data)
+      : raw.data;
 
   return (
     <div className="flex h-full flex-col gap-6 p-6">
@@ -142,6 +163,73 @@ export function SportTechPage({
                 refreshing={inspect.isFetching}
               />
             ) : null}
+          </div>
+        )}
+
+        {tab === "proveedor" && (
+          <div
+            role="tabpanel"
+            id={tabPanelId("proveedor")}
+            aria-labelledby={tabTriggerId("proveedor")}
+            className="space-y-4"
+          >
+            <div className="flex flex-wrap gap-2">
+              {SPORTTECH_RAW_RESOURCES.map((r) => (
+                <Button
+                  key={r.resource}
+                  size="sm"
+                  variant={r.resource === rawResource ? "default" : "outline"}
+                  disabled={!id}
+                  onClick={() => setRawResource(r.resource)}
+                >
+                  {r.label}
+                </Button>
+              ))}
+            </div>
+            <Card>
+              <CardHeader className="flex-row items-center justify-between space-y-0">
+                <CardTitle>
+                  {SPORTTECH_RAW_RESOURCES.find((r) => r.resource === rawResource)
+                    ?.label ?? "Proveedor"}
+                  {rawResource === "athletes" && Array.isArray(rawDisplay) && (
+                    <span className="ml-2 text-sm font-normal text-(--color-muted-foreground)">
+                      {rawDisplay.length} registros
+                    </span>
+                  )}
+                </CardTitle>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => raw.refetch()}
+                  disabled={!id || raw.isFetching}
+                >
+                  {raw.isFetching ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="size-4" />
+                  )}
+                  Refrescar
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {!id ? (
+                  <p className="text-sm text-(--color-muted-foreground)">
+                    Pegá o guardá un eventId para ver lo que manda el proveedor.
+                  </p>
+                ) : raw.isLoading ? (
+                  <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />
+                ) : raw.isError ? (
+                  <p role="alert" className="text-sm text-(--color-destructive)">
+                    {(raw.error as Error)?.message ??
+                      "Error al consultar el proveedor."}
+                  </p>
+                ) : (
+                  <div className="max-h-[60vh] overflow-auto pr-1">
+                    <DataView data={rawDisplay} showTechnical collapsible />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         )}
 

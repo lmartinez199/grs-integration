@@ -112,3 +112,26 @@ export const sportTechInspectEvent = (eventId: string) =>
     "grs",
     `/sporttech/inspect/${encodeURIComponent(eventId)}`,
   );
+
+// ─── Passthrough crudo (lo que el proveedor manda, sin interpretación) ────────
+
+/** Recursos crudos del proveedor disponibles en la pestaña "Proveedor". */
+export type SportTechRawResource = "structure" | "athletes";
+
+export const SPORTTECH_RAW_RESOURCES: {
+  resource: SportTechRawResource;
+  label: string;
+}[] = [
+  { resource: "structure", label: "Estructura" },
+  { resource: "athletes", label: "Atletas" },
+];
+
+/** JSON crudo de un recurso del proveedor (estructura = objeto, atletas = mapa id→atleta). */
+export const sportTechRawResource = (
+  eventId: string,
+  resource: SportTechRawResource,
+) =>
+  request<Record<string, unknown>>(
+    "grs",
+    `/sporttech/inspect/${encodeURIComponent(eventId)}/raw/${resource}`,
+  );
