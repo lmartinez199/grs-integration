@@ -61,13 +61,24 @@ export default function App() {
           <Route
             path="/sporttech-gar"
             element={
-              <SportTechPage provider="sporttech-gar" title="GAR (artística)" />
+              // key={provider}: las 2 rutas montan el MISMO componente en la misma
+              // posición → sin key React reusa la instancia al navegar entre
+              // disciplinas y el estado local (eventId) se filtra de una a otra.
+              <SportTechPage
+                key="sporttech-gar"
+                provider="sporttech-gar"
+                title="GAR (artística)"
+              />
             }
           />
           <Route
             path="/sporttech-gry"
             element={
-              <SportTechPage provider="sporttech-gry" title="GRY (rítmica)" />
+              <SportTechPage
+                key="sporttech-gry"
+                provider="sporttech-gry"
+                title="GRY (rítmica)"
+              />
             }
           />
           <Route path="/integrations" element={<IntegrationsPage />} />
