@@ -1,10 +1,11 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, RefreshCw, Save } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 
 import {
   getIntegration,
   updateIntegrationExternalIds,
+  type IntegrationEventRef,
 } from "@/api/grs/integrations";
 import {
   sportTechInspectEvent,
@@ -14,6 +15,7 @@ import {
   type SportTechInspectCompetition,
   type SportTechRawResource,
 } from "@/api/grs/sporttech";
+import { ActiveEventSelector } from "@/components/integration/active-event-selector";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,44 +44,26 @@ export function SportTechPage({
   title: string;
 }) {
   const [tab, setTab] = useState("competicion");
-  const [eventId, setEventId] = useState("");
-  const [eventCode, setEventCode] = useState("");
   const [rawResource, setRawResource] =
     useState<SportTechRawResource>("athletes");
   const [rosterFilter, setRosterFilter] = useState("");
-  const id = eventId.trim();
-  const code = eventCode.trim();
 
-  // Esta disciplina tiene UN solo evento del OVS; se guarda en su integración.
+  // La lista de eventos (1 por año) + el activo se gestionan en Integraciones;
+  // acá solo se elige cuál opera (el activo) para inspect/sync.
   const integration = useQuery({
     queryKey: ["integrations", provider],
     queryFn: () => getIntegration(provider),
     retry: false,
   });
-  const savedEventId =
-    (integration.data?.externalIds?.eventId as string | undefined) ?? "";
-  const savedEventCode =
-    (integration.data?.externalIds?.eventCode as string | undefined) ?? "";
+  const externalIds = integration.data?.externalIds ?? {};
+  const events = (externalIds.events as IntegrationEventRef[] | undefined) ?? [];
+  const savedActiveId = String(externalIds.activeId ?? "");
+  // Id operado = el activo si está en la lista, si no el primero configurado.
+  const id = events.find((e) => e.id === savedActiveId)?.id ?? events[0]?.id ?? "";
 
-  useEffect(() => {
-    if (savedEventId && !eventId) setEventId(savedEventId);
-  }, [savedEventId]);
-  useEffect(() => {
-    if (savedEventCode && !eventCode) setEventCode(savedEventCode);
-  }, [savedEventCode]);
-
-  const configDirty =
-    (Boolean(id) && id !== savedEventId) || code !== savedEventCode;
-
-  // Guarda eventId + eventCode juntos: el backend reemplaza todo el externalIds
-  // ($set), así que hay que mandar ambos para no perder uno. eventCode vacío =
-  // usar el default del backend ("JJB").
-  function saveConfig() {
-    if (!id) return;
-    updateIntegrationExternalIds(provider, {
-      eventId: id,
-      ...(code ? { eventCode: code } : {}),
-    })
+  function setActive(newId: string) {
+    if (newId === id) return;
+    updateIntegrationExternalIds(provider, { ...externalIds, activeId: newId })
       .then(() => integration.refetch())
       .catch(() => {}); // sin registro de integración → no bloquea
   }
@@ -124,48 +108,19 @@ export function SportTechPage({
       <header className="shrink-0">
         <h1 className="text-2xl font-semibold">{title}</h1>
         <p className="text-sm text-(--color-muted-foreground)">
-          Operación de la integración con SportTech.io (OVS). Pegá el UUID del
-          evento del OVS de esta disciplina, mirá la competición y dispará el
-          pull por etapa.
+          Operación de la integración con SportTech.io (OVS). Elegí el evento
+          activo (se configuran en Integraciones), mirá la competición y dispará
+          el pull por etapa.
         </p>
       </header>
 
-      <div className="shrink-0 space-y-1">
-        <div className="flex max-w-2xl flex-wrap gap-2">
-          <Input
-            placeholder="eventId de SportTech (UUID del OVS)"
-            value={eventId}
-            onChange={(e) => setEventId(e.target.value)}
-            className="min-w-64 flex-1"
-          />
-          <Input
-            placeholder="Edición (def. JJB)"
-            value={eventCode}
-            onChange={(e) => setEventCode(e.target.value)}
-            className="w-40"
-          />
-          <Button
-            size="sm"
-            variant="secondary"
-            disabled={!id || !configDirty}
-            onClick={saveConfig}
-          >
-            <Save className="size-4" />
-            Guardar
-          </Button>
-        </div>
-        <p className="text-xs text-(--color-muted-foreground)">
-          {savedEventId ? (
-            <>
-              Evento: <span className="font-mono">{savedEventId}</span> · Edición:{" "}
-              <span className="font-mono">
-                {savedEventCode || "JJB (default)"}
-              </span>
-            </>
-          ) : (
-            "Aún no hay evento guardado para esta disciplina."
-          )}
-        </p>
+      <div className="shrink-0">
+        <ActiveEventSelector
+          events={events}
+          activeId={id}
+          onSetActive={setActive}
+          noun="Evento"
+        />
       </div>
 
       <Tabs

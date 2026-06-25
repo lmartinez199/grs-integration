@@ -1,5 +1,11 @@
 import { request } from "@/lib/http";
 
+/** Un evento configurado del proveedor (id + etiqueta opcional). 1 por año; CRUD. */
+export interface IntegrationEventRef {
+  id: string;
+  label?: string;
+}
+
 /** Una corrida de sync de UNA etapa (entrada del historial acotado). */
 export interface IntegrationRun {
   at: string;

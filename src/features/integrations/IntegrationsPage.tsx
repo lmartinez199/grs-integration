@@ -7,15 +7,28 @@ import {
   setIntegrationEnabled,
   updateIntegrationExternalIds,
   type Integration,
+  type IntegrationEventRef,
   type IntegrationRun,
 } from "@/api/grs/integrations";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { formatDateTime, humanizeKey } from "@/lib/utils";
+import { EventListEditor } from "@/components/integration/event-list-editor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+/** Lee la lista de eventos + el activo de un externalIds loose. */
+function readEvents(ids: Record<string, unknown>): {
+  events: IntegrationEventRef[];
+  activeId: string;
+} {
+  return {
+    events: (ids.events as IntegrationEventRef[] | undefined) ?? [],
+    activeId: String(ids.activeId ?? ""),
+  };
+}
 
 const PROVIDER_LABELS: Record<string, string> = {
   swimsystem: "SWM — SwimSystem (natación)",
@@ -33,14 +46,15 @@ function SwimSystemFields({ ids, onChange }: {
   ids: Record<string, unknown>;
   onChange: (next: Record<string, unknown>) => void;
 }) {
+  const { events, activeId } = readEvents(ids);
   return (
     <div className="space-y-1">
-      <Label htmlFor="swm-meetId">meetId (UUID del meet)</Label>
-      <Input
-        id="swm-meetId"
-        value={String(ids.meetId ?? "")}
-        onChange={(e) => onChange({ ...ids, meetId: e.target.value })}
-        placeholder="uuid del meet (1 por año)"
+      <Label>Meets (1 por año · activá el actual)</Label>
+      <EventListEditor
+        noun="meet"
+        events={events}
+        activeId={activeId}
+        onChange={(events, activeId) => onChange({ ...ids, events, activeId })}
       />
     </div>
   );
@@ -50,15 +64,27 @@ function SportTechFields({ ids, onChange }: {
   ids: Record<string, unknown>;
   onChange: (next: Record<string, unknown>) => void;
 }) {
+  const { events, activeId } = readEvents(ids);
   return (
-    <div className="space-y-1">
-      <Label htmlFor="sporttech-eventId">eventId (UUID del OVS)</Label>
-      <Input
-        id="sporttech-eventId"
-        value={String(ids.eventId ?? "")}
-        onChange={(e) => onChange({ ...ids, eventId: e.target.value })}
-        placeholder="uuid del evento de esta disciplina"
-      />
+    <div className="space-y-3">
+      <div className="space-y-1">
+        <Label>Eventos (1 por año · activá el actual)</Label>
+        <EventListEditor
+          noun="evento"
+          events={events}
+          activeId={activeId}
+          onChange={(events, activeId) => onChange({ ...ids, events, activeId })}
+        />
+      </div>
+      <div className="space-y-1">
+        <Label htmlFor="sporttech-eventCode">Código de edición (eventCode)</Label>
+        <Input
+          id="sporttech-eventCode"
+          value={String(ids.eventCode ?? "")}
+          onChange={(e) => onChange({ ...ids, eventCode: e.target.value })}
+          placeholder="JJB"
+        />
+      </div>
     </div>
   );
 }
