@@ -18,6 +18,7 @@ import {
 } from "@/api/grs/swimsystem";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { ActiveEventSelector } from "@/components/integration/active-event-selector";
+import { SyncHistoryCard } from "@/components/integration/sync-history-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -299,6 +300,8 @@ export function SwmPage() {
                 </CardContent>
               </Card>
             )}
+
+            <SyncHistoryCard provider="swimsystem" />
           </div>
         )}
       </div>

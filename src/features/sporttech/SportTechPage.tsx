@@ -16,6 +16,7 @@ import {
   type SportTechRawResource,
 } from "@/api/grs/sporttech";
 import { ActiveEventSelector } from "@/components/integration/active-event-selector";
+import { SyncHistoryCard } from "@/components/integration/sync-history-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -250,8 +251,10 @@ export function SportTechPage({
             role="tabpanel"
             id={tabPanelId("sync")}
             aria-labelledby={tabTriggerId("sync")}
+            className="space-y-4"
           >
             <SportTechSyncSteps eventId={id} />
+            <SyncHistoryCard provider={provider} />
           </div>
         )}
       </div>

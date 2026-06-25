@@ -12,7 +12,6 @@ import {
 } from "@/api/grs/integrations";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { EventListEditor } from "@/components/integration/event-list-editor";
-import { RunHistory } from "@/components/integration/run-history";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -263,8 +262,6 @@ function IntegrationCard({ integration }: { integration: Integration }) {
           <dt className="text-(--color-muted-foreground)">Actualizado</dt>
           <dd>{fmt(integration.updatedAt)}</dd>
         </dl>
-
-        <RunHistory runs={integration.runs} />
       </CardContent>
     </Card>
   );
