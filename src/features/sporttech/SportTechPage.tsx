@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, RefreshCw, Save } from "lucide-react";
 
@@ -223,6 +223,10 @@ export function SportTechPage({
                     {(raw.error as Error)?.message ??
                       "Error al consultar el proveedor."}
                   </p>
+                ) : rawResource === "structure" && raw.data ? (
+                  <div className="max-h-[60vh] overflow-auto pr-1">
+                    <RawStructureView data={raw.data} />
+                  </div>
                 ) : (
                   <div className="max-h-[60vh] overflow-auto pr-1">
                     <DataView data={rawDisplay} showTechnical collapsible />
@@ -394,6 +398,57 @@ function CompetitionCard({ comp }: { comp: SportTechInspectCompetition }) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * Estructura cruda del proveedor en secciones digeribles: Evento (solo campos
+ * clave, no las ~40 flags `SHOW_*`) + Competiciones y Stages como arrays
+ * colapsables (el objeto crudo entero aplanado era ilegible).
+ */
+function RawStructureView({ data }: { data: Record<string, unknown> }) {
+  const event = (data.Event ?? {}) as Record<string, unknown>;
+  const comps = Object.values(
+    (data.Competitions ?? {}) as Record<string, unknown>,
+  );
+  const stages = Object.values((data.Stages ?? {}) as Record<string, unknown>);
+  const eventSummary = {
+    Título: event.Title,
+    Subtítulo: event.Subtitle,
+    Inicio: event.StartDate,
+    Fin: event.EndDate,
+    Versión: event.Version,
+    UUID: event.UUID,
+  };
+  return (
+    <div className="space-y-5">
+      <RawSection title="Evento">
+        <DataView data={eventSummary} showTechnical />
+      </RawSection>
+      <RawSection title={`Competiciones (${comps.length})`}>
+        <DataView data={comps} showTechnical collapsible />
+      </RawSection>
+      <RawSection title={`Stages (${stages.length})`}>
+        <DataView data={stages} showTechnical collapsible />
+      </RawSection>
+    </div>
+  );
+}
+
+function RawSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="space-y-2">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-(--color-muted-foreground)">
+        {title}
+      </h3>
+      {children}
+    </section>
   );
 }
 
