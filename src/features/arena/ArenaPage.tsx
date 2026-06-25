@@ -19,13 +19,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataView } from "@/components/ui/data-view";
+import {
+  Tabs,
+  tabPanelId,
+  tabTriggerId,
+  type TabItem,
+} from "@/components/ui/tabs";
 import { EventSummary } from "./EventSummary";
 import { FightsByRound } from "./FightsByRound";
 import { WebhookConfig } from "./WebhookConfig";
 import { ArenaLoopCard, ArenaSyncSteps } from "./ArenaSyncSection";
 import { useArenaLive } from "./useArenaLive";
 
+const TABS: TabItem[] = [
+  { value: "competicion", label: "Competición" },
+  { value: "proveedor", label: "Proveedor" },
+  { value: "sync", label: "Sync" },
+];
+
 export function ArenaPage() {
+  const [tab, setTab] = useState("competicion");
   const [selected, setSelected] = useState<string | number | null>(null);
   const [catFilter, setCatFilter] = useState("");
 
@@ -58,7 +71,22 @@ export function ArenaPage() {
         </p>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-6 overflow-auto">
+      <Tabs
+        tabs={TABS}
+        value={tab}
+        onChange={setTab}
+        aria-label="Secciones de Arena"
+        className="shrink-0"
+      />
+
+      <div className="min-h-0 flex-1 overflow-auto">
+        {tab === "competicion" && (
+          <div
+            role="tabpanel"
+            id={tabPanelId("competicion")}
+            aria-labelledby={tabTriggerId("competicion")}
+            className="space-y-6"
+          >
       <Card>
         <CardHeader>
           <CardTitle>Evento actual</CardTitle>
@@ -75,12 +103,6 @@ export function ArenaPage() {
           )}
         </CardContent>
       </Card>
-
-      <ArenaLoopCard />
-
-      <WebhookConfig />
-
-      <ArenaSyncSteps />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1.4fr]">
         <Card>
@@ -163,13 +185,36 @@ export function ArenaPage() {
           </CardContent>
         </Card>
       </div>
+          </div>
+        )}
 
-      <ProveedorRawSection
-        event={event.data}
-        categories={categories.data}
-        selected={selected}
-        selectedName={selectedCategory?.name}
-      />
+        {tab === "proveedor" && (
+          <div
+            role="tabpanel"
+            id={tabPanelId("proveedor")}
+            aria-labelledby={tabTriggerId("proveedor")}
+          >
+            <ProveedorRawSection
+              event={event.data}
+              categories={categories.data}
+              selected={selected}
+              selectedName={selectedCategory?.name}
+            />
+          </div>
+        )}
+
+        {tab === "sync" && (
+          <div
+            role="tabpanel"
+            id={tabPanelId("sync")}
+            aria-labelledby={tabTriggerId("sync")}
+            className="space-y-6"
+          >
+            <ArenaLoopCard />
+            <WebhookConfig />
+            <ArenaSyncSteps />
+          </div>
+        )}
       </div>
     </div>
   );
