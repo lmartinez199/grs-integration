@@ -1,5 +1,15 @@
 import { request } from "@/lib/http";
 
+/** Una corrida de sync de UNA etapa (entrada del historial acotado). */
+export interface IntegrationRun {
+  at: string;
+  stage: string;
+  status: "ok" | "error";
+  counts?: Record<string, number>;
+  errorCount: number;
+  errors?: string[];
+}
+
 /** Config operativa NO-secreta de una integración (espejo de IntegrationResponseDto). */
 export interface Integration {
   id: string;
@@ -11,6 +21,8 @@ export interface Integration {
   lastSyncAt?: string;
   lastSyncStatus?: "ok" | "error";
   lastSyncError?: string;
+  /** Historial acotado de las últimas corridas (más reciente al final). */
+  runs?: IntegrationRun[];
   updatedAt: string;
 }
 
