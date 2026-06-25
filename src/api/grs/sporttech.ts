@@ -1,9 +1,9 @@
 import { request } from "@/lib/http";
 
 /**
- * Cliente de la integración de gimnasia (SportTech.io / OVS). Solo disparo manual
- * del pull por etapas — SportTech NO tiene webhook ni inspect (a diferencia de
- * SWM): todo va por `POST /sporttech/sync/:eventId[/etapa]`.
+ * Cliente de la integración de gimnasia (SportTech.io / OVS). Sin webhook: el pull
+ * va por `POST /sporttech/sync/:eventId[/etapa]` (disparo manual) y la vista
+ * read-only de la competición por `GET /sporttech/inspect/:eventId`.
  */
 
 /** Etapas del sync (orden de dependencia). */
@@ -61,4 +61,54 @@ export const sportTechSyncStage = (eventId: string, stage: SportTechStage) =>
     "grs",
     `/sporttech/sync/${encodeURIComponent(eventId)}/${stage}`,
     { method: "POST" },
+  );
+
+// ─── Inspect (vista read-only de la competición del proveedor) ────────────────
+
+/** Una unit que la estructura produciría (preview, sin escribir en GRS). */
+export interface SportTechInspectUnit {
+  phaseCode: string;
+  phaseName: string;
+  sportEventCode: string;
+  eventName: string;
+  unitCode: string;
+  hasMedals: boolean;
+  /** El sport-event ya existe en el catálogo (si no, el sync lo auto-crea). */
+  known: boolean;
+}
+
+/** Una competición del evento del proveedor, resumida con sus units. */
+export interface SportTechInspectCompetition {
+  id: string;
+  title: string;
+  gender: string;
+  category: string;
+  categoryName?: string;
+  isTeam: boolean;
+  units: SportTechInspectUnit[];
+}
+
+/** Vista read-only de un evento del OVS: qué hay y qué se crearía al sincronizar. */
+export interface SportTechEventInspection {
+  eventId: string;
+  discipline?: string;
+  title?: string;
+  startDate?: string;
+  endDate?: string;
+  counts: {
+    competitions: number;
+    stages: number;
+    units: number;
+    athletes: number;
+    unmapped: number;
+  };
+  competitions: SportTechInspectCompetition[];
+  errors: string[];
+}
+
+/** Inspecciona el evento (read-only): estructura del proveedor + chequeo de catálogo. */
+export const sportTechInspectEvent = (eventId: string) =>
+  request<SportTechEventInspection>(
+    "grs",
+    `/sporttech/inspect/${encodeURIComponent(eventId)}`,
   );
