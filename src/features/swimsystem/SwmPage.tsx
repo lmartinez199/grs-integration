@@ -7,13 +7,10 @@ import {
   swmHealth,
   swmInspect,
   swmSyncMeet,
-  swmSyncStage,
   swmValidate,
   swmWebhookLog,
   SWM_RESOURCES,
-  SWM_STAGES,
   type SwmResource,
-  type SwmStage,
 } from "@/api/grs/swimsystem";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +24,8 @@ import {
   tabTriggerId,
   type TabItem,
 } from "@/components/ui/tabs";
+
+import { SwmSyncSteps } from "./SwmSyncSteps";
 
 const TABS: TabItem[] = [
   { value: "estado", label: "Estado" },
@@ -85,11 +84,6 @@ export function SwmPage() {
   const sync = useMutationWithToast({
     mutationFn: () => swmSyncMeet(id),
     successMsg: "Sync de natación (SWM) disparada",
-    invalidateKeys: [["swm", "webhooks"]],
-  });
-  const stageSync = useMutationWithToast({
-    mutationFn: (stage: SwmStage) => swmSyncStage(id, stage),
-    successMsg: "Etapa de sync disparada",
     invalidateKeys: [["swm", "webhooks"]],
   });
 
@@ -276,71 +270,7 @@ export function SwmPage() {
               </Button>
             </div>
 
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <p className="text-sm text-(--color-muted-foreground)">
-                  Carga inicial por etapa (orden: organizaciones → estructura →
-                  participantes → grupos → start-lists):
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {SWM_STAGES.filter((s) => s.stage !== "results").map(
-                    ({ stage, label }) => (
-                      <StageButton
-                        key={stage}
-                        label={label}
-                        disabled={!id || stageSync.isPending}
-                        isPending={
-                          stageSync.isPending && stageSync.variables === stage
-                        }
-                        onClick={() => {
-                          saveMeetIdIfNew(id);
-                          stageSync.mutate(stage);
-                        }}
-                      />
-                    ),
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <p className="text-sm text-(--color-muted-foreground)">
-                  Resultados (durante/después de la competencia, no en la carga
-                  inicial):
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {SWM_STAGES.filter((s) => s.stage === "results").map(
-                    ({ stage, label }) => (
-                      <StageButton
-                        key={stage}
-                        label={label}
-                        disabled={!id || stageSync.isPending}
-                        isPending={
-                          stageSync.isPending && stageSync.variables === stage
-                        }
-                        onClick={() => {
-                          saveMeetIdIfNew(id);
-                          stageSync.mutate(stage);
-                        }}
-                      />
-                    ),
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {stageSync.data && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    Resultado de la etapa · {stageSync.data.stage}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <DataView data={omitErrors(stageSync.data)} />
-                  <SyncErrors errors={stageSync.data.errors} />
-                </CardContent>
-              </Card>
-            )}
+            <SwmSyncSteps meetId={id} />
 
             {sync.data && (
               <Card>
@@ -368,30 +298,6 @@ export function SwmPage() {
         )}
       </div>
     </div>
-  );
-}
-
-/** Botón de una etapa del sync (con spinner mientras corre). */
-function StageButton({
-  label,
-  disabled,
-  isPending,
-  onClick,
-}: {
-  label: string;
-  disabled: boolean;
-  isPending: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <Button size="sm" variant="outline" disabled={disabled} onClick={onClick}>
-      {isPending ? (
-        <Loader2 className="size-4 animate-spin" />
-      ) : (
-        <RefreshCw className="size-4" />
-      )}
-      {label}
-    </Button>
   );
 }
 
