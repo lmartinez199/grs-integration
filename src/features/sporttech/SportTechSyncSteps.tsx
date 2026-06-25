@@ -74,10 +74,9 @@ const STEPS: SetupStep<Ctx>[] = [
   },
   {
     key: "results",
-    badge: "3",
     label: "Resultados",
     desc: "Marcas, estado de unit (Frame.State) y medallero (individual y por equipo).",
-    group: "entidades",
+    group: "resultados",
     requires: requireEvent,
     run: async (ctx) => {
       const r = await sportTechSyncStage(ctx.eventId, "results");

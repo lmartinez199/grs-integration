@@ -14,13 +14,14 @@ import {
 
 /**
  * Setup por pasos con estado, compartido entre disciplinas (ath, judo/zempo).
- * El concepto es el mismo en todas: dos grupos fijos —«estructura» (crea el
- * esqueleto del evento en GRS) y «entidades» (empuja los datos)— renderizados
- * como una lista de pasos con su resultado y opción de re-ejecutar. Lo que
- * cambia por disciplina es solo la lista de pasos (datos), no la UI.
+ * El concepto es el mismo en todas: grupos fijos —«estructura» (crea el esqueleto
+ * del evento en GRS), «entidades» (empuja los datos de la carga inicial) y
+ * «resultados» (marcas/medallero, durante/después de la competencia)— renderizados
+ * como una lista de pasos con su resultado y opción de re-ejecutar. Lo que cambia
+ * por disciplina es solo la lista de pasos (datos), no la UI.
  */
 
-export type StepGroup = "estructura" | "entidades";
+export type StepGroup = "estructura" | "entidades" | "resultados";
 
 /** Resumen estándar de un paso (created/processed/skipped + errores). */
 export interface StepSummary {
@@ -82,11 +83,15 @@ const GROUP_META: Record<StepGroup, { title: string; desc: string }> = {
   },
   entidades: {
     title: "Entidades y datos",
-    desc: "Empuja los datos al evento: organizaciones, participantes, resultados…",
+    desc: "Carga inicial del evento: organizaciones, participantes…",
+  },
+  resultados: {
+    title: "Resultados",
+    desc: "Marcas, estado y medallero — se disparan durante/después de la competencia, no en la carga inicial.",
   },
 };
 
-const GROUP_ORDER: StepGroup[] = ["estructura", "entidades"];
+const GROUP_ORDER: StepGroup[] = ["estructura", "entidades", "resultados"];
 
 function stepStatus(r: StepResult | undefined): "ok" | "error" | "idle" {
   if (!r) return "idle";
