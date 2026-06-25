@@ -43,9 +43,11 @@ export function SportTechPage({
 }) {
   const [tab, setTab] = useState("competicion");
   const [eventId, setEventId] = useState("");
+  const [eventCode, setEventCode] = useState("");
   const [rawResource, setRawResource] =
     useState<SportTechRawResource>("athletes");
   const id = eventId.trim();
+  const code = eventCode.trim();
 
   // Esta disciplina tiene UN solo evento del OVS; se guarda en su integración.
   const integration = useQuery({
@@ -55,14 +57,28 @@ export function SportTechPage({
   });
   const savedEventId =
     (integration.data?.externalIds?.eventId as string | undefined) ?? "";
+  const savedEventCode =
+    (integration.data?.externalIds?.eventCode as string | undefined) ?? "";
 
   useEffect(() => {
     if (savedEventId && !eventId) setEventId(savedEventId);
   }, [savedEventId]);
+  useEffect(() => {
+    if (savedEventCode && !eventCode) setEventCode(savedEventCode);
+  }, [savedEventCode]);
 
-  function saveEventId(value: string) {
-    if (!value || value === savedEventId) return;
-    updateIntegrationExternalIds(provider, { eventId: value })
+  const configDirty =
+    (Boolean(id) && id !== savedEventId) || code !== savedEventCode;
+
+  // Guarda eventId + eventCode juntos: el backend reemplaza todo el externalIds
+  // ($set), así que hay que mandar ambos para no perder uno. eventCode vacío =
+  // usar el default del backend ("JJB").
+  function saveConfig() {
+    if (!id) return;
+    updateIntegrationExternalIds(provider, {
+      eventId: id,
+      ...(code ? { eventCode: code } : {}),
+    })
       .then(() => integration.refetch())
       .catch(() => {}); // sin registro de integración → no bloquea
   }
@@ -102,17 +118,24 @@ export function SportTechPage({
       </header>
 
       <div className="shrink-0 space-y-1">
-        <div className="flex max-w-xl gap-2">
+        <div className="flex max-w-2xl flex-wrap gap-2">
           <Input
             placeholder="eventId de SportTech (UUID del OVS)"
             value={eventId}
             onChange={(e) => setEventId(e.target.value)}
+            className="min-w-64 flex-1"
+          />
+          <Input
+            placeholder="Edición (def. JJB)"
+            value={eventCode}
+            onChange={(e) => setEventCode(e.target.value)}
+            className="w-40"
           />
           <Button
             size="sm"
             variant="secondary"
-            disabled={!id || id === savedEventId}
-            onClick={() => saveEventId(id)}
+            disabled={!id || !configDirty}
+            onClick={saveConfig}
           >
             <Save className="size-4" />
             Guardar
@@ -121,7 +144,10 @@ export function SportTechPage({
         <p className="text-xs text-(--color-muted-foreground)">
           {savedEventId ? (
             <>
-              Evento guardado: <span className="font-mono">{savedEventId}</span>
+              Evento: <span className="font-mono">{savedEventId}</span> · Edición:{" "}
+              <span className="font-mono">
+                {savedEventCode || "JJB (default)"}
+              </span>
             </>
           ) : (
             "Aún no hay evento guardado para esta disciplina."
