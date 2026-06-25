@@ -18,6 +18,8 @@ import { Label } from "@/components/ui/label";
 const PROVIDER_LABELS: Record<string, string> = {
   swimsystem: "SWM — SwimSystem (natación)",
   arena: "WRE — Arena (lucha)",
+  "sporttech-gar": "GAR — Gimnasia Artística (SportTech)",
+  "sporttech-gry": "GRY — Gimnasia Rítmica (SportTech)",
 };
 
 function fmt(iso?: string) {
@@ -51,6 +53,23 @@ function SwimSystemFields({ ids, onChange }: {
       <p className="text-xs text-(--color-muted-foreground)">
         {meetIds.length} meet{meetIds.length !== 1 ? "s" : ""} configurado{meetIds.length !== 1 ? "s" : ""}
       </p>
+    </div>
+  );
+}
+
+function SportTechFields({ ids, onChange }: {
+  ids: Record<string, unknown>;
+  onChange: (next: Record<string, unknown>) => void;
+}) {
+  return (
+    <div className="space-y-1">
+      <Label htmlFor="sporttech-eventId">eventId (UUID del OVS)</Label>
+      <Input
+        id="sporttech-eventId"
+        value={String(ids.eventId ?? "")}
+        onChange={(e) => onChange({ ...ids, eventId: e.target.value })}
+        placeholder="uuid del evento de esta disciplina"
+      />
     </div>
   );
 }
@@ -134,6 +153,10 @@ function IntegrationCard({ integration }: { integration: Integration }) {
         )}
         {integration.provider === "arena" && (
           <ArenaFields ids={externalIds} onChange={setExternalIds} />
+        )}
+        {(integration.provider === "sporttech-gar" ||
+          integration.provider === "sporttech-gry") && (
+          <SportTechFields ids={externalIds} onChange={setExternalIds} />
         )}
 
         {hasChanges && (

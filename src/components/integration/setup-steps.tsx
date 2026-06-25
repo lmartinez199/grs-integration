@@ -30,6 +30,11 @@ export interface StepSummary {
   updated?: number;
   skipped: number;
   errors: string[];
+  /**
+   * Resumen legible que REEMPLAZA la línea genérica de conteos (cuando el sync
+   * tiene métricas propias, p. ej. gimnasia: "14 units · 7 conjuntos · 24 medallas").
+   */
+  label?: string;
 }
 
 /** Lo que devuelve `run` en caso de éxito. El error lo añade el catch interno. */
@@ -122,7 +127,9 @@ export function SetupSteps<Ctx>({
           return false;
         }
         toast.success(
-          `${step.label}: ${s.created} creados${s.updated ? ` · ${s.updated} actualizados` : ""} · ${s.processed} procesados${s.skipped ? ` · ${s.skipped} omitidos` : ""}`,
+          s.label
+            ? `${step.label}: ${s.label}`
+            : `${step.label}: ${s.created} creados${s.updated ? ` · ${s.updated} actualizados` : ""} · ${s.processed} procesados${s.skipped ? ` · ${s.skipped} omitidos` : ""}`,
         );
       } else if (res.kind === "queued") {
         toast.success(
@@ -293,9 +300,8 @@ function StepResultLine({ result }: { result: StepResult }) {
           hasError ? "text-(--color-destructive)" : "text-(--color-success)",
         )}
       >
-        {s.created} creados
-        {s.updated ? ` · ${s.updated} actualizados` : ""} · {s.processed} procesados
-        {s.skipped ? ` · ${s.skipped} omitidos` : ""}
+        {s.label ??
+          `${s.created} creados${s.updated ? ` · ${s.updated} actualizados` : ""} · ${s.processed} procesados${s.skipped ? ` · ${s.skipped} omitidos` : ""}`}
         {hasError ? ` · ${s.errors.length} con error` : ""}
       </p>
 
