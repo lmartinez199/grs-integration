@@ -130,6 +130,13 @@ export const getCategories = () => request<ArenaCategory[]>("grs", "/arena/sync/
 export const getCategoryFights = (categoryId: string | number) =>
   request<ArenaFight[]>("grs", `/arena/sync/categories/${categoryId}/fights`);
 
+/** Peleas crudas (bracket + repechage sin enriquecer) — passthrough del proveedor. */
+export const getCategoryFightsRaw = (categoryId: string | number) =>
+  request<Record<string, unknown>[]>(
+    "grs",
+    `/arena/sync/categories/${categoryId}/fights/raw`,
+  );
+
 // ---- Sync (acciones) -----------------------------------------------------
 
 /**

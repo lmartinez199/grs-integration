@@ -8,14 +8,17 @@ import {
   getCurrentEvent,
   getCategories,
   getCategoryFights,
+  getCategoryFightsRaw,
   syncCategory,
   type ArenaCategory,
+  type ArenaSportEvent,
 } from "@/api/grs/arena";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DataView } from "@/components/ui/data-view";
 import { EventSummary } from "./EventSummary";
 import { FightsByRound } from "./FightsByRound";
 import { WebhookConfig } from "./WebhookConfig";
@@ -160,8 +163,104 @@ export function ArenaPage() {
           </CardContent>
         </Card>
       </div>
+
+      <ProveedorRawSection
+        event={event.data}
+        categories={categories.data}
+        selected={selected}
+        selectedName={selectedCategory?.name}
+      />
       </div>
     </div>
+  );
+}
+
+const RAW_RESOURCES = [
+  { value: "evento", label: "Evento" },
+  { value: "categorias", label: "Categorías" },
+  { value: "peleas", label: "Peleas" },
+] as const;
+type RawResource = (typeof RAW_RESOURCES)[number]["value"];
+
+/**
+ * Vista cruda de lo que manda Arena, sin interpretación de GRS (equivalente a la
+ * pestaña "Proveedor" de SWM/SportTech). Evento y categorías son passthrough
+ * directo; las peleas usan el endpoint crudo (bracket+repechage sin enriquecer).
+ */
+function ProveedorRawSection({
+  event,
+  categories,
+  selected,
+  selectedName,
+}: {
+  event: ArenaSportEvent | undefined;
+  categories: ArenaCategory[] | undefined;
+  selected: string | number | null;
+  selectedName?: string;
+}) {
+  const [resource, setResource] = useState<RawResource>("evento");
+
+  const rawFights = useQuery({
+    queryKey: ["arena", "fights-raw", selected],
+    queryFn: () => getCategoryFightsRaw(selected!),
+    enabled: resource === "peleas" && selected != null,
+  });
+
+  const data =
+    resource === "evento"
+      ? event
+      : resource === "categorias"
+        ? categories
+        : rawFights.data;
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
+        <CardTitle>
+          Proveedor (crudo)
+          {resource === "peleas" && selectedName ? (
+            <span className="ml-2 text-sm font-normal text-(--color-muted-foreground)">
+              {selectedName}
+            </span>
+          ) : null}
+        </CardTitle>
+        <div className="flex flex-wrap gap-2">
+          {RAW_RESOURCES.map((r) => (
+            <Button
+              key={r.value}
+              size="sm"
+              variant={r.value === resource ? "default" : "outline"}
+              onClick={() => setResource(r.value)}
+            >
+              {r.label}
+            </Button>
+          ))}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <p className="mb-3 text-sm text-(--color-muted-foreground)">
+          Lo que manda Arena tal cual, sin interpretación de GRS.
+        </p>
+        {resource === "peleas" && selected == null ? (
+          <p className="text-sm text-(--color-muted-foreground)">
+            Selecciona una categoría arriba para ver sus peleas crudas.
+          </p>
+        ) : resource === "peleas" && rawFights.isLoading ? (
+          <Loader2
+            className="size-5 animate-spin text-(--color-muted-foreground)"
+            aria-hidden
+          />
+        ) : resource === "peleas" && rawFights.isError ? (
+          <p role="alert" className="text-sm text-(--color-destructive)">
+            Error al cargar peleas crudas.
+          </p>
+        ) : (
+          <div className="max-h-[60vh] overflow-auto pr-1">
+            <DataView data={data} showTechnical collapsible />
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
