@@ -46,6 +46,7 @@ export function SportTechPage({
   const [eventCode, setEventCode] = useState("");
   const [rawResource, setRawResource] =
     useState<SportTechRawResource>("athletes");
+  const [rosterFilter, setRosterFilter] = useState("");
   const id = eventId.trim();
   const code = eventCode.trim();
 
@@ -101,10 +102,22 @@ export function SportTechPage({
     retry: false,
   });
   // Los atletas vienen como mapa id→atleta; a array para las tarjetas colapsables.
-  const rawDisplay =
-    rawResource === "athletes" && raw.data
-      ? Object.values(raw.data)
-      : raw.data;
+  const rosterArray =
+    rawResource === "athletes" && raw.data ? Object.values(raw.data) : null;
+  // Filtro del roster: match en cualquier campo (nombre, país, ExternalID…).
+  const rosterQuery = rosterFilter.trim().toLowerCase();
+  const filteredRoster =
+    rosterArray && rosterQuery
+      ? rosterArray.filter((a) =>
+          JSON.stringify(a).toLowerCase().includes(rosterQuery),
+        )
+      : rosterArray;
+  const rawDisplay = rosterArray ? filteredRoster : raw.data;
+
+  // Al cambiar de recurso, limpia el filtro (no aplica a la estructura).
+  useEffect(() => {
+    setRosterFilter("");
+  }, [rawResource]);
 
   return (
     <div className="flex h-full flex-col gap-6 p-6">
@@ -213,29 +226,43 @@ export function SportTechPage({
               ))}
             </div>
             <Card>
-              <CardHeader className="flex-row items-center justify-between space-y-0">
+              <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
                 <CardTitle>
                   {SPORTTECH_RAW_RESOURCES.find((r) => r.resource === rawResource)
                     ?.label ?? "Proveedor"}
-                  {rawResource === "athletes" && Array.isArray(rawDisplay) && (
+                  {rosterArray && (
                     <span className="ml-2 text-sm font-normal text-(--color-muted-foreground)">
-                      {rawDisplay.length} registros
+                      {Array.isArray(rawDisplay) &&
+                      rawDisplay.length !== rosterArray.length
+                        ? `${rawDisplay.length} / ${rosterArray.length}`
+                        : rosterArray.length}{" "}
+                      registros
                     </span>
                   )}
                 </CardTitle>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => raw.refetch()}
-                  disabled={!id || raw.isFetching}
-                >
-                  {raw.isFetching ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <RefreshCw className="size-4" />
+                <div className="flex items-center gap-2">
+                  {rosterArray && rosterArray.length > 0 && (
+                    <Input
+                      placeholder="Buscar atleta (nombre, país…)"
+                      value={rosterFilter}
+                      onChange={(e) => setRosterFilter(e.target.value)}
+                      className="h-8 w-56 text-xs"
+                    />
                   )}
-                  Refrescar
-                </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => raw.refetch()}
+                    disabled={!id || raw.isFetching}
+                  >
+                    {raw.isFetching ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <RefreshCw className="size-4" />
+                    )}
+                    Refrescar
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 {!id ? (
@@ -427,17 +454,51 @@ function CompetitionCard({ comp }: { comp: SportTechInspectCompetition }) {
   );
 }
 
+// Catálogos de Stage.Kind por disciplina (del proveedor; solo HINT de lectura para
+// la vista cruda — la fase canónica la deriva el backend en la pestaña Competición).
+const RG_KINDS: Record<number, string> = {
+  0: "All-Around",
+  1: "All-Around Final",
+  2: "Final por aparato",
+};
+const AG_KINDS: Record<number, string> = {
+  0: "All-Around",
+  1: "Clasificación",
+  2: "Cuartos",
+  3: "Semifinal",
+  4: "Final",
+  5: "Final por aparato",
+  6: "All-Around Compulsory",
+  7: "All-Around Optional",
+};
+
+/** Nombre legible del Kind de un stage (infiere disciplina por su forma). */
+function stageFaseLabel(stage: Record<string, unknown>): string | undefined {
+  const kind = stage.Kind;
+  if (typeof kind !== "number") return undefined;
+  const table =
+    stage.Apparatuses != null
+      ? RG_KINDS
+      : stage.FrameTypes != null
+        ? AG_KINDS
+        : undefined;
+  return table?.[kind];
+}
+
 /**
  * Estructura cruda del proveedor en secciones digeribles: Evento (solo campos
  * clave, no las ~40 flags `SHOW_*`) + Competiciones y Stages como arrays
- * colapsables (el objeto crudo entero aplanado era ilegible).
+ * colapsables (el objeto crudo entero aplanado era ilegible). A cada stage se le
+ * antepone un `Fase` derivado del Kind (hint legible; el Kind crudo se conserva).
  */
 function RawStructureView({ data }: { data: Record<string, unknown> }) {
   const event = (data.Event ?? {}) as Record<string, unknown>;
   const comps = Object.values(
     (data.Competitions ?? {}) as Record<string, unknown>,
   );
-  const stages = Object.values((data.Stages ?? {}) as Record<string, unknown>);
+  const stages = Object.values(
+    (data.Stages ?? {}) as Record<string, Record<string, unknown>>,
+  ).map((s) => ({ Fase: stageFaseLabel(s) ?? "—", ...s }));
   const eventSummary = {
     Título: event.Title,
     Subtítulo: event.Subtitle,
