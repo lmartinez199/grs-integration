@@ -14,13 +14,14 @@ import {
 
 /**
  * Setup por pasos con estado, compartido entre disciplinas (ath, judo/zempo).
- * El concepto es el mismo en todas: dos grupos fijos —«estructura» (crea el
- * esqueleto del evento en GRS) y «entidades» (empuja los datos)— renderizados
- * como una lista de pasos con su resultado y opción de re-ejecutar. Lo que
- * cambia por disciplina es solo la lista de pasos (datos), no la UI.
+ * El concepto es el mismo en todas: grupos fijos —«estructura» (crea el esqueleto
+ * del evento en GRS), «entidades» (empuja los datos de la carga inicial) y
+ * «resultados» (marcas/medallero, durante/después de la competencia)— renderizados
+ * como una lista de pasos con su resultado y opción de re-ejecutar. Lo que cambia
+ * por disciplina es solo la lista de pasos (datos), no la UI.
  */
 
-export type StepGroup = "estructura" | "entidades";
+export type StepGroup = "estructura" | "entidades" | "resultados";
 
 /** Resumen estándar de un paso (created/processed/skipped + errores). */
 export interface StepSummary {
@@ -30,6 +31,11 @@ export interface StepSummary {
   updated?: number;
   skipped: number;
   errors: string[];
+  /**
+   * Resumen legible que REEMPLAZA la línea genérica de conteos (cuando el sync
+   * tiene métricas propias, p. ej. gimnasia: "14 units · 7 conjuntos · 24 medallas").
+   */
+  label?: string;
 }
 
 /** Lo que devuelve `run` en caso de éxito. El error lo añade el catch interno. */
@@ -77,11 +83,15 @@ const GROUP_META: Record<StepGroup, { title: string; desc: string }> = {
   },
   entidades: {
     title: "Entidades y datos",
-    desc: "Empuja los datos al evento: organizaciones, participantes, resultados…",
+    desc: "Carga inicial del evento: organizaciones, participantes…",
+  },
+  resultados: {
+    title: "Resultados",
+    desc: "Marcas, estado y medallero — se disparan durante/después de la competencia, no en la carga inicial.",
   },
 };
 
-const GROUP_ORDER: StepGroup[] = ["estructura", "entidades"];
+const GROUP_ORDER: StepGroup[] = ["estructura", "entidades", "resultados"];
 
 function stepStatus(r: StepResult | undefined): "ok" | "error" | "idle" {
   if (!r) return "idle";
@@ -122,7 +132,9 @@ export function SetupSteps<Ctx>({
           return false;
         }
         toast.success(
-          `${step.label}: ${s.created} creados${s.updated ? ` · ${s.updated} actualizados` : ""} · ${s.processed} procesados${s.skipped ? ` · ${s.skipped} omitidos` : ""}`,
+          s.label
+            ? `${step.label}: ${s.label}`
+            : `${step.label}: ${s.created} creados${s.updated ? ` · ${s.updated} actualizados` : ""} · ${s.processed} procesados${s.skipped ? ` · ${s.skipped} omitidos` : ""}`,
         );
       } else if (res.kind === "queued") {
         toast.success(
@@ -293,9 +305,8 @@ function StepResultLine({ result }: { result: StepResult }) {
           hasError ? "text-(--color-destructive)" : "text-(--color-success)",
         )}
       >
-        {s.created} creados
-        {s.updated ? ` · ${s.updated} actualizados` : ""} · {s.processed} procesados
-        {s.skipped ? ` · ${s.skipped} omitidos` : ""}
+        {s.label ??
+          `${s.created} creados${s.updated ? ` · ${s.updated} actualizados` : ""} · ${s.processed} procesados${s.skipped ? ` · ${s.skipped} omitidos` : ""}`}
         {hasError ? ` · ${s.errors.length} con error` : ""}
       </p>
 

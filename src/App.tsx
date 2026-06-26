@@ -13,6 +13,7 @@ import { JudPage } from "@/features/judo/JudPage";
 import { AthPage } from "@/features/ath/AthPage";
 import { ArcoPage } from "@/features/arco/ArcoPage";
 import { SwmPage } from "@/features/swimsystem/SwmPage";
+import { SportTechPage } from "@/features/sporttech/SportTechPage";
 import { IntegrationsPage } from "@/features/integrations/IntegrationsPage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
 
@@ -57,6 +58,29 @@ export default function App() {
           <Route path="/ath" element={<AthPage />} />
           <Route path="/arco" element={<ArcoPage />} />
           <Route path="/swm" element={<SwmPage />} />
+          <Route
+            path="/sporttech-gar"
+            element={
+              // key={provider}: las 2 rutas montan el MISMO componente en la misma
+              // posición → sin key React reusa la instancia al navegar entre
+              // disciplinas y el estado local (eventId) se filtra de una a otra.
+              <SportTechPage
+                key="sporttech-gar"
+                provider="sporttech-gar"
+                title="GAR (artística)"
+              />
+            }
+          />
+          <Route
+            path="/sporttech-gry"
+            element={
+              <SportTechPage
+                key="sporttech-gry"
+                provider="sporttech-gry"
+                title="GRY (rítmica)"
+              />
+            }
+          />
           <Route path="/integrations" element={<IntegrationsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>

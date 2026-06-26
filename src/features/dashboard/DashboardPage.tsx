@@ -3,6 +3,7 @@ import { ZempoSyncCard } from "./ZempoSyncCard";
 import { AthSyncCard } from "./AthSyncCard";
 import { ArcoSyncCard } from "./ArcoSyncCard";
 import { SwmSyncCard } from "./SwmSyncCard";
+import { SportTechSyncCard } from "./SportTechSyncCard";
 
 export function DashboardPage() {
   return (
@@ -21,6 +22,8 @@ export function DashboardPage() {
           <AthSyncCard />
           <ArcoSyncCard />
           <SwmSyncCard />
+          <SportTechSyncCard provider="sporttech-gar" title="GAR (artística)" />
+          <SportTechSyncCard provider="sporttech-gry" title="GRY (rítmica)" />
         </div>
       </div>
     </div>

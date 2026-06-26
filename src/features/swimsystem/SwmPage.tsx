@@ -2,20 +2,23 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, RefreshCw, Search } from "lucide-react";
 
-import { getIntegration, updateIntegrationExternalIds } from "@/api/grs/integrations";
+import {
+  getIntegration,
+  updateIntegrationExternalIds,
+  type IntegrationEventRef,
+} from "@/api/grs/integrations";
 import {
   swmHealth,
   swmInspect,
   swmSyncMeet,
-  swmSyncStage,
   swmValidate,
   swmWebhookLog,
   SWM_RESOURCES,
-  SWM_STAGES,
   type SwmResource,
-  type SwmStage,
 } from "@/api/grs/swimsystem";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
+import { ActiveEventSelector } from "@/components/integration/active-event-selector";
+import { SyncHistoryCard } from "@/components/integration/sync-history-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +31,8 @@ import {
   type TabItem,
 } from "@/components/ui/tabs";
 
+import { SwmSyncSteps } from "./SwmSyncSteps";
+
 const TABS: TabItem[] = [
   { value: "estado", label: "Estado" },
   { value: "proveedor", label: "Proveedor" },
@@ -36,27 +41,27 @@ const TABS: TabItem[] = [
 
 export function SwmPage() {
   const [tab, setTab] = useState("estado");
-  const [meetId, setMeetId] = useState("");
   const [resource, setResource] = useState<SwmResource | null>(null);
   const [filter, setFilter] = useState("");
-  const id = meetId.trim();
 
   const integration = useQuery({
     queryKey: ["integrations", "swimsystem"],
     queryFn: () => getIntegration("swimsystem"),
   });
-  const knownMeetIds = (integration.data?.externalIds?.meetIds as string[] | undefined) ?? [];
-
-  useEffect(() => {
-    if (knownMeetIds.length === 1 && !meetId) setMeetId(knownMeetIds[0]);
-  }, [knownMeetIds.length]);
+  // Lista de meets (1 por año) + activo, gestionados en Integraciones; acá se
+  // elige cuál opera (el activo) para inspect/sync.
+  const externalIds = integration.data?.externalIds ?? {};
+  const events = (externalIds.events as IntegrationEventRef[] | undefined) ?? [];
+  const savedActiveId = String(externalIds.activeId ?? "");
+  const id = events.find((e) => e.id === savedActiveId)?.id ?? events[0]?.id ?? "";
 
   useEffect(() => { setFilter(""); }, [resource]);
 
-  function saveMeetIdIfNew(meetIdToSave: string) {
-    if (!meetIdToSave || knownMeetIds.includes(meetIdToSave)) return;
+  function setActive(newId: string) {
+    if (newId === id) return;
     updateIntegrationExternalIds("swimsystem", {
-      meetIds: [...knownMeetIds, meetIdToSave],
+      ...externalIds,
+      activeId: newId,
     }).then(() => integration.refetch());
   }
 
@@ -85,11 +90,6 @@ export function SwmPage() {
   const sync = useMutationWithToast({
     mutationFn: () => swmSyncMeet(id),
     successMsg: "Sync de natación (SWM) disparada",
-    invalidateKeys: [["swm", "webhooks"]],
-  });
-  const stageSync = useMutationWithToast({
-    mutationFn: (stage: SwmStage) => swmSyncStage(id, stage),
-    successMsg: "Etapa de sync disparada",
     invalidateKeys: [["swm", "webhooks"]],
   });
 
@@ -183,7 +183,7 @@ export function SwmPage() {
             aria-labelledby={tabTriggerId("proveedor")}
             className="space-y-4"
           >
-            <MeetIdInput meetId={meetId} setMeetId={setMeetId} knownMeetIds={knownMeetIds} />
+            <ActiveEventSelector events={events} activeId={id} onSetActive={setActive} noun="Meet" />
             <div className="flex flex-wrap gap-2">
               {SWM_RESOURCES.map((r) => (
                 <Button
@@ -191,7 +191,7 @@ export function SwmPage() {
                   size="sm"
                   variant={r === resource ? "default" : "outline"}
                   disabled={!id}
-                  onClick={() => { setResource(r); saveMeetIdIfNew(id); }}
+                  onClick={() => setResource(r)}
                 >
                   {r}
                 </Button>
@@ -247,12 +247,12 @@ export function SwmPage() {
             aria-labelledby={tabTriggerId("sync")}
             className="space-y-4"
           >
-            <MeetIdInput meetId={meetId} setMeetId={setMeetId} knownMeetIds={knownMeetIds} />
+            <ActiveEventSelector events={events} activeId={id} onSetActive={setActive} noun="Meet" />
             <div className="flex flex-wrap gap-2">
               <Button
                 size="sm"
                 disabled={!id || sync.isPending}
-                onClick={() => { saveMeetIdIfNew(id); sync.mutate(); }}
+                onClick={() => sync.mutate()}
               >
                 {sync.isPending ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -276,44 +276,7 @@ export function SwmPage() {
               </Button>
             </div>
 
-            <div className="space-y-2">
-              <p className="text-sm text-(--color-muted-foreground)">
-                O por etapa (orden: estructura → participantes → start-lists →
-                resultados):
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {SWM_STAGES.map(({ stage, label }) => (
-                  <Button
-                    key={stage}
-                    size="sm"
-                    variant="outline"
-                    disabled={!id || stageSync.isPending}
-                    onClick={() => { saveMeetIdIfNew(id); stageSync.mutate(stage); }}
-                  >
-                    {stageSync.isPending && stageSync.variables === stage ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <RefreshCw className="size-4" />
-                    )}
-                    {label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {stageSync.data && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    Resultado de la etapa · {stageSync.data.stage}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <DataView data={omitErrors(stageSync.data)} />
-                  <SyncErrors errors={stageSync.data.errors} />
-                </CardContent>
-              </Card>
-            )}
+            <SwmSyncSteps meetId={id} />
 
             {sync.data && (
               <Card>
@@ -337,6 +300,8 @@ export function SwmPage() {
                 </CardContent>
               </Card>
             )}
+
+            <SyncHistoryCard provider="swimsystem" />
           </div>
         )}
       </div>
@@ -367,40 +332,3 @@ function SyncErrors({ errors }: { errors?: string[] }) {
   );
 }
 
-function MeetIdInput({
-  meetId,
-  setMeetId,
-  knownMeetIds = [],
-}: {
-  meetId: string;
-  setMeetId: (v: string) => void;
-  knownMeetIds?: string[];
-}) {
-  return (
-    <div className="space-y-2">
-      <Input
-        placeholder="meetId de SwimSystem (UUID)"
-        value={meetId}
-        onChange={(e) => setMeetId(e.target.value)}
-        className="max-w-md"
-      />
-      {knownMeetIds.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {knownMeetIds.map((id) => (
-            <button
-              key={id}
-              onClick={() => setMeetId(id)}
-              className={`rounded-md border px-2 py-0.5 font-mono text-xs transition-colors ${
-                id === meetId
-                  ? "border-transparent bg-(--color-primary) text-(--color-primary-foreground)"
-                  : "border-(--color-border) text-(--color-muted-foreground) hover:text-(--color-foreground)"
-              }`}
-            >
-              {id.slice(0, 8)}…
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}

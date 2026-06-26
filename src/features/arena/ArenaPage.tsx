@@ -8,21 +8,38 @@ import {
   getCurrentEvent,
   getCategories,
   getCategoryFights,
+  getCategoryFightsRaw,
   syncCategory,
   type ArenaCategory,
+  type ArenaSportEvent,
 } from "@/api/grs/arena";
 import { cn } from "@/lib/utils";
+import { SyncHistoryCard } from "@/components/integration/sync-history-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DataView } from "@/components/ui/data-view";
+import {
+  Tabs,
+  tabPanelId,
+  tabTriggerId,
+  type TabItem,
+} from "@/components/ui/tabs";
 import { EventSummary } from "./EventSummary";
 import { FightsByRound } from "./FightsByRound";
 import { WebhookConfig } from "./WebhookConfig";
 import { ArenaLoopCard, ArenaSyncSteps } from "./ArenaSyncSection";
 import { useArenaLive } from "./useArenaLive";
 
+const TABS: TabItem[] = [
+  { value: "competicion", label: "Competición" },
+  { value: "proveedor", label: "Proveedor" },
+  { value: "sync", label: "Sync" },
+];
+
 export function ArenaPage() {
+  const [tab, setTab] = useState("competicion");
   const [selected, setSelected] = useState<string | number | null>(null);
   const [catFilter, setCatFilter] = useState("");
 
@@ -55,7 +72,22 @@ export function ArenaPage() {
         </p>
       </header>
 
-      <div className="min-h-0 flex-1 space-y-6 overflow-auto">
+      <Tabs
+        tabs={TABS}
+        value={tab}
+        onChange={setTab}
+        aria-label="Secciones de Arena"
+        className="shrink-0"
+      />
+
+      <div className="min-h-0 flex-1 overflow-auto">
+        {tab === "competicion" && (
+          <div
+            role="tabpanel"
+            id={tabPanelId("competicion")}
+            aria-labelledby={tabTriggerId("competicion")}
+            className="space-y-6"
+          >
       <Card>
         <CardHeader>
           <CardTitle>Evento actual</CardTitle>
@@ -72,12 +104,6 @@ export function ArenaPage() {
           )}
         </CardContent>
       </Card>
-
-      <ArenaLoopCard />
-
-      <WebhookConfig />
-
-      <ArenaSyncSteps />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1.4fr]">
         <Card>
@@ -160,8 +186,128 @@ export function ArenaPage() {
           </CardContent>
         </Card>
       </div>
+          </div>
+        )}
+
+        {tab === "proveedor" && (
+          <div
+            role="tabpanel"
+            id={tabPanelId("proveedor")}
+            aria-labelledby={tabTriggerId("proveedor")}
+          >
+            <ProveedorRawSection
+              event={event.data}
+              categories={categories.data}
+              selected={selected}
+              selectedName={selectedCategory?.name}
+            />
+          </div>
+        )}
+
+        {tab === "sync" && (
+          <div
+            role="tabpanel"
+            id={tabPanelId("sync")}
+            aria-labelledby={tabTriggerId("sync")}
+            className="space-y-6"
+          >
+            <ArenaLoopCard />
+            <WebhookConfig />
+            <ArenaSyncSteps />
+            <SyncHistoryCard provider="arena" />
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+const RAW_RESOURCES = [
+  { value: "evento", label: "Evento" },
+  { value: "categorias", label: "Categorías" },
+  { value: "peleas", label: "Peleas" },
+] as const;
+type RawResource = (typeof RAW_RESOURCES)[number]["value"];
+
+/**
+ * Vista cruda de lo que manda Arena, sin interpretación de GRS (equivalente a la
+ * pestaña "Proveedor" de SWM/SportTech). Evento y categorías son passthrough
+ * directo; las peleas usan el endpoint crudo (bracket+repechage sin enriquecer).
+ */
+function ProveedorRawSection({
+  event,
+  categories,
+  selected,
+  selectedName,
+}: {
+  event: ArenaSportEvent | undefined;
+  categories: ArenaCategory[] | undefined;
+  selected: string | number | null;
+  selectedName?: string;
+}) {
+  const [resource, setResource] = useState<RawResource>("evento");
+
+  const rawFights = useQuery({
+    queryKey: ["arena", "fights-raw", selected],
+    queryFn: () => getCategoryFightsRaw(selected!),
+    enabled: resource === "peleas" && selected != null,
+  });
+
+  const data =
+    resource === "evento"
+      ? event
+      : resource === "categorias"
+        ? categories
+        : rawFights.data;
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between gap-2 space-y-0">
+        <CardTitle>
+          Proveedor (crudo)
+          {resource === "peleas" && selectedName ? (
+            <span className="ml-2 text-sm font-normal text-(--color-muted-foreground)">
+              {selectedName}
+            </span>
+          ) : null}
+        </CardTitle>
+        <div className="flex flex-wrap gap-2">
+          {RAW_RESOURCES.map((r) => (
+            <Button
+              key={r.value}
+              size="sm"
+              variant={r.value === resource ? "default" : "outline"}
+              onClick={() => setResource(r.value)}
+            >
+              {r.label}
+            </Button>
+          ))}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <p className="mb-3 text-sm text-(--color-muted-foreground)">
+          Lo que manda Arena tal cual, sin interpretación de GRS.
+        </p>
+        {resource === "peleas" && selected == null ? (
+          <p className="text-sm text-(--color-muted-foreground)">
+            Selecciona una categoría arriba para ver sus peleas crudas.
+          </p>
+        ) : resource === "peleas" && rawFights.isLoading ? (
+          <Loader2
+            className="size-5 animate-spin text-(--color-muted-foreground)"
+            aria-hidden
+          />
+        ) : resource === "peleas" && rawFights.isError ? (
+          <p role="alert" className="text-sm text-(--color-destructive)">
+            Error al cargar peleas crudas.
+          </p>
+        ) : (
+          <div className="max-h-[60vh] overflow-auto pr-1">
+            <DataView data={data} showTechnical collapsible />
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

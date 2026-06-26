@@ -5,19 +5,36 @@ import { Loader2 } from "lucide-react";
 import {
   listIntegrations,
   setIntegrationEnabled,
+  setIntegrationPollInterval,
   updateIntegrationExternalIds,
   type Integration,
+  type IntegrationEventRef,
 } from "@/api/grs/integrations";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
+import { EventListEditor } from "@/components/integration/event-list-editor";
+import { runStatusVariant } from "@/components/integration/run-history";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+/** Lee la lista de eventos + el activo de un externalIds loose. */
+function readEvents(ids: Record<string, unknown>): {
+  events: IntegrationEventRef[];
+  activeId: string;
+} {
+  return {
+    events: (ids.events as IntegrationEventRef[] | undefined) ?? [],
+    activeId: String(ids.activeId ?? ""),
+  };
+}
+
 const PROVIDER_LABELS: Record<string, string> = {
   swimsystem: "SWM — SwimSystem (natación)",
   arena: "WRE — Arena (lucha)",
+  "sporttech-gar": "GAR — Gimnasia Artística (SportTech)",
+  "sporttech-gry": "GRY — Gimnasia Rítmica (SportTech)",
 };
 
 function fmt(iso?: string) {
@@ -29,28 +46,45 @@ function SwimSystemFields({ ids, onChange }: {
   ids: Record<string, unknown>;
   onChange: (next: Record<string, unknown>) => void;
 }) {
-  const meetIds = (ids.meetIds as string[] | undefined) ?? [];
-  const [raw, setRaw] = useState(meetIds.join(", "));
-
+  const { events, activeId } = readEvents(ids);
   return (
     <div className="space-y-1">
-      <Label htmlFor="swm-meetIds">meetIds (separados por coma)</Label>
-      <Input
-        id="swm-meetIds"
-        value={raw}
-        onChange={(e) => {
-          setRaw(e.target.value);
-          const arr = e.target.value
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean);
-          onChange({ ...ids, meetIds: arr });
-        }}
-        placeholder="uuid1, uuid2, ..."
+      <Label>Meets (1 por año · activá el actual)</Label>
+      <EventListEditor
+        noun="meet"
+        events={events}
+        activeId={activeId}
+        onChange={(events, activeId) => onChange({ ...ids, events, activeId })}
       />
-      <p className="text-xs text-(--color-muted-foreground)">
-        {meetIds.length} meet{meetIds.length !== 1 ? "s" : ""} configurado{meetIds.length !== 1 ? "s" : ""}
-      </p>
+    </div>
+  );
+}
+
+function SportTechFields({ ids, onChange }: {
+  ids: Record<string, unknown>;
+  onChange: (next: Record<string, unknown>) => void;
+}) {
+  const { events, activeId } = readEvents(ids);
+  return (
+    <div className="space-y-3">
+      <div className="space-y-1">
+        <Label>Eventos (1 por año · activá el actual)</Label>
+        <EventListEditor
+          noun="evento"
+          events={events}
+          activeId={activeId}
+          onChange={(events, activeId) => onChange({ ...ids, events, activeId })}
+        />
+      </div>
+      <div className="space-y-1">
+        <Label htmlFor="sporttech-eventCode">Código de edición (eventCode)</Label>
+        <Input
+          id="sporttech-eventCode"
+          value={String(ids.eventCode ?? "")}
+          onChange={(e) => onChange({ ...ids, eventCode: e.target.value })}
+          placeholder="JJB"
+        />
+      </div>
     </div>
   );
 }
@@ -78,6 +112,52 @@ function ArenaFields({ ids, onChange }: {
           onChange={(e) => onChange({ ...ids, eventCode: e.target.value })}
           placeholder="JJB2026"
         />
+      </div>
+    </div>
+  );
+}
+
+/** Editor del intervalo de auto-sync (runner). En segundos; 0 = sin auto-sync. */
+function PollIntervalField({ integration }: { integration: Integration }) {
+  const currentSeconds = Math.round((integration.pollIntervalMs ?? 0) / 1000);
+  const [seconds, setSeconds] = useState(String(currentSeconds));
+  const save = useMutationWithToast({
+    mutationFn: () =>
+      setIntegrationPollInterval(
+        integration.provider,
+        Math.max(0, Math.round(Number(seconds) || 0)) * 1000,
+      ),
+    successMsg: `${integration.provider} — auto-sync actualizado`,
+    invalidateKeys: [["integrations"]],
+  });
+  const dirty = (Number(seconds) || 0) !== currentSeconds;
+  return (
+    <div className="space-y-1">
+      <Label htmlFor={`poll-${integration.provider}`}>
+        Auto-sync cada (segundos · 0 = off)
+      </Label>
+      <div className="flex max-w-xs items-center gap-2">
+        <Input
+          id={`poll-${integration.provider}`}
+          type="number"
+          min={0}
+          value={seconds}
+          onChange={(e) => setSeconds(e.target.value)}
+          className="w-28"
+        />
+        <Button
+          size="sm"
+          variant="secondary"
+          disabled={!dirty || save.isPending}
+          onClick={() => save.mutate()}
+        >
+          {save.isPending ? <Loader2 className="size-3 animate-spin" /> : "Guardar"}
+        </Button>
+        {currentSeconds > 0 && (
+          <span className="text-xs text-(--color-success)">
+            runner activo · cada {currentSeconds}s
+          </span>
+        )}
       </div>
     </div>
   );
@@ -135,6 +215,12 @@ function IntegrationCard({ integration }: { integration: Integration }) {
         {integration.provider === "arena" && (
           <ArenaFields ids={externalIds} onChange={setExternalIds} />
         )}
+        {(integration.provider === "sporttech-gar" ||
+          integration.provider === "sporttech-gry") && (
+          <SportTechFields ids={externalIds} onChange={setExternalIds} />
+        )}
+
+        <PollIntervalField integration={integration} />
 
         {hasChanges && (
           <Button
@@ -157,7 +243,7 @@ function IntegrationCard({ integration }: { integration: Integration }) {
           <dd>
             {integration.lastSyncStatus ? (
               <Badge
-                variant={integration.lastSyncStatus === "ok" ? "default" : "destructive"}
+                variant={runStatusVariant(integration.lastSyncStatus)}
                 className="text-xs"
               >
                 {integration.lastSyncStatus}

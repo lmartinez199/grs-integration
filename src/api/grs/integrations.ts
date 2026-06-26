@@ -1,5 +1,24 @@
 import { request } from "@/lib/http";
 
+/** Un evento configurado del proveedor (id + etiqueta opcional). 1 por año; CRUD. */
+export interface IntegrationEventRef {
+  id: string;
+  label?: string;
+}
+
+/** Estado de una corrida: ok | error | skipped (no-op intencional, p.ej. una vía que no aplica al evento). */
+export type IntegrationRunStatus = "ok" | "error" | "skipped";
+
+/** Una corrida de sync de UNA etapa (entrada del historial acotado). */
+export interface IntegrationRun {
+  at: string;
+  stage: string;
+  status: IntegrationRunStatus;
+  counts?: Record<string, number>;
+  errorCount: number;
+  errors?: string[];
+}
+
 /** Config operativa NO-secreta de una integración (espejo de IntegrationResponseDto). */
 export interface Integration {
   id: string;
@@ -9,8 +28,10 @@ export interface Integration {
   pollIntervalMs: number;
   webhookReceiverUrl?: string;
   lastSyncAt?: string;
-  lastSyncStatus?: "ok" | "error";
+  lastSyncStatus?: IntegrationRunStatus;
   lastSyncError?: string;
+  /** Historial acotado de las últimas corridas (más reciente al final). */
+  runs?: IntegrationRun[];
   updatedAt: string;
 }
 
@@ -33,4 +54,14 @@ export const updateIntegrationExternalIds = (
   request<Integration>("grs", `/integrations/${provider}/external-ids`, {
     method: "PUT",
     body: { externalIds },
+  });
+
+/** Intervalo de auto-sync del runner en ms (0 = sin auto-sync). */
+export const setIntegrationPollInterval = (
+  provider: string,
+  pollIntervalMs: number,
+) =>
+  request<Integration>("grs", `/integrations/${provider}/poll-interval`, {
+    method: "PUT",
+    body: { pollIntervalMs },
   });

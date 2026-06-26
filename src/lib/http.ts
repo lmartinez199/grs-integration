@@ -62,15 +62,18 @@ export async function request<T = unknown>(
   const url = `${baseUrl(service)}${path.startsWith("/") ? path : `/${path}`}`;
 
   const hasBody = body !== undefined && body !== null;
+  // FormData (subida de archivos): NO se serializa ni se fija Content-Type —
+  // el cliente HTTP pone el boundary del multipart él mismo.
+  const isForm = typeof FormData !== "undefined" && body instanceof FormData;
   const res = await tauriFetch(url, {
     method,
     headers: {
       Accept: "application/json",
-      ...(hasBody ? { "Content-Type": "application/json" } : {}),
+      ...(hasBody && !isForm ? { "Content-Type": "application/json" } : {}),
       ...(skipAuth ? {} : authHeaders(service)),
       ...headers,
     },
-    ...(hasBody ? { body: JSON.stringify(body) } : {}),
+    ...(hasBody ? { body: isForm ? (body as FormData) : JSON.stringify(body) } : {}),
   });
 
   // El JWT del GRS expiró o es inválido: cerrar sesión.
