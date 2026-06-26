@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# TypeScript: cache de build incremental (composite/project references)
+*.tsbuildinfo
+
 # Variables de entorno: no se versionan (incluye .example/.development/.production).
 .env*
 
