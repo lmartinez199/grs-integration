@@ -29,6 +29,7 @@ import {
   type TabItem,
 } from "@/components/ui/tabs";
 
+import { SportTechCsvCard } from "./SportTechCsvCard";
 import { SportTechSyncSteps } from "./SportTechSyncSteps";
 
 const TABS: TabItem[] = [
@@ -254,6 +255,7 @@ export function SportTechPage({
             className="space-y-4"
           >
             <SportTechSyncSteps eventId={id} />
+            <SportTechCsvCard eventId={id} provider={provider} />
             <SyncHistoryCard provider={provider} />
           </div>
         )}

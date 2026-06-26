@@ -29,6 +29,7 @@ export interface SportTechEventSyncSummary {
   groups: number;
   results: number;
   awards: number;
+  startLists?: number;
   sportEventsCreated: number;
   errors: string[];
 }
@@ -62,6 +63,21 @@ export const sportTechSyncStage = (eventId: string, stage: SportTechStage) =>
     `/sporttech/sync/${encodeURIComponent(eventId)}/${stage}`,
     { method: "POST" },
   );
+
+/**
+ * Ingesta por CSV (export del proveedor) — vía alternativa al pull OVS. Sube el
+ * archivo (multipart `file`) y corre el pipeline completo. La disciplina (GAR/GRY)
+ * sale del propio CSV; `eventId` es solo traza. Idempotente.
+ */
+export const sportTechSyncCsv = (eventId: string, file: File) => {
+  const form = new FormData();
+  form.append("file", file);
+  return request<SportTechEventSyncSummary>(
+    "grs",
+    `/sporttech/sync/${encodeURIComponent(eventId)}/csv`,
+    { method: "POST", body: form },
+  );
+};
 
 // ─── Inspect (vista read-only de la competición del proveedor) ────────────────
 
