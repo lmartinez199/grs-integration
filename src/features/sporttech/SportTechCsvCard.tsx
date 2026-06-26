@@ -14,6 +14,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  * detecta el backend del propio CSV, así que el mismo control sirve para las dos
  * disciplinas. `eventId` (el activo) es solo traza; si no hay, se usa el provider.
  */
+/** Disciplina esperada según el provider de la página (sporttech-gar → GAR). */
+function expectedDiscipline(provider: string): "GAR" | "GRY" | "" {
+  if (provider.endsWith("gar")) return "GAR";
+  if (provider.endsWith("gry")) return "GRY";
+  return "";
+}
+
 export function SportTechCsvCard({
   eventId,
   provider,
@@ -94,6 +101,20 @@ export function SportTechCsvCard({
           </p>
         )}
 
+        {summary?.discipline &&
+          expectedDiscipline(provider) &&
+          summary.discipline !== expectedDiscipline(provider) && (
+            <p
+              role="alert"
+              className="rounded-md border border-(--color-warning)/40 bg-(--color-warning)/5 p-2 text-sm text-(--color-warning)"
+            >
+              El CSV es de <strong>{summary.discipline}</strong>, pero estás en la
+              página de <strong>{expectedDiscipline(provider)}</strong>. Se procesó
+              como {summary.discipline} y quedó registrado en esa disciplina, no en
+              esta.
+            </p>
+          )}
+
         {summary && <CsvSummaryView summary={summary} />}
       </CardContent>
     </Card>
@@ -124,6 +145,11 @@ function CsvSummaryView({ summary }: { summary: SportTechEventSyncSummary }) {
         ) : (
           <span className="text-(--color-warning)">
             Procesado con {summary.errors.length} aviso(s)
+          </span>
+        )}
+        {summary.discipline && (
+          <span className="text-(--color-muted-foreground)">
+            · disciplina detectada: {summary.discipline}
           </span>
         )}
       </div>

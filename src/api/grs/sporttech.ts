@@ -23,6 +23,8 @@ export const SPORTTECH_STAGES: { stage: SportTechStage; label: string }[] = [
 /** Resumen del pull completo de un evento. */
 export interface SportTechEventSyncSummary {
   eventId: string;
+  /** Disciplina (GAR/GRY) detectada del evento o del CSV; "" si no se pudo. */
+  discipline?: string;
   competitions: number;
   athletes: number;
   units: number;
