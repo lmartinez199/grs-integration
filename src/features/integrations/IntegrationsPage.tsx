@@ -35,6 +35,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   arena: "WRE — Arena (lucha)",
   "sporttech-gar": "GAR — Gimnasia Artística (SportTech)",
   "sporttech-gry": "GRY — Gimnasia Rítmica (SportTech)",
+  judo: "JUD — Judo (zempo)",
 };
 
 function fmt(iso?: string) {
@@ -85,6 +86,24 @@ function SportTechFields({ ids, onChange }: {
           placeholder="JJB"
         />
       </div>
+    </div>
+  );
+}
+
+function JudoFields({ ids, onChange }: {
+  ids: Record<string, unknown>;
+  onChange: (next: Record<string, unknown>) => void;
+}) {
+  const { events, activeId } = readEvents(ids);
+  return (
+    <div className="space-y-1">
+      <Label>Competiciones (por código · activá la actual)</Label>
+      <EventListEditor
+        noun="competición"
+        events={events}
+        activeId={activeId}
+        onChange={(events, activeId) => onChange({ ...ids, events, activeId })}
+      />
     </div>
   );
 }
@@ -213,6 +232,9 @@ function IntegrationCard({ integration }: { integration: Integration }) {
         {(integration.provider === "sporttech-gar" ||
           integration.provider === "sporttech-gry") && (
           <SportTechFields ids={externalIds} onChange={setExternalIds} />
+        )}
+        {integration.provider === "judo" && (
+          <JudoFields ids={externalIds} onChange={setExternalIds} />
         )}
 
         <PollIntervalField integration={integration} />

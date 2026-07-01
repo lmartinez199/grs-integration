@@ -9,6 +9,7 @@ import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { IntegrationInfoRows } from "@/components/integration/integration-info-rows";
 import { Input } from "@/components/ui/input";
 import { RetryNotice } from "@/components/ui/retry-notice";
 import { SyncCard } from "@/components/ui/sync-card";
@@ -54,6 +55,9 @@ export function ZempoSyncCard() {
             isRetrying={schedules.isFetching}
           />
         )}
+
+        <IntegrationInfoRows provider="judo" eventLabel="Competición activa" />
+
         <form
           className="flex gap-2"
           onSubmit={(e) => {
