@@ -150,14 +150,10 @@ export function ArenaPage() {
                   variant="outline"
                   className="h-7 px-2"
                   onClick={() => categorySync.mutate(selected)}
-                  disabled={categorySync.isPending}
+                  loading={categorySync.isPending}
+                  icon={<RefreshCw aria-hidden />}
                   title="Re-sincronizar esta categoría desde Arena"
                 >
-                  {categorySync.isPending ? (
-                    <Loader2 className="size-4 animate-spin" aria-hidden />
-                  ) : (
-                    <RefreshCw className="size-4" aria-hidden />
-                  )}
                   Sincronizar
                 </Button>
               )}

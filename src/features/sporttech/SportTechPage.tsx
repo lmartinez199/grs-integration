@@ -210,13 +210,10 @@ export function SportTechPage({
                     size="sm"
                     variant="outline"
                     onClick={() => raw.refetch()}
-                    disabled={!id || raw.isFetching}
+                    disabled={!id}
+                    loading={raw.isFetching}
+                    icon={<RefreshCw />}
                   >
-                    {raw.isFetching ? (
-                      <Loader2 className="size-4 animate-spin" />
-                    ) : (
-                      <RefreshCw className="size-4" />
-                    )}
                     Refrescar
                   </Button>
                 </div>
@@ -291,13 +288,9 @@ function InspectionView({
             size="sm"
             variant="outline"
             onClick={onRefresh}
-            disabled={refreshing}
+            loading={refreshing}
+            icon={<RefreshCw />}
           >
-            {refreshing ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <RefreshCw className="size-4" />
-            )}
             Refrescar
           </Button>
         </CardHeader>

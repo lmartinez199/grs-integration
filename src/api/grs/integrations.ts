@@ -35,6 +35,18 @@ export interface Integration {
   updatedAt: string;
 }
 
+/**
+ * Evento activo de una integración (el UUID que usan el dashboard y el runner).
+ * Los IDs se guardan como `{ events: [{id,label}], activeId }` — no como `eventId`.
+ */
+export function readActiveEvent(
+  externalIds: Record<string, unknown>,
+): IntegrationEventRef | undefined {
+  const events = (externalIds.events as IntegrationEventRef[] | undefined) ?? [];
+  const activeId = String(externalIds.activeId ?? "");
+  return events.find((e) => e.id === activeId) ?? (activeId ? { id: activeId } : undefined);
+}
+
 export const listIntegrations = () =>
   request<Integration[]>("grs", "/integrations");
 

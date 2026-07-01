@@ -6,7 +6,7 @@ function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "rounded-lg border bg-(--color-card) text-(--color-card-foreground) shadow-sm",
+        "rounded-xl border bg-(--color-card) text-(--color-card-foreground) shadow-sm transition-shadow hover:shadow-md",
         className,
       )}
       {...props}

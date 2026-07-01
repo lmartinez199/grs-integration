@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Swords } from "lucide-react";
+import { Swords } from "lucide-react";
 
 import { login } from "@/api/grs/auth";
 import { useAuth } from "@/stores/auth.store";
@@ -95,8 +95,7 @@ export function LoginPage() {
               </p>
             )}
 
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+            <Button type="submit" loading={isSubmitting}>
               Iniciar sesión
             </Button>
 

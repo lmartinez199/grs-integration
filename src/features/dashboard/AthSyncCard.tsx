@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Play, Square, RefreshCw, Timer } from "lucide-react";
+import { Play, Square, RefreshCw, Timer } from "lucide-react";
 
 import { getJobsStatus, startSyncData, stopSyncData, manualSyncMapped } from "@/api/ath";
 import { formatDateTime } from "@/lib/utils";
@@ -8,6 +8,7 @@ import { SYNC_INTERVAL } from "@/lib/constants";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { RetryNotice } from "@/components/ui/retry-notice";
 import { SyncCard } from "@/components/ui/sync-card";
 import { DefinitionRow } from "@/components/ui/definition-row";
@@ -47,15 +48,13 @@ export function AthSyncCard() {
       title="ATH (atletismo)"
       icon={<Timer className="size-4 text-(--color-primary)" />}
       status={
-        status.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
-        ) : status.isError ? (
-          <Badge variant="destructive">sin conexión</Badge>
-        ) : active ? (
-          <Badge variant="success">sincronizando</Badge>
-        ) : (
-          <Badge variant="secondary">inactivo</Badge>
-        )
+        <StatusBadge loading={status.isLoading} error={status.isError}>
+          {active ? (
+            <Badge variant="success">sincronizando</Badge>
+          ) : (
+            <Badge variant="secondary">inactivo</Badge>
+          )}
+        </StatusBadge>
       }
     >
         {status.isError ? (
@@ -110,28 +109,30 @@ export function AthSyncCard() {
         </label>
 
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" onClick={() => start.mutate({ reconcileUnits })} disabled={start.isPending}>
-            <Play className="size-4" /> Iniciar
+          <Button
+            size="sm"
+            icon={<Play />}
+            onClick={() => start.mutate({ reconcileUnits })}
+            disabled={start.isPending}
+          >
+            Iniciar
           </Button>
           <Button
             size="sm"
             variant="outline"
+            icon={<Square />}
             onClick={() => stop.mutate()}
             disabled={stop.isPending}
           >
-            <Square className="size-4" /> Detener
+            Detener
           </Button>
           <Button
             size="sm"
             variant="secondary"
+            icon={<RefreshCw />}
+            loading={manual.isPending}
             onClick={() => manual.mutate()}
-            disabled={manual.isPending}
           >
-            {manual.isPending ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <RefreshCw className="size-4" />
-            )}
             Sync manual
           </Button>
         </div>

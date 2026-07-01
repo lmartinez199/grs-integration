@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, PersonStanding, RefreshCw } from "lucide-react";
+import { PersonStanding, RefreshCw } from "lucide-react";
 
-import { getIntegration } from "@/api/grs/integrations";
+import { getIntegration, readActiveEvent } from "@/api/grs/integrations";
+import { IntegrationInfoRows } from "@/components/integration/integration-info-rows";
 import { sportTechSyncEvent } from "@/api/grs/sporttech";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { DefinitionRow } from "@/components/ui/definition-row";
 import { Input } from "@/components/ui/input";
@@ -31,8 +33,7 @@ export function SportTechSyncCard({
     queryFn: () => getIntegration(provider),
     retry: false,
   });
-  const savedEventId =
-    (integration.data?.externalIds?.eventId as string | undefined) ?? "";
+  const savedEventId = readActiveEvent(integration.data?.externalIds ?? {})?.id ?? "";
 
   useEffect(() => {
     if (savedEventId && !eventId) setEventId(savedEventId);
@@ -51,21 +52,21 @@ export function SportTechSyncCard({
       title={title}
       icon={<PersonStanding className="size-4 text-(--color-primary)" />}
       status={
-        sync.isPending ? (
-          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
-        ) : sync.isError ? (
-          <Badge variant="destructive">error</Badge>
-        ) : summary ? (
-          errorCount > 0 ? (
-            <Badge variant="warning">{errorCount} con error</Badge>
+        <StatusBadge loading={sync.isPending} error={sync.isError} errorLabel="error">
+          {summary ? (
+            errorCount > 0 ? (
+              <Badge variant="warning">{errorCount} con error</Badge>
+            ) : (
+              <Badge variant="success">sincronizado</Badge>
+            )
           ) : (
-            <Badge variant="success">sincronizado</Badge>
-          )
-        ) : (
-          <Badge variant="secondary">manual</Badge>
-        )
+            <Badge variant="secondary">manual</Badge>
+          )}
+        </StatusBadge>
       }
     >
+      <IntegrationInfoRows provider={provider} />
+
       {summary && (
         <dl className="space-y-1 text-sm">
           <DefinitionRow label="Units" value={String(summary.units)} />
@@ -93,12 +94,7 @@ export function SportTechSyncCard({
           value={eventId}
           onChange={(e) => setEventId(e.target.value)}
         />
-        <Button type="submit" size="sm" disabled={sync.isPending}>
-          {sync.isPending ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <RefreshCw className="size-4" />
-          )}
+        <Button type="submit" size="sm" icon={<RefreshCw />} loading={sync.isPending}>
           Sincronizar
         </Button>
       </form>
