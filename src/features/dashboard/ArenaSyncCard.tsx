@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Play, Square, RefreshCw, Swords } from "lucide-react";
+import { Play, Square, RefreshCw, Swords } from "lucide-react";
 
 import { SYNC_INTERVAL } from "@/lib/constants";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
@@ -12,9 +12,11 @@ import {
 } from "@/api/grs/arena";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { RetryNotice } from "@/components/ui/retry-notice";
 import { SyncCard } from "@/components/ui/sync-card";
 import { DefinitionRow } from "@/components/ui/definition-row";
+import { IntegrationInfoRows } from "@/components/integration/integration-info-rows";
 
 export function ArenaSyncCard() {
   const settings = useQuery({
@@ -49,15 +51,13 @@ export function ArenaSyncCard() {
       title="WRE (lucha)"
       icon={<Swords className="size-4 text-(--color-primary)" />}
       status={
-        settings.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
-        ) : settings.isError ? (
-          <Badge variant="destructive">sin conexión</Badge>
-        ) : enabled ? (
-          <Badge variant="success">auto-sync ON</Badge>
-        ) : (
-          <Badge variant="secondary">auto-sync OFF</Badge>
-        )
+        <StatusBadge loading={settings.isLoading} error={settings.isError}>
+          {enabled ? (
+            <Badge variant="success">auto-sync ON</Badge>
+          ) : (
+            <Badge variant="secondary">auto-sync OFF</Badge>
+          )}
+        </StatusBadge>
       }
     >
         {settings.isError ? (
@@ -73,33 +73,33 @@ export function ArenaSyncCard() {
           <DefinitionRow label="URL de WRE" value={settings.data?.baseUrl || "—"} />
         </dl>
 
+        <IntegrationInfoRows provider="arena" />
+
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
+            icon={<Play />}
             onClick={() => start.mutate()}
             disabled={enabled || start.isPending}
           >
-            <Play className="size-4" /> Iniciar
+            Iniciar
           </Button>
           <Button
             size="sm"
             variant="outline"
+            icon={<Square />}
             onClick={() => stop.mutate()}
             disabled={!enabled || stop.isPending}
           >
-            <Square className="size-4" /> Detener
+            Detener
           </Button>
           <Button
             size="sm"
             variant="secondary"
+            icon={<RefreshCw />}
+            loading={full.isPending}
             onClick={() => full.mutate()}
-            disabled={full.isPending}
           >
-            {full.isPending ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <RefreshCw className="size-4" />
-            )}
             Sync completa
           </Button>
           <Button

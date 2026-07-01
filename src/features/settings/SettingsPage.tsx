@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
-import { Activity, Loader2, Save } from "lucide-react";
+import { Activity, Save } from "lucide-react";
 
 import { useSettings, type Settings } from "@/stores/settings.store";
 import { zempoHealth } from "@/api/grs/zempo-sync";
@@ -47,7 +47,7 @@ const connectionsSchema = z.object({
   language: z.string().min(2, "Mínimo 2 caracteres"),
 });
 
-function ConnectionsCard() {
+export function ConnectionsCard() {
   const settings = useSettings();
   const update = useSettings((s) => s.update);
 
@@ -117,21 +117,16 @@ function ConnectionsCard() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button type="submit" disabled={isSubmitting}>
-              <Save className="size-4" />
+            <Button type="submit" icon={<Save />} loading={isSubmitting}>
               Guardar conexiones
             </Button>
             <Button
               type="button"
               variant="outline"
-              disabled={testZempo.isPending}
+              icon={<Activity />}
+              loading={testZempo.isPending}
               onClick={() => testZempo.mutate()}
             >
-              {testZempo.isPending ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Activity className="size-4" />
-              )}
               Probar conexión Zempo
             </Button>
             {testZempo.data && (

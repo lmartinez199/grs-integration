@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Target } from "lucide-react";
+import { Target } from "lucide-react";
 
 import { getArcoDocuments } from "@/api/grs/arco";
 import { SYNC_INTERVAL } from "@/lib/constants";
 import { formatDateTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { RetryNotice } from "@/components/ui/retry-notice";
 import { SyncCard } from "@/components/ui/sync-card";
 import { DefinitionRow } from "@/components/ui/definition-row";
@@ -30,15 +31,13 @@ export function ArcoSyncCard() {
       title="ARC (tiro con arco)"
       icon={<Target className="size-4 text-(--color-primary)" />}
       status={
-        documents.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
-        ) : documents.isError ? (
-          <Badge variant="destructive">sin conexión</Badge>
-        ) : total > 0 ? (
-          <Badge variant="success">recibiendo</Badge>
-        ) : (
-          <Badge variant="secondary">sin datos</Badge>
-        )
+        <StatusBadge loading={documents.isLoading} error={documents.isError}>
+          {total > 0 ? (
+            <Badge variant="success">recibiendo</Badge>
+          ) : (
+            <Badge variant="secondary">sin datos</Badge>
+          )}
+        </StatusBadge>
       }
     >
       {documents.isError ? (

@@ -251,27 +251,21 @@ export function SwmPage() {
             <div className="flex flex-wrap gap-2">
               <Button
                 size="sm"
-                disabled={!id || sync.isPending}
+                disabled={!id}
+                loading={sync.isPending}
+                icon={<RefreshCw />}
                 onClick={() => sync.mutate()}
               >
-                {sync.isPending ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="size-4" />
-                )}
                 Sincronizar meet
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                disabled={!id || validation.isFetching}
+                disabled={!id}
+                loading={validation.isFetching}
+                icon={<Search />}
                 onClick={() => validation.refetch()}
               >
-                {validation.isFetching ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <Search className="size-4" />
-                )}
                 Validar (mapeo RSC)
               </Button>
             </div>

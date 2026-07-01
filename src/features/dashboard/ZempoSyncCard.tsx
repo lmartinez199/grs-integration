@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Plus, Trash2, Activity } from "lucide-react";
+import { Plus, Trash2, Activity } from "lucide-react";
 
 import { listSchedules, startSchedule, stopSchedule } from "@/api/zempo";
 import { SYNC_INTERVAL } from "@/lib/constants";
@@ -8,6 +8,7 @@ import { filterActiveSchedules } from "@/lib/domain/zempo";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Input } from "@/components/ui/input";
 import { RetryNotice } from "@/components/ui/retry-notice";
 import { SyncCard } from "@/components/ui/sync-card";
@@ -41,13 +42,9 @@ export function ZempoSyncCard() {
       title="JUD (judo)"
       icon={<Activity className="size-4 text-(--color-primary)" />}
       status={
-        schedules.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
-        ) : schedules.isError ? (
-          <Badge variant="destructive">sin conexión</Badge>
-        ) : (
+        <StatusBadge loading={schedules.isLoading} error={schedules.isError}>
           <Badge variant="secondary">{list.length} activas</Badge>
-        )
+        </StatusBadge>
       }
     >
         {schedules.isError && (
@@ -69,8 +66,7 @@ export function ZempoSyncCard() {
             value={codigo}
             onChange={(e) => setCodigo(e.target.value)}
           />
-          <Button type="submit" size="sm" disabled={start.isPending}>
-            {start.isPending ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
+          <Button type="submit" size="sm" icon={<Plus />} loading={start.isPending}>
             Agregar
           </Button>
         </form>

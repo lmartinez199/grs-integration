@@ -98,15 +98,9 @@ export function WebhookConfig() {
               size="sm"
               variant="outline"
               onClick={() => toggle.mutate({ id: current.id, enabled: isActive })}
-              disabled={toggle.isPending}
+              loading={toggle.isPending}
+              icon={isActive ? <PowerOff aria-hidden /> : <Power aria-hidden />}
             >
-              {toggle.isPending ? (
-                <Loader2 className="size-4 animate-spin" aria-hidden />
-              ) : isActive ? (
-                <PowerOff className="size-4" aria-hidden />
-              ) : (
-                <Power className="size-4" aria-hidden />
-              )}
               {isActive ? "Desactivar" : "Activar"}
             </Button>
             <Button
@@ -120,12 +114,12 @@ export function WebhookConfig() {
             </Button>
           </div>
         ) : (
-          <Button size="sm" onClick={() => create.mutate()} disabled={create.isPending}>
-            {create.isPending ? (
-              <Loader2 className="size-4 animate-spin" aria-hidden />
-            ) : (
-              <Plus className="size-4" aria-hidden />
-            )}
+          <Button
+            size="sm"
+            onClick={() => create.mutate()}
+            loading={create.isPending}
+            icon={<Plus aria-hidden />}
+          >
             Configurar automáticamente
           </Button>
         )}

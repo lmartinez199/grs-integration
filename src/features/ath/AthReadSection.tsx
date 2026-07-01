@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, RefreshCw, Layers, CalendarClock } from "lucide-react";
+import { RefreshCw, Layers, CalendarClock } from "lucide-react";
 
 import * as ath from "@/api/ath";
 import { Button } from "@/components/ui/button";
@@ -41,8 +41,7 @@ function LazyReadCard({
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <CardTitle className="flex items-center gap-2 text-base">{icon}{title}</CardTitle>
-        <Button size="sm" variant="outline" onClick={() => q.refetch()} disabled={q.isFetching}>
-          {q.isFetching ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+        <Button size="sm" variant="outline" onClick={() => q.refetch()} icon={<RefreshCw />} loading={q.isFetching}>
           Cargar
         </Button>
       </CardHeader>
@@ -121,8 +120,7 @@ function SchedulesCard() {
               </select>
             </div>
           )}
-          <Button size="sm" variant="outline" onClick={() => q.refetch()} disabled={q.isFetching}>
-            {q.isFetching ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+          <Button size="sm" variant="outline" onClick={() => q.refetch()} icon={<RefreshCw />} loading={q.isFetching}>
             {q.data !== undefined ? "Recargar" : "Cargar"}
           </Button>
         </div>

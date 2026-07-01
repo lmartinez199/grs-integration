@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, RefreshCw, Waves } from "lucide-react";
+import { RefreshCw, Waves } from "lucide-react";
 
 import { swmHealth, swmSyncMeet, swmWebhookLog } from "@/api/grs/swimsystem";
 import { SYNC_INTERVAL } from "@/lib/constants";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { DefinitionRow } from "@/components/ui/definition-row";
 import { Input } from "@/components/ui/input";
 import { RetryNotice } from "@/components/ui/retry-notice";
 import { SyncCard } from "@/components/ui/sync-card";
+import { IntegrationInfoRows } from "@/components/integration/integration-info-rows";
 
 const fmt = (ts?: number) => (ts ? new Date(ts).toLocaleString() : "—");
 
@@ -50,15 +52,13 @@ export function SwmSyncCard() {
       title="SWM (natación)"
       icon={<Waves className="size-4 text-(--color-primary)" />}
       status={
-        health.isLoading ? (
-          <Loader2 className="size-4 animate-spin text-(--color-muted-foreground)" />
-        ) : health.isError ? (
-          <Badge variant="destructive">sin conexión</Badge>
-        ) : webhookActive ? (
-          <Badge variant="success">webhook activo</Badge>
-        ) : (
-          <Badge variant="secondary">sin actividad</Badge>
-        )
+        <StatusBadge loading={health.isLoading} error={health.isError}>
+          {webhookActive ? (
+            <Badge variant="success">webhook activo</Badge>
+          ) : (
+            <Badge variant="secondary">sin actividad</Badge>
+          )}
+        </StatusBadge>
       }
     >
       {health.isError ? (
@@ -80,6 +80,8 @@ export function SwmSyncCard() {
         </dl>
       )}
 
+      <IntegrationInfoRows provider="swimsystem" eventLabel="Meet activo" />
+
       <form
         className="flex gap-2"
         onSubmit={(e) => {
@@ -92,12 +94,7 @@ export function SwmSyncCard() {
           value={meetId}
           onChange={(e) => setMeetId(e.target.value)}
         />
-        <Button type="submit" size="sm" disabled={sync.isPending}>
-          {sync.isPending ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <RefreshCw className="size-4" />
-          )}
+        <Button type="submit" size="sm" icon={<RefreshCw />} loading={sync.isPending}>
           Sincronizar
         </Button>
       </form>

@@ -148,10 +148,11 @@ function PollIntervalField({ integration }: { integration: Integration }) {
         <Button
           size="sm"
           variant="secondary"
-          disabled={!dirty || save.isPending}
+          disabled={!dirty}
+          loading={save.isPending}
           onClick={() => save.mutate()}
         >
-          {save.isPending ? <Loader2 className="size-3 animate-spin" /> : "Guardar"}
+          Guardar
         </Button>
         {currentSeconds > 0 && (
           <span className="text-xs text-(--color-success)">
@@ -195,15 +196,9 @@ function IntegrationCard({ integration }: { integration: Integration }) {
             size="sm"
             variant="outline"
             onClick={() => toggleEnabled.mutate()}
-            disabled={toggleEnabled.isPending}
+            loading={toggleEnabled.isPending}
           >
-            {toggleEnabled.isPending ? (
-              <Loader2 className="size-3 animate-spin" />
-            ) : integration.enabled ? (
-              "Deshabilitar"
-            ) : (
-              "Habilitar"
-            )}
+            {integration.enabled ? "Deshabilitar" : "Habilitar"}
           </Button>
         </div>
       </CardHeader>
@@ -226,13 +221,9 @@ function IntegrationCard({ integration }: { integration: Integration }) {
           <Button
             size="sm"
             onClick={() => saveIds.mutate()}
-            disabled={saveIds.isPending}
+            loading={saveIds.isPending}
           >
-            {saveIds.isPending ? (
-              <Loader2 className="size-3 animate-spin" />
-            ) : (
-              "Guardar"
-            )}
+            Guardar
           </Button>
         )}
 
@@ -268,42 +259,33 @@ function IntegrationCard({ integration }: { integration: Integration }) {
   );
 }
 
-export function IntegrationsPage() {
+/** Lista de integraciones (sin header de página) — reutilizable en Configuración. */
+export function IntegrationsSection() {
   const integrations = useQuery({
     queryKey: ["integrations"],
     queryFn: listIntegrations,
   });
 
   return (
-    <div className="flex h-full flex-col gap-6 p-6">
-      <header className="shrink-0">
-        <h1 className="text-2xl font-semibold">Integraciones</h1>
-        <p className="text-sm text-(--color-muted-foreground)">
-          Config operativa por proveedor — habilitar/deshabilitar y editar IDs externos.
-          Los secretos (API keys, webhook secrets) siguen en variables de entorno del servidor.
+    <>
+      {integrations.isLoading && (
+        <div className="flex items-center gap-2 text-sm text-(--color-muted-foreground)">
+          <Loader2 className="size-4 animate-spin" />
+          Cargando...
+        </div>
+      )}
+      {integrations.isError && (
+        <p className="text-sm text-(--color-destructive)">
+          Error al cargar integraciones: {(integrations.error as Error).message}
         </p>
-      </header>
-
-      <div className="min-h-0 flex-1 overflow-auto">
-        {integrations.isLoading && (
-          <div className="flex items-center gap-2 text-sm text-(--color-muted-foreground)">
-            <Loader2 className="size-4 animate-spin" />
-            Cargando...
-          </div>
-        )}
-        {integrations.isError && (
-          <p className="text-sm text-(--color-destructive)">
-            Error al cargar integraciones: {(integrations.error as Error).message}
-          </p>
-        )}
-        {integrations.data && (
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-            {integrations.data.map((integration) => (
-              <IntegrationCard key={integration.provider} integration={integration} />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+      )}
+      {integrations.data && (
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          {integrations.data.map((integration) => (
+            <IntegrationCard key={integration.provider} integration={integration} />
+          ))}
+        </div>
+      )}
+    </>
   );
 }

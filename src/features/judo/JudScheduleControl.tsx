@@ -82,12 +82,7 @@ export function JudScheduleControl() {
             value={codigo}
             onChange={(e) => setCodigo(e.target.value)}
           />
-          <Button type="submit" size="sm" disabled={start.isPending}>
-            {start.isPending ? (
-              <Loader2 className="size-4 animate-spin" aria-hidden />
-            ) : (
-              <Plus className="size-4" aria-hidden />
-            )}
+          <Button type="submit" size="sm" icon={<Plus aria-hidden />} loading={start.isPending}>
             Agregar
           </Button>
         </form>

@@ -14,8 +14,7 @@ import { AthPage } from "@/features/ath/AthPage";
 import { ArcoPage } from "@/features/arco/ArcoPage";
 import { SwmPage } from "@/features/swimsystem/SwmPage";
 import { SportTechPage } from "@/features/sporttech/SportTechPage";
-import { IntegrationsPage } from "@/features/integrations/IntegrationsPage";
-import { SettingsPage } from "@/features/settings/SettingsPage";
+import { ConfiguracionPage } from "@/features/config/ConfiguracionPage";
 
 function ProtectedRoute() {
   const token = useAuth((s) => s.accessToken);
@@ -81,8 +80,10 @@ export default function App() {
               />
             }
           />
-          <Route path="/integrations" element={<IntegrationsPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/config" element={<ConfiguracionPage />} />
+          {/* Rutas antiguas fusionadas en /config. */}
+          <Route path="/integrations" element={<Navigate to="/config" replace />} />
+          <Route path="/settings" element={<Navigate to="/config" replace />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

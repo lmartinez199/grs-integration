@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { CheckCircle2, FileUp, Loader2 } from "lucide-react";
+import { CheckCircle2, FileUp } from "lucide-react";
 
 import {
   sportTechSyncCsv,
@@ -89,8 +89,7 @@ export function SportTechCsvCard({
           <span className="max-w-[20rem] truncate text-sm text-(--color-muted-foreground)">
             {file ? file.name : "Ningún archivo seleccionado"}
           </span>
-          <Button size="sm" onClick={run} disabled={!file || busy}>
-            {busy && <Loader2 className="size-4 animate-spin" />}
+          <Button size="sm" onClick={run} disabled={!file} loading={busy}>
             Procesar CSV
           </Button>
         </div>

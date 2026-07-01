@@ -174,14 +174,10 @@ function ScheduleItem({ s }: { s: AthSchedule }) {
               variant={sent ? "ghost" : "outline"}
               className="h-7 px-2"
               onClick={() => sync.mutate()}
-              disabled={sync.isPending}
+              icon={<Send />}
+              loading={sync.isPending}
               title="Sincronizar esta prueba al GRS"
             >
-              {sync.isPending ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <Send className="size-3.5" />
-              )}
               {sent ? "Reenviar" : "Enviar a GRS"}
             </Button>
           )}

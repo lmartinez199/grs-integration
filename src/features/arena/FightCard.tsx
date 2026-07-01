@@ -1,4 +1,4 @@
-import { RefreshCw, Loader2, Copy } from "lucide-react";
+import { RefreshCw, Copy } from "lucide-react";
 
 import { syncFight, type ArenaFight } from "@/api/grs/arena";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
@@ -95,16 +95,11 @@ export function FightCard({ fight }: { fight: ArenaFight }) {
               variant="ghost"
               className="size-6"
               onClick={() => sync.mutate()}
-              disabled={sync.isPending}
+              loading={sync.isPending}
+              icon={<RefreshCw aria-hidden />}
               aria-label="Sincronizar esta pelea"
               title="Sincronizar esta pelea"
-            >
-              {sync.isPending ? (
-                <Loader2 className="size-3.5 animate-spin" aria-hidden />
-              ) : (
-                <RefreshCw className="size-3.5" aria-hidden />
-              )}
-            </Button>
+            />
           )}
         </div>
       </div>

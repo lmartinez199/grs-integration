@@ -22,8 +22,12 @@ export function SyncCard({
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0">
-        <CardTitle className="flex items-center gap-2">
-          {icon}
+        <CardTitle className="flex items-center gap-2.5 text-base">
+          {icon && (
+            <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-(--color-primary)/12 text-(--color-primary)">
+              {icon}
+            </span>
+          )}
           {title}
         </CardTitle>
         <span aria-live="polite" aria-atomic="true">

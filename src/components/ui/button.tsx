@@ -1,5 +1,6 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
+import { Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -34,15 +35,24 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+    VariantProps<typeof buttonVariants> {
+  /** Muestra un spinner en lugar de `icon` y deshabilita el botón. */
+  loading?: boolean;
+  /** Icono a la izquierda del texto; lo reemplaza el spinner cuando `loading`. */
+  icon?: React.ReactNode;
+}
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => (
+  ({ className, variant, size, loading, icon, disabled, children, ...props }, ref) => (
     <button
       ref={ref}
       className={cn(buttonVariants({ variant, size, className }))}
+      disabled={disabled || loading}
       {...props}
-    />
+    >
+      {loading ? <Loader2 className="animate-spin" aria-hidden /> : icon}
+      {children}
+    </button>
   ),
 );
 Button.displayName = "Button";
