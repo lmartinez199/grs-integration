@@ -86,7 +86,7 @@ export function AthLoopSection() {
                 <DefinitionRow label="Fecha" value={data?.date ?? "—"} />
                 <DefinitionRow label="Hora" value={data?.hour || "todas"} />
                 <DefinitionRow label="Iniciado" value={formatDateTime(data?.startedAt)} />
-                <DefinitionRow label="Última sync" value={formatDateTime(data?.lastSyncAt)} />
+                <DefinitionRow label="Última sincronización" value={formatDateTime(data?.lastSyncAt)} />
                 {data?.reconcileUnits && (
                   <DefinitionRow
                     label="Sync de units"

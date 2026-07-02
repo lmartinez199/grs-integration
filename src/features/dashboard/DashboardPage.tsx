@@ -11,7 +11,7 @@ export function DashboardPage() {
       <header className="shrink-0">
         <h1 className="text-2xl font-semibold">Panel de sincronización</h1>
         <p className="text-sm text-(--color-muted-foreground)">
-          Controla y monitorea la sincronización de los tres servicios.
+          Controla y monitorea la sincronización de todas las integraciones.
         </p>
       </header>
 

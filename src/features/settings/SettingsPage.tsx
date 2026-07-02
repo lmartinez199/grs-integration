@@ -19,25 +19,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export function SettingsPage() {
-  return (
-    <div className="flex h-full flex-col p-6">
-      <div className="mx-auto flex h-full w-full max-w-3xl flex-col gap-6">
-        <header className="shrink-0">
-          <h1 className="text-2xl font-semibold">Ajustes</h1>
-          <p className="text-sm text-(--color-muted-foreground)">
-            Configura las conexiones a los servicios.
-          </p>
-        </header>
-
-        <div className="min-h-0 flex-1 space-y-6 overflow-auto">
-          <ConnectionsCard />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 const connectionsSchema = z.object({
   grsBaseUrl: z.url("URL inválida"),
   zempoBaseUrl: z.url("URL inválida"),

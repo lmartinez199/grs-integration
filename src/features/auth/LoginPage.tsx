@@ -49,7 +49,7 @@ export function LoginPage() {
       if (e instanceof ApiError) {
         setError(e.status === 401 ? "Credenciales inválidas" : e.message);
       } else {
-        setError("No se pudo conectar con el GRS. Revisa la URL en Ajustes.");
+        setError("No se pudo conectar con el GRS. Revisa la URL en Configuración.");
       }
     }
   }

@@ -41,7 +41,7 @@ export function EventListEditor({
     <div className="space-y-2">
       {events.length === 0 ? (
         <p className="text-xs text-(--color-muted-foreground)">
-          Sin {noun}s. Agregá el id del año.
+          Sin {noun}s. Agrega el id del año.
         </p>
       ) : (
         <ul className="space-y-1.5">

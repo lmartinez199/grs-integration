@@ -97,7 +97,7 @@ export function ArenaPage() {
             <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" aria-hidden />
           ) : event.isError || !event.data ? (
             <p role="alert" className="text-sm text-(--color-destructive)">
-              No se pudo cargar el evento. Verifica la conexión y el eventCode en Ajustes.
+              No se pudo cargar el evento. Verifica la conexión y el eventCode en Configuración.
             </p>
           ) : (
             <EventSummary event={event.data} />

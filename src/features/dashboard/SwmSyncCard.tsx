@@ -70,7 +70,7 @@ export function SwmSyncCard() {
       ) : (
         <dl className="space-y-1 text-sm">
           <DefinitionRow
-            label="Webhook secret"
+            label="Secreto del webhook"
             value={health.data?.config.webhookSecretConfigured ? "Sí" : "No"}
           />
           <DefinitionRow
