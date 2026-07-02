@@ -131,13 +131,13 @@ export function FightCard({ fight }: { fight: ArenaFight }) {
       {rounds.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 border-t border-(--color-border) px-3 py-1.5">
           <span className="text-2xs font-semibold uppercase tracking-wide text-(--color-muted-foreground)">
-            Rounds
+            Rondas
           </span>
           {rounds.map((r) => (
             <span
               key={r.n}
               className="rounded bg-(--color-muted) px-1.5 py-0.5 text-xs tabular-nums"
-              title={`Round ${r.n}`}
+              title={`Ronda ${r.n}`}
             >
               <span className="text-(--color-muted-foreground)">R{r.n}</span>{" "}
               <span className="font-medium">

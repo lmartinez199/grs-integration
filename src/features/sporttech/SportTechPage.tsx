@@ -110,8 +110,8 @@ export function SportTechPage({
       <header className="shrink-0">
         <h1 className="text-2xl font-semibold">{title}</h1>
         <p className="text-sm text-(--color-muted-foreground)">
-          Operación de la integración con SportTech.io (OVS). Elegí el evento
-          activo (se configuran en Integraciones), mirá la competición y dispará
+          Operación de la integración con SportTech.io (OVS). Elige el evento
+          activo (se configuran en Integraciones), mira la competición y dispara
           el pull por etapa.
         </p>
       </header>
@@ -143,7 +143,7 @@ export function SportTechPage({
           >
             {!id ? (
               <p className="text-sm text-(--color-muted-foreground)">
-                Pegá o guardá un eventId para ver la competición del proveedor.
+                Pega o guarda un eventId para ver la competición del proveedor.
               </p>
             ) : inspect.isLoading ? (
               <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />
@@ -221,7 +221,7 @@ export function SportTechPage({
               <CardContent>
                 {!id ? (
                   <p className="text-sm text-(--color-muted-foreground)">
-                    Pegá o guardá un eventId para ver lo que manda el proveedor.
+                    Pega o guarda un eventId para ver lo que manda el proveedor.
                   </p>
                 ) : raw.isLoading ? (
                   <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" />

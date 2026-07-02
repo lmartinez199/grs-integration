@@ -50,7 +50,7 @@ function SwimSystemFields({ ids, onChange }: {
   const { events, activeId } = readEvents(ids);
   return (
     <div className="space-y-1">
-      <Label>Meets (1 por año · activá el actual)</Label>
+      <Label>Meets (1 por año · activa el actual)</Label>
       <EventListEditor
         noun="meet"
         events={events}
@@ -69,7 +69,7 @@ function SportTechFields({ ids, onChange }: {
   return (
     <div className="space-y-3">
       <div className="space-y-1">
-        <Label>Eventos (1 por año · activá el actual)</Label>
+        <Label>Eventos (1 por año · activa el actual)</Label>
         <EventListEditor
           noun="evento"
           events={events}
@@ -97,7 +97,7 @@ function JudoFields({ ids, onChange }: {
   const { events, activeId } = readEvents(ids);
   return (
     <div className="space-y-1">
-      <Label>Competiciones (por código · activá la actual)</Label>
+      <Label>Competiciones (por código · activa la actual)</Label>
       <EventListEditor
         noun="competición"
         events={events}
@@ -124,7 +124,7 @@ function ArenaFields({ ids, onChange }: {
         />
       </div>
       <div className="space-y-1">
-        <Label htmlFor="arena-eventCode">Event code</Label>
+        <Label htmlFor="arena-eventCode">Código de evento (eventCode)</Label>
         <Input
           id="arena-eventCode"
           value={String(ids.eventCode ?? "")}
@@ -250,7 +250,7 @@ function IntegrationCard({ integration }: { integration: Integration }) {
         )}
 
         <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-          <dt className="text-(--color-muted-foreground)">Último sync</dt>
+          <dt className="text-(--color-muted-foreground)">Última sincronización</dt>
           <dd>{fmt(integration.lastSyncAt)}</dd>
           <dt className="text-(--color-muted-foreground)">Estado</dt>
           <dd>

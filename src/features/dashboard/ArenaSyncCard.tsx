@@ -27,12 +27,12 @@ export function ArenaSyncCard() {
 
   const start = useMutationWithToast({
     mutationFn: startAutoSync,
-    successMsg: "Sync automática de ARENA activada",
+    successMsg: "Sync automática de WRE activada",
     invalidateKeys: [["arena", "settings"]],
   });
   const stop = useMutationWithToast({
     mutationFn: stopAutoSync,
-    successMsg: "Sync automática de ARENA detenida",
+    successMsg: "Sync automática de WRE detenida",
     invalidateKeys: [["arena", "settings"]],
   });
   const full = useMutationWithToast({
@@ -53,9 +53,9 @@ export function ArenaSyncCard() {
       status={
         <StatusBadge loading={settings.isLoading} error={settings.isError}>
           {enabled ? (
-            <Badge variant="success">auto-sync ON</Badge>
+            <Badge variant="success">auto-sync activa</Badge>
           ) : (
-            <Badge variant="secondary">auto-sync OFF</Badge>
+            <Badge variant="secondary">auto-sync inactiva</Badge>
           )}
         </StatusBadge>
       }
