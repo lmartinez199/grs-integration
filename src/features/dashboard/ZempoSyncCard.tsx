@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, Trash2, Activity } from "lucide-react";
+import { Activity, Play, Plus, Square, Trash2 } from "lucide-react";
 
 import { listSchedules, startSchedule, stopSchedule } from "@/api/zempo";
+import {
+  getIntegration,
+  readActiveEvent,
+  readActiveTeamEvent,
+  type IntegrationEventRef,
+} from "@/api/grs/integrations";
 import { SYNC_INTERVAL } from "@/lib/constants";
 import { filterActiveSchedules } from "@/lib/domain/zempo";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
@@ -38,13 +44,46 @@ export function ZempoSyncCard() {
 
   const list = filterActiveSchedules(schedules.data);
 
+  // Códigos activos de la config (fila `judo`): zempo separa individual y equipos.
+  const integration = useQuery({
+    queryKey: ["integrations", "judo"],
+    queryFn: () => getIntegration("judo"),
+    retry: false,
+  });
+  const configured = [
+    readActiveEvent(integration.data?.externalIds ?? {}),
+    readActiveTeamEvent(integration.data?.externalIds ?? {}),
+  ].filter((e): e is IntegrationEventRef => !!e?.id);
+  const running = new Set(list.map((s) => String(s.competicaoCodigo ?? "")));
+  const allRunning =
+    configured.length > 0 && configured.every((e) => running.has(e.id));
+
+  const startConfigured = useMutationWithToast({
+    mutationFn: async () => {
+      for (const e of configured)
+        if (!running.has(e.id)) await startSchedule(e.id);
+    },
+    successMsg: "Auto-sync de judo iniciada (códigos de la config)",
+    invalidateKeys: [["zempo", "schedules"]],
+  });
+  const stopConfigured = useMutationWithToast({
+    mutationFn: async () => {
+      for (const e of configured)
+        if (running.has(e.id)) await stopSchedule(e.id);
+    },
+    successMsg: "Auto-sync de judo detenida",
+    invalidateKeys: [["zempo", "schedules"]],
+  });
+
   return (
     <SyncCard
       title="JUD (judo)"
       icon={<Activity className="size-4 text-(--color-primary)" />}
       status={
         <StatusBadge loading={schedules.isLoading} error={schedules.isError}>
-          <Badge variant="secondary">{list.length} activas</Badge>
+          <Badge variant={list.length > 0 ? "success" : "secondary"}>
+            {list.length} activas
+          </Badge>
         </StatusBadge>
       }
     >
@@ -57,6 +96,36 @@ export function ZempoSyncCard() {
         )}
 
         <IntegrationInfoRows provider="judo" eventLabel="Competición activa" />
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            icon={<Play />}
+            onClick={() => startConfigured.mutate()}
+            disabled={
+              configured.length === 0 || allRunning || startConfigured.isPending
+            }
+          >
+            Iniciar auto-sync
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            icon={<Square />}
+            onClick={() => stopConfigured.mutate()}
+            disabled={
+              !configured.some((e) => running.has(e.id)) ||
+              stopConfigured.isPending
+            }
+          >
+            Detener
+          </Button>
+          {configured.length === 0 && (
+            <span className="text-xs text-(--color-muted-foreground)">
+              Configura los códigos (individual/equipos) en Integraciones.
+            </span>
+          )}
+        </div>
 
         <form
           className="flex gap-2"
