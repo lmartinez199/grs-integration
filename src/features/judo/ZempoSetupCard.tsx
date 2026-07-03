@@ -1,5 +1,8 @@
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ListChecks } from "lucide-react";
 
+import { getIntegration } from "@/api/grs/integrations";
 import {
   zempoSetup,
   zempoSyncParticipants,
@@ -130,6 +133,17 @@ export function ZempoSetupCard({ codigo }: { codigo: string }) {
   const setCategory = useJudoStore((s) => s.setCategory);
   const results = useJudoStore((s) => s.stepResults);
   const setStepResult = useJudoStore((s) => s.setStepResult);
+
+  // Pre-llena el eventCode con el guardado en Integraciones (editable igual).
+  const integration = useQuery({
+    queryKey: ["integrations", "judo"],
+    queryFn: () => getIntegration("judo"),
+    retry: false,
+  });
+  const configEventCode = String(integration.data?.externalIds.eventCode ?? "");
+  useEffect(() => {
+    if (configEventCode && !eventCode) setEventCode(configEventCode);
+  }, [configEventCode]);
 
   const ctx: JudoCtx = {
     cod: codigo.trim(),
