@@ -3,6 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
 import { getZempoPreview } from "@/api/grs/zempo-sync";
+import {
+  getIntegration,
+  readActiveEvent,
+  readActiveTeamEvent,
+} from "@/api/grs/integrations";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export function JudCompeticionBar({
@@ -26,6 +32,18 @@ export function JudCompeticionBar({
     retry: false,
   });
 
+  // Códigos configurados en Integraciones (zempo separa individual y equipos):
+  // un click en el chip evita re-tipear el código en cada lugar.
+  const integration = useQuery({
+    queryKey: ["integrations", "judo"],
+    queryFn: () => getIntegration("judo"),
+    retry: false,
+  });
+  const configured = [
+    { label: "Individual", ref: readActiveEvent(integration.data?.externalIds ?? {}) },
+    { label: "Equipos", ref: readActiveTeamEvent(integration.data?.externalIds ?? {}) },
+  ].filter((o): o is { label: string; ref: { id: string; label?: string } } => !!o.ref?.id);
+
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-(--color-border) bg-(--color-card) p-3 sm:flex-row sm:items-center">
       <label className="flex items-center gap-2">
@@ -37,6 +55,20 @@ export function JudCompeticionBar({
           onChange={(e) => setCodigo(e.target.value)}
         />
       </label>
+      {configured.length > 0 && (
+        <div className="flex items-center gap-1.5">
+          {configured.map((o) => (
+            <Button
+              key={o.ref.id}
+              size="sm"
+              variant={codigo.trim() === o.ref.id ? "default" : "outline"}
+              onClick={() => setCodigo(o.ref.id)}
+            >
+              {o.label} · {o.ref.id}
+            </Button>
+          ))}
+        </div>
+      )}
       <div className="min-h-5 text-sm sm:ml-2">
         {debounced.length < 3 ? null : preview.isLoading ? (
           <span className="flex items-center gap-1.5 text-(--color-muted-foreground)">

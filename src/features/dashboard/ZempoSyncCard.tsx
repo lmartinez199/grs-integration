@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, Play, Plus, Square, Trash2 } from "lucide-react";
+import { Activity, Play, Square, Trash2 } from "lucide-react";
 
 import { listSchedules, startSchedule, stopSchedule } from "@/api/zempo";
 import {
@@ -16,24 +15,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { IntegrationInfoRows } from "@/components/integration/integration-info-rows";
-import { Input } from "@/components/ui/input";
 import { RetryNotice } from "@/components/ui/retry-notice";
 import { SyncCard } from "@/components/ui/sync-card";
 
 export function ZempoSyncCard() {
-  const [codigo, setCodigo] = useState("");
-
   const schedules = useQuery({
     queryKey: ["zempo", "schedules"],
     queryFn: listSchedules,
     refetchInterval: SYNC_INTERVAL,
-  });
-
-  const start = useMutationWithToast({
-    mutationFn: (c: string) => startSchedule(c),
-    successMsg: "Sync de zempo activada",
-    invalidateKeys: [["zempo", "schedules"]],
-    onSuccess: () => setCodigo(""),
   });
 
   const stop = useMutationWithToast({
@@ -126,23 +115,6 @@ export function ZempoSyncCard() {
             </span>
           )}
         </div>
-
-        <form
-          className="flex gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (codigo.trim()) start.mutate(codigo.trim());
-          }}
-        >
-          <Input
-            placeholder="Código de competición"
-            value={codigo}
-            onChange={(e) => setCodigo(e.target.value)}
-          />
-          <Button type="submit" size="sm" icon={<Plus />} loading={start.isPending}>
-            Agregar
-          </Button>
-        </form>
 
         <ul className="space-y-1">
           {list.length === 0 ? (
