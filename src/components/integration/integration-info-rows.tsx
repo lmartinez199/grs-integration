@@ -1,6 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getIntegration, readActiveEvent } from "@/api/grs/integrations";
+import {
+  getIntegration,
+  readActiveEvent,
+  readActiveTeamEvent,
+} from "@/api/grs/integrations";
 import { DefinitionRow } from "@/components/ui/definition-row";
 
 /**
@@ -23,14 +27,26 @@ export function IntegrationInfoRows({
   if (!data) return null;
 
   const active = readActiveEvent(data.externalIds);
+  // Solo judo la trae: zempo separa individual y equipos en 2 códigos.
+  const activeTeam = readActiveTeamEvent(data.externalIds);
   const pollMs = data.pollIntervalMs ?? 0;
+  // Providers del runner: activo = flag Iniciar/Detener. Arena (cron propio): poll>0.
+  const runnerManaged = ["sporttech-gar", "sporttech-gry", "swimsystem"].includes(provider);
+  const autoOn = runnerManaged ? data.enabled && !!data.autoSyncEnabled : pollMs > 0;
+  const seconds = Math.round((pollMs > 0 ? pollMs : 300_000) / 1000);
 
   return (
     <dl className="space-y-1 text-sm">
       {active && <DefinitionRow label={eventLabel} value={active.label || active.id} />}
+      {activeTeam && (
+        <DefinitionRow
+          label="Equipos (activa)"
+          value={activeTeam.label || activeTeam.id}
+        />
+      )}
       <DefinitionRow
         label="Auto-sync"
-        value={pollMs > 0 ? `cada ${Math.round(pollMs / 1000)} s` : "manual"}
+        value={autoOn ? `cada ${seconds} s` : "manual"}
       />
     </dl>
   );

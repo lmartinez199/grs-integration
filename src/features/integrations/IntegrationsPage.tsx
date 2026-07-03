@@ -90,20 +90,36 @@ function SportTechFields({ ids, onChange }: {
   );
 }
 
+/** Zempo separa individual y equipos: 2 códigos por edición, cada uno con su activo. */
 function JudoFields({ ids, onChange }: {
   ids: Record<string, unknown>;
   onChange: (next: Record<string, unknown>) => void;
 }) {
   const { events, activeId } = readEvents(ids);
+  const teamEvents = (ids.teamEvents as IntegrationEventRef[] | undefined) ?? [];
+  const activeTeamId = String(ids.activeTeamId ?? "");
   return (
-    <div className="space-y-1">
-      <Label>Competiciones (por código · activa la actual)</Label>
-      <EventListEditor
-        noun="competición"
-        events={events}
-        activeId={activeId}
-        onChange={(events, activeId) => onChange({ ...ids, events, activeId })}
-      />
+    <div className="space-y-3">
+      <div className="space-y-1">
+        <Label>Individual (por código · activa la actual)</Label>
+        <EventListEditor
+          noun="competición"
+          events={events}
+          activeId={activeId}
+          onChange={(events, activeId) => onChange({ ...ids, events, activeId })}
+        />
+      </div>
+      <div className="space-y-1">
+        <Label>Equipos (por código · activa la actual)</Label>
+        <EventListEditor
+          noun="competición"
+          events={teamEvents}
+          activeId={activeTeamId}
+          onChange={(teamEvents, activeTeamId) =>
+            onChange({ ...ids, teamEvents, activeTeamId })
+          }
+        />
+      </div>
     </div>
   );
 }
@@ -136,7 +152,10 @@ function ArenaFields({ ids, onChange }: {
   );
 }
 
-/** Editor del intervalo de auto-sync (runner). En segundos; 0 = sin auto-sync. */
+/**
+ * Editor del intervalo de auto-sync (runner). En segundos; 0 = default (5 min).
+ * Solo el TIEMPO vive acá: el Iniciar/Detener está en la card del Dashboard.
+ */
 function PollIntervalField({ integration }: { integration: Integration }) {
   const currentSeconds = Math.round((integration.pollIntervalMs ?? 0) / 1000);
   const [seconds, setSeconds] = useState(String(currentSeconds));
@@ -153,7 +172,7 @@ function PollIntervalField({ integration }: { integration: Integration }) {
   return (
     <div className="space-y-1">
       <Label htmlFor={`poll-${integration.provider}`}>
-        Auto-sync cada (segundos · 0 = off)
+        Auto-sync cada (segundos · 0 = 5 min por defecto)
       </Label>
       <div className="flex max-w-xs items-center gap-2">
         <Input
@@ -173,9 +192,13 @@ function PollIntervalField({ integration }: { integration: Integration }) {
         >
           Guardar
         </Button>
-        {currentSeconds > 0 && (
+        {integration.autoSyncEnabled ? (
           <span className="text-xs text-(--color-success)">
-            runner activo · cada {currentSeconds}s
+            auto-sync activo · cada {currentSeconds > 0 ? currentSeconds : 300}s
+          </span>
+        ) : (
+          <span className="text-xs text-(--color-muted-foreground)">
+            se inicia desde el Dashboard
           </span>
         )}
       </div>

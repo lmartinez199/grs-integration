@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { PersonStanding, RefreshCw } from "lucide-react";
+import { PersonStanding, Play, RefreshCw, Square } from "lucide-react";
 
-import { getIntegration, readActiveEvent } from "@/api/grs/integrations";
+import {
+  getIntegration,
+  readActiveEvent,
+  setIntegrationAutoSync,
+} from "@/api/grs/integrations";
 import { IntegrationInfoRows } from "@/components/integration/integration-info-rows";
 import { sportTechSyncEvent } from "@/api/grs/sporttech";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
@@ -44,6 +48,15 @@ export function SportTechSyncCard({
     successMsg: "Sync de gimnasia (SportTech) disparada",
   });
 
+  // Auto-sync del runner (resultados cada pollIntervalMs, default 5 min).
+  const autoOn =
+    !!integration.data?.enabled && !!integration.data?.autoSyncEnabled;
+  const setAuto = useMutationWithToast({
+    mutationFn: (enabled: boolean) => setIntegrationAutoSync(provider, enabled),
+    successMsg: `${title} — auto-sync actualizado`,
+    invalidateKeys: [["integrations", provider], ["integrations"]],
+  });
+
   const summary = sync.data;
   const errorCount = summary?.errors.length ?? 0;
 
@@ -53,12 +66,12 @@ export function SportTechSyncCard({
       icon={<PersonStanding className="size-4 text-(--color-primary)" />}
       status={
         <StatusBadge loading={sync.isPending} error={sync.isError} errorLabel="error">
-          {summary ? (
-            errorCount > 0 ? (
-              <Badge variant="warning">{errorCount} con error</Badge>
-            ) : (
-              <Badge variant="success">sincronizado</Badge>
-            )
+          {summary && errorCount > 0 ? (
+            <Badge variant="warning">{errorCount} con error</Badge>
+          ) : autoOn ? (
+            <Badge variant="success">auto-sync activa</Badge>
+          ) : summary ? (
+            <Badge variant="success">sincronizado</Badge>
           ) : (
             <Badge variant="secondary">manual</Badge>
           )}
@@ -98,6 +111,26 @@ export function SportTechSyncCard({
           Sincronizar
         </Button>
       </form>
+
+      <div className="flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          icon={<Play />}
+          onClick={() => setAuto.mutate(true)}
+          disabled={autoOn || setAuto.isPending}
+        >
+          Iniciar auto-sync
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          icon={<Square />}
+          onClick={() => setAuto.mutate(false)}
+          disabled={!autoOn || setAuto.isPending}
+        >
+          Detener
+        </Button>
+      </div>
     </SyncCard>
   );
 }

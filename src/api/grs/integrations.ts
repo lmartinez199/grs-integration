@@ -24,6 +24,8 @@ export interface Integration {
   id: string;
   provider: string;
   enabled: boolean;
+  /** On/off del auto-sync del runner (Iniciar/Detener desde el dashboard). */
+  autoSyncEnabled: boolean;
   externalIds: Record<string, unknown>;
   pollIntervalMs: number;
   webhookReceiverUrl?: string;
@@ -44,6 +46,18 @@ export function readActiveEvent(
 ): IntegrationEventRef | undefined {
   const events = (externalIds.events as IntegrationEventRef[] | undefined) ?? [];
   const activeId = String(externalIds.activeId ?? "");
+  return events.find((e) => e.id === activeId) ?? (activeId ? { id: activeId } : undefined);
+}
+
+/**
+ * Competición de EQUIPOS activa (judo: zempo separa individual y equipos en 2
+ * códigos por edición — `{ teamEvents, activeTeamId }` junto a `{ events, activeId }`).
+ */
+export function readActiveTeamEvent(
+  externalIds: Record<string, unknown>,
+): IntegrationEventRef | undefined {
+  const events = (externalIds.teamEvents as IntegrationEventRef[] | undefined) ?? [];
+  const activeId = String(externalIds.activeTeamId ?? "");
   return events.find((e) => e.id === activeId) ?? (activeId ? { id: activeId } : undefined);
 }
 
@@ -68,7 +82,14 @@ export const updateIntegrationExternalIds = (
     body: { externalIds },
   });
 
-/** Intervalo de auto-sync del runner en ms (0 = sin auto-sync). */
+/** Iniciar/Detener el auto-sync del runner (no toca `enabled`, el kill-switch). */
+export const setIntegrationAutoSync = (provider: string, enabled: boolean) =>
+  request<Integration>("grs", `/integrations/${provider}/auto-sync`, {
+    method: "PUT",
+    body: { enabled },
+  });
+
+/** Intervalo de auto-sync del runner en ms (0 = default del runner, 5 min). */
 export const setIntegrationPollInterval = (
   provider: string,
   pollIntervalMs: number,
