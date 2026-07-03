@@ -120,6 +120,15 @@ function JudoFields({ ids, onChange }: {
           }
         />
       </div>
+      <div className="space-y-1">
+        <Label htmlFor="judo-eventCode">Código de evento GRS (eventCode)</Label>
+        <Input
+          id="judo-eventCode"
+          value={String(ids.eventCode ?? "")}
+          onChange={(e) => onChange({ ...ids, eventCode: e.target.value })}
+          placeholder="ej. JJB2026 — lo usa el paso setup"
+        />
+      </div>
     </div>
   );
 }
