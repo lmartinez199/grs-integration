@@ -113,7 +113,7 @@ Reglas prácticas:
 - `api/` no importa nada de React ni de la UI; solo tipos y `lib/http.ts`.
 - `lib/domain/` son funciones puras: fáciles de testear y de razonar.
 - Todo estado que debe sobrevivir al cierre de la app pasa por `stores/persist.ts` (nunca `localStorage`).
-- La configuración (URLs, API keys) **no vive en `.env`**: se ingresa en la UI (Configuración → Conexiones) y se guarda en `grs-desktop.json`.
+- La configuración (URLs, API keys) tiene dos niveles: las variables `VITE_*` de `.env.local` son los **defaults de primera ejecución** (ver `DEFAULT_SETTINGS` en `stores/settings.store.ts`), y lo que el operador guarde en la UI (Configuración → Conexiones) las **sobrescribe** y persiste en `grs-desktop.json`.
 
 ## 5. Código reutilizable — no reinventar
 
@@ -150,9 +150,22 @@ pnpm tauri dev     # Vite + ventana Tauri con hot reload
 pnpm dev           # solo Vite en el navegador (sin ventana Tauri; el HTTP nativo no funciona aquí)
 ```
 
-Necesitas los 3 backends corriendo localmente (`grs-backend-v2`, `jud-integration-zempo`, `ath-microservice`).
+Necesitas los 3 backends. Dos opciones:
 
-> ⚠️ **Conflicto de puertos:** zempo y ath usan ambos `3001` por defecto en sus repos. Reasigna uno; la app asume ath en `3005`.
+- **Contra dev (sin backends locales):** crea un `.env.local` en la raíz con las URLs de dev — son los defaults de primera ejecución de la app:
+
+  ```bash
+  VITE_GRS_BASE_URL=https://devovrs.srv.win2tec.es/b
+  VITE_ZEMPO_BASE_URL=https://jud-integration-zempo.srv.win2tec.es/zempo
+  VITE_ATH_BASE_URL=https://ath-microservice.srv.win2tec.es/api/ath
+  VITE_LANGUAGE=eng
+  ```
+
+  Ojo: si ya guardaste conexiones en la app, `grs-desktop.json` tiene prioridad sobre el `.env.local`; ajústalas en Configuración → Conexiones o borra ese archivo.
+
+- **Todo local:** corre `grs-backend-v2`, `jud-integration-zempo` y `ath-microservice` (los defaults localhost aplican solos).
+
+  > ⚠️ **Conflicto de puertos:** zempo y ath usan ambos `3001` por defecto en sus repos. Reasigna uno; la app asume ath en `3005`.
 
 Al abrir la app: login contra el GRS (`POST /api/auth/login`) y luego **Configuración → Conexiones** para ingresar URLs y API keys (se guardan localmente en `grs-desktop.json`).
 
