@@ -10,6 +10,7 @@ import {
 import { IntegrationInfoRows } from "@/components/integration/integration-info-rows";
 import { sportTechSyncEvent } from "@/api/grs/sporttech";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
+import { SYNC_INTERVAL } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ export function SportTechSyncCard({
     queryKey: ["integrations", provider],
     queryFn: () => getIntegration(provider),
     retry: false,
+    refetchInterval: SYNC_INTERVAL,
   });
   const savedEventId = readActiveEvent(integration.data?.externalIds ?? {})?.id ?? "";
 
