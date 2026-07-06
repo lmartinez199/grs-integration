@@ -1,7 +1,6 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useId,
   useMemo,
   useState,
@@ -430,19 +429,16 @@ function ScheduleGroups({
   groups: { key: string; label: string; items: AthSchedule[] }[];
 }) {
   const baseId = useId();
-  // Por defecto solo el primer día abierto; el resto colapsado para escanear fácil.
-  const [open, setOpen] = useState<Set<string>>(() => new Set());
-
-  useEffect(() => {
-    setOpen(new Set(groups.slice(0, 1).map((g) => g.key)));
-    // Re-inicializar cuando cambian los grupos (nueva carga/filtro).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groups.map((g) => g.key).join("|")]);
+  // Por defecto solo el primer día abierto; el resto colapsado para escanear
+  // fácil. `toggled` guarda los días que el usuario invirtió respecto a ese
+  // default (XOR), así el estado se deriva en render sin efectos.
+  const [toggled, setToggled] = useState<Set<string>>(() => new Set());
 
   const toggle = (key: string) =>
-    setOpen((prev) => {
+    setToggled((prev) => {
       const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
 
@@ -453,7 +449,7 @@ function ScheduleGroups({
           key={group.key}
           group={group}
           panelId={`${baseId}-${idx}`}
-          isOpen={open.has(group.key)}
+          isOpen={(idx === 0) !== toggled.has(group.key)}
           onToggle={() => toggle(group.key)}
         />
       ))}

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, RefreshCw } from "lucide-react";
 
@@ -100,11 +100,6 @@ export function SportTechPage({
       : rosterArray;
   const rawDisplay = rosterArray ? filteredRoster : raw.data;
 
-  // Al cambiar de recurso, limpia el filtro (no aplica a la estructura).
-  useEffect(() => {
-    setRosterFilter("");
-  }, [rawResource]);
-
   return (
     <div className="flex h-full flex-col gap-6 p-6">
       <header className="shrink-0">
@@ -176,7 +171,11 @@ export function SportTechPage({
                   size="sm"
                   variant={r.resource === rawResource ? "default" : "outline"}
                   disabled={!id}
-                  onClick={() => setRawResource(r.resource)}
+                  onClick={() => {
+                    setRawResource(r.resource);
+                    // El filtro es del roster; al cambiar de recurso no aplica.
+                    setRosterFilter("");
+                  }}
                 >
                   {r.label}
                 </Button>

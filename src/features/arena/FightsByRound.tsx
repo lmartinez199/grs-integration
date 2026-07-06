@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { ChevronRight, Search } from "lucide-react";
 
 import type { ArenaFight } from "@/api/grs/arena";
@@ -82,25 +82,22 @@ export function FightsByRound({ fights }: { fights: ArenaFight[] }) {
 
 function RoundGroups({ rounds }: { rounds: { name: string; items: ArenaFight[] }[] }) {
   const baseId = useId();
-  const [open, setOpen] = useState<Set<string>>(new Set());
-
-  // Abrir todas las rondas por defecto (suelen ser pocas).
-  useEffect(() => {
-    setOpen(new Set(rounds.map((r) => r.name)));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rounds.map((r) => r.name).join("|")]);
+  // Estado invertido: guarda las rondas que el usuario CERRÓ. Así las rondas
+  // nacen abiertas por defecto (suelen ser pocas) sin necesidad de un efecto.
+  const [closed, setClosed] = useState<Set<string>>(new Set());
 
   const toggle = (name: string) =>
-    setOpen((prev) => {
+    setClosed((prev) => {
       const next = new Set(prev);
-      next.has(name) ? next.delete(name) : next.add(name);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
       return next;
     });
 
   return (
     <div className="space-y-2">
       {rounds.map((round, idx) => {
-        const isOpen = open.has(round.name);
+        const isOpen = !closed.has(round.name);
         const done = round.items.filter((f) => f.isCompleted).length;
         const panelId = `${baseId}-${idx}`;
         return (

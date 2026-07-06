@@ -1,12 +1,16 @@
 # Integración GRS
 
-Panel de operador de escritorio para el evento **JJB2026**. Consume 3 APIs REST:
+Panel de operador de escritorio para el evento **JJB2026**.
+
+> 🧭 ¿Nuevo en el proyecto? Empieza por [docs/onboarding-dev.md](docs/onboarding-dev.md).
+
+Consume 3 APIs REST:
 
 | Servicio | Rol | Base URL por defecto | Auth |
 |---|---|---|---|
-| **grs-backend-v2** (monolito) | Datos + login. Solo se usa el módulo **ARENA**. | `http://localhost:3010/api` | JWT `Bearer` |
+| **grs-backend-v2** (monolito) | Login + endpoints de lucha (ARENA), judo, arco, natación, gimnasia e integraciones. | `http://localhost:3010/api` | JWT `Bearer` |
 | **jud-integration-zempo** | Orquestador de sync de judo. | `http://localhost:3001/zempo` | API key `Bearer` |
-| **ath-microservice** | ACL de atletismo (CBAT → GRS). | `http://localhost:3005/api/ath` | (sin auth de entrada) |
+| **ath-microservice** | ACL de atletismo (CBAT → GRS). | `http://localhost:3005/api/ath` | API key `Bearer` (opcional) |
 
 > Los dos microservicios migrarán al monolito en el futuro. Su acceso está aislado en `src/api/zempo` y `src/api/ath`, de modo que esa migración sólo cambia la base URL y el módulo de cliente.
 
@@ -26,9 +30,10 @@ src/
 ├── api/{grs,zempo,ath}/   # clientes por servicio (desacoplados)
 ├── lib/{http,query,utils} # cliente HTTP (plugin-http), QueryClient, cn()
 ├── stores/                # auth.store, settings.store, persist
-├── components/ui/         # button, input, card, badge, label, toast
+├── components/ui/         # primitivos: button, input, card, badge, toast, tabs, ...
+├── components/integration/# piezas de sync compartidas entre deportes
 ├── components/AppLayout   # shell con navegación lateral
-└── features/{auth,dashboard,arena,settings}
+└── features/{auth,dashboard,arena,judo,ath,arco,swimsystem,sporttech,config}
 ```
 
 ## Requisitos
@@ -44,7 +49,7 @@ pnpm install
 pnpm tauri dev     # levanta Vite + ventana Tauri
 ```
 
-Con los 3 backends corriendo localmente. Configura URLs y API keys en **Ajustes** dentro de la app (se guardan localmente). El login usa `POST /api/auth/login` (usuario + contraseña) contra el GRS.
+Con los 3 backends corriendo localmente. Configura URLs y API keys en **Configuración → Conexiones** dentro de la app (se guardan localmente). El login usa `POST /api/auth/login` (usuario + contraseña) contra el GRS.
 
 > ⚠️ **Conflicto de puertos:** zempo y ath usan ambos `3001` por defecto en sus repos. Reasigna uno (la app asume ath en `3005`).
 
@@ -58,4 +63,5 @@ pnpm tauri build   # instalador Windows (MSI/NSIS)
 ## Scripts útiles
 
 - `pnpm exec tsc --noEmit` — typecheck
+- `pnpm lint` — ESLint
 - `pnpm dev` — solo Vite (sin ventana Tauri)

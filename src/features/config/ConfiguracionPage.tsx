@@ -1,5 +1,5 @@
-import { ConnectionsCard } from "@/features/settings/SettingsPage";
-import { IntegrationsSection } from "@/features/integrations/IntegrationsPage";
+import { ConnectionsCard } from "@/features/config/ConnectionsCard";
+import { IntegrationsSection } from "@/features/config/IntegrationsSection";
 
 /**
  * Página unificada (fusión de Ajustes + Integraciones). Dos secciones:

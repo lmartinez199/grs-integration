@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, RefreshCw, Search } from "lucide-react";
 
@@ -54,8 +54,6 @@ export function SwmPage() {
   const events = (externalIds.events as IntegrationEventRef[] | undefined) ?? [];
   const savedActiveId = String(externalIds.activeId ?? "");
   const id = events.find((e) => e.id === savedActiveId)?.id ?? events[0]?.id ?? "";
-
-  useEffect(() => { setFilter(""); }, [resource]);
 
   function setActive(newId: string) {
     if (newId === id) return;
@@ -191,7 +189,11 @@ export function SwmPage() {
                   size="sm"
                   variant={r === resource ? "default" : "outline"}
                   disabled={!id}
-                  onClick={() => setResource(r)}
+                  onClick={() => {
+                    setResource(r);
+                    // El filtro pertenece al recurso anterior; se limpia aquí.
+                    setFilter("");
+                  }}
                 >
                   {r}
                 </Button>

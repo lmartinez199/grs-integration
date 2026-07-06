@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PersonStanding, Play, RefreshCw, Square } from "lucide-react";
 
@@ -10,6 +10,7 @@ import {
 import { IntegrationInfoRows } from "@/components/integration/integration-info-rows";
 import { sportTechSyncEvent } from "@/api/grs/sporttech";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
+import { SYNC_INTERVAL } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
@@ -29,19 +30,19 @@ export function SportTechSyncCard({
   provider: string;
   title: string;
 }) {
-  const [eventId, setEventId] = useState("");
+  // null = el usuario no ha tocado el input → se muestra el evento guardado.
+  // Si escribe (o borra), su valor manda; sin efectos de sincronización.
+  const [eventIdInput, setEventIdInput] = useState<string | null>(null);
 
   // Evento guardado de esta disciplina (1 por integración); pre-rellena el input.
   const integration = useQuery({
     queryKey: ["integrations", provider],
     queryFn: () => getIntegration(provider),
     retry: false,
+    refetchInterval: SYNC_INTERVAL,
   });
   const savedEventId = readActiveEvent(integration.data?.externalIds ?? {})?.id ?? "";
-
-  useEffect(() => {
-    if (savedEventId && !eventId) setEventId(savedEventId);
-  }, [savedEventId]);
+  const eventId = eventIdInput ?? savedEventId;
 
   const sync = useMutationWithToast({
     mutationFn: (id: string) => sportTechSyncEvent(id),
@@ -105,7 +106,7 @@ export function SportTechSyncCard({
         <Input
           placeholder="eventId de SportTech (UUID)"
           value={eventId}
-          onChange={(e) => setEventId(e.target.value)}
+          onChange={(e) => setEventIdInput(e.target.value)}
         />
         <Button type="submit" size="sm" icon={<RefreshCw />} loading={sync.isPending}>
           Sincronizar
