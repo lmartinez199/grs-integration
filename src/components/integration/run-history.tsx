@@ -34,6 +34,71 @@ const COUNT_LABELS: Record<string, string> = {
   clubs: "Clubes",
 };
 
+interface ErrorGroup {
+  cause: string;
+  subjects: string[];
+}
+
+/**
+ * Agrupa errores "sujeto: causa" por causa. Los syncs por categoría fallan en
+ * ráfaga por la misma razón (Arena caída, fechas fuera de rango…) y el
+ * historial repetía el mismo mensaje N veces, una pared de texto ilegible.
+ */
+function groupErrors(errors: string[]): ErrorGroup[] {
+  const groups = new Map<string, string[]>();
+  for (const raw of errors) {
+    const e = raw.trim();
+    const i = e.indexOf(": ");
+    const subject = i > 0 ? e.slice(0, i) : "";
+    const cause = i > 0 ? e.slice(i + 2) : e;
+    groups.set(cause, [...(groups.get(cause) ?? []), subject]);
+  }
+  return [...groups.entries()].map(([cause, subjects]) => ({
+    cause,
+    subjects: subjects.filter(Boolean),
+  }));
+}
+
+/**
+ * Errores de sync compactos: una línea por causa con contador; los elementos
+ * afectados quedan colapsados en un <details>.
+ */
+export function SyncErrorList({
+  errors,
+  totalCount,
+}: {
+  errors: string[];
+  /** errorCount del backend, por si supera a los errores listados. */
+  totalCount?: number;
+}) {
+  const groups = groupErrors(errors);
+  const extra = Math.max(0, (totalCount ?? errors.length) - errors.length);
+  return (
+    <div className="space-y-0.5 text-xs text-(--color-destructive)">
+      {groups.map((g, i) =>
+        g.subjects.length > 1 ? (
+          <details key={i}>
+            <summary className="cursor-pointer [overflow-wrap:anywhere] marker:text-(--color-muted-foreground)">
+              <span className="font-semibold">{g.subjects.length}×</span> {g.cause}
+            </summary>
+            <p className="pt-0.5 pl-4 text-(--color-muted-foreground) [overflow-wrap:anywhere]">
+              Afecta: {g.subjects.join(" · ")}
+            </p>
+          </details>
+        ) : (
+          <p key={i} className="[overflow-wrap:anywhere]">
+            {g.subjects[0] ? `${g.subjects[0]}: ` : ""}
+            {g.cause}
+          </p>
+        ),
+      )}
+      {extra > 0 && (
+        <p className="text-(--color-muted-foreground)">…y {extra} errores más</p>
+      )}
+    </div>
+  );
+}
+
 /** Línea de tiempo de las últimas corridas (más reciente arriba). */
 export function RunHistory({ runs }: { runs?: IntegrationRun[] }) {
   if (!runs?.length) return null;
@@ -69,11 +134,9 @@ export function RunHistory({ runs }: { runs?: IntegrationRun[] }) {
               )}
             </div>
             {run.errorCount > 0 && run.errors?.length ? (
-              <ul className="mt-0.5 list-disc pl-4 text-(--color-destructive)">
-                {run.errors.map((e, j) => (
-                  <li key={j}>{e}</li>
-                ))}
-              </ul>
+              <div className="mt-0.5">
+                <SyncErrorList errors={run.errors} totalCount={run.errorCount} />
+              </div>
             ) : null}
           </li>
         ))}

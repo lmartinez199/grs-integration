@@ -12,7 +12,11 @@ import {
 } from "@/api/grs/integrations";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { EventListEditor } from "@/components/integration/event-list-editor";
-import { runStatusVariant } from "@/components/integration/run-history";
+import {
+  SyncErrorList,
+  runStatusLabel,
+  runStatusVariant,
+} from "@/components/integration/run-history";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -291,7 +295,7 @@ function IntegrationCard({ integration }: { integration: Integration }) {
                 variant={runStatusVariant(integration.lastSyncStatus)}
                 className="text-xs"
               >
-                {integration.lastSyncStatus}
+                {runStatusLabel(integration.lastSyncStatus)}
               </Badge>
             ) : (
               "—"
@@ -300,8 +304,9 @@ function IntegrationCard({ integration }: { integration: Integration }) {
           {integration.lastSyncError && (
             <>
               <dt className="text-(--color-muted-foreground)">Error</dt>
-              <dd className="truncate text-xs text-(--color-destructive)">
-                {integration.lastSyncError}
+              {/* Sin truncate: cortaba el mensaje y se perdían las fechas del error. */}
+              <dd className="min-w-0">
+                <SyncErrorList errors={[integration.lastSyncError]} />
               </dd>
             </>
           )}
