@@ -60,7 +60,7 @@ export function SportTechCsvCard({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-(--color-muted-foreground)">
-          Vía alternativa al pull OVS: subí el CSV de export del proveedor
+          Vía alternativa al pull OVS: sube el CSV de export del proveedor
           (artística o rítmica). La disciplina se detecta del propio archivo. Corre
           el pipeline completo (estructura → participantes → grupos → start-lists →
           resultados). Idempotente.

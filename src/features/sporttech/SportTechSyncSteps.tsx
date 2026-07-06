@@ -25,7 +25,7 @@ function step(r: SportTechStageSummary, label: string): StepRunResult {
 }
 
 const requireEvent = (ctx: Ctx) =>
-  ctx.eventId ? null : "Pegá el UUID del evento del OVS.";
+  ctx.eventId ? null : "Pega el UUID del evento del OVS.";
 
 /**
  * Pasos del sync de gimnasia (SportTech), en orden de dependencia. «Estructura»
@@ -95,7 +95,7 @@ export function SportTechSyncSteps({ eventId }: { eventId: string }) {
     <SetupSteps<Ctx>
       title="Sync del evento"
       icon={<Database className="size-4 text-(--color-primary)" />}
-      description="Dispará el pull por etapa (orden de dependencia). Cada paso muestra su resumen y sus errores."
+      description="Dispara el pull por etapa (orden de dependencia). Cada paso muestra su resumen y sus errores."
       steps={STEPS}
       ctx={{ eventId }}
       results={results}

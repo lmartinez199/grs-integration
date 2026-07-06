@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { RunHistory, runStatusVariant } from "./run-history";
+import { RunHistory, runStatusLabel, runStatusVariant } from "./run-history";
 
 /**
  * Último sync + historial de corridas de una integración, para verlo en la
@@ -55,7 +55,7 @@ export function SyncHistoryCard({ provider }: { provider: string }) {
           <>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
               <span className="text-(--color-muted-foreground)">
-                Último sync:{" "}
+                Última sincronización:{" "}
                 <span className="text-(--color-foreground)">
                   {data.lastSyncAt ? formatDateTime(data.lastSyncAt) : "—"}
                 </span>
@@ -65,7 +65,7 @@ export function SyncHistoryCard({ provider }: { provider: string }) {
                   variant={runStatusVariant(data.lastSyncStatus)}
                   className="text-xs"
                 >
-                  {data.lastSyncStatus}
+                  {runStatusLabel(data.lastSyncStatus)}
                 </Badge>
               )}
             </div>
@@ -78,8 +78,8 @@ export function SyncHistoryCard({ provider }: { provider: string }) {
               <RunHistory runs={data.runs} />
             ) : (
               <p className="text-sm text-(--color-muted-foreground)">
-                Todavía no hay corridas registradas. Dispará un sync para ver el
-                historial.
+                Todavía no hay corridas registradas. Dispara una sincronización
+                para ver el historial.
               </p>
             )}
           </>
