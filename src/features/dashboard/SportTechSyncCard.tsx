@@ -43,6 +43,8 @@ export function SportTechSyncCard({
 
   useEffect(() => {
     if (savedEventId && !eventId) setEventId(savedEventId);
+    // Solo cuando llega el valor guardado: si el usuario borra el campo, no re-llenar.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedEventId]);
 
   const sync = useMutationWithToast({

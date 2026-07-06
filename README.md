@@ -63,4 +63,5 @@ pnpm tauri build   # instalador Windows (MSI/NSIS)
 ## Scripts útiles
 
 - `pnpm exec tsc --noEmit` — typecheck
+- `pnpm lint` — ESLint
 - `pnpm dev` — solo Vite (sin ventana Tauri)

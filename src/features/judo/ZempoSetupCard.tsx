@@ -143,6 +143,8 @@ export function ZempoSetupCard({ codigo }: { codigo: string }) {
   const configEventCode = String(integration.data?.externalIds.eventCode ?? "");
   useEffect(() => {
     if (configEventCode && !eventCode) setEventCode(configEventCode);
+    // Solo cuando llega el valor guardado: si el usuario borra el campo, no re-llenar.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configEventCode]);
 
   const ctx: JudoCtx = {

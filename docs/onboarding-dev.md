@@ -121,7 +121,7 @@ Antes de escribir algo nuevo, revisa este catálogo:
 
 - **`src/lib/http.ts` → `request(service, path, opts)`**: único punto de salida HTTP. Resuelve base URL y headers de auth según el servicio (`"grs" | "zempo" | "ath"`), lanza `ApiError` tipado y fuerza logout en 401. **Nunca uses `fetch` directo.**
 - **`src/hooks/useMutationWithToast.ts`**: mutación de TanStack Query con toast de éxito/error incluido.
-- **`src/components/ui/`**: primitivos — `button`, `input`, `card`, `badge`, `label`, `tabs`, `toast`, `status-badge`, `sync-card`, `data-view`, `table-view`, `definition-row`, `competitor-row`, `action-button`, `retry-notice`. Usa estos en vez de crear variantes.
+- **`src/components/ui/`**: primitivos — `button`, `input`, `card`, `badge`, `label`, `tabs`, `toast`, `status-badge`, `sync-card`, `data-view`, `table-view`, `definition-row`, `competitor-row`, `action-button`, `retry-notice`. Usa estos en vez de crear variantes. ESLint refuerza la parte automatizable: un `<input>` de texto crudo fuera de `ui/` es error de lint (checkbox/radio/file crudos son válidos porque no tienen primitivo).
 - **`src/components/integration/`**: piezas compartidas entre deportes — `setup-steps`, `run-history`, `sync-history-card`, `active-event-selector`, `event-list-editor`, `integration-info-rows`.
 - **`src/lib/domain/`**: helpers puros por deporte; si tu lógica no toca la red ni la UI, va aquí.
 - **Patrón de stores**: los deportes que necesitan estado local propio (arena, judo, ath, arco) tienen su `*.store.ts` con el mismo esqueleto; swm y sporttech viven solo de TanStack Query. Si necesitas uno, copia un store existente (p. ej. `arco.store.ts`).
@@ -162,9 +162,10 @@ Al abrir la app: login contra el GRS (`POST /api/auth/login`) y luego **Configur
 pnpm build              # typecheck (tsc) + build de frontend
 pnpm tauri build        # instalador Windows (MSI/NSIS) en src-tauri/target/release/
 pnpm exec tsc --noEmit  # solo typecheck
+pnpm lint               # ESLint (JS/TS recomendadas + hooks de React + convenciones del proyecto)
 ```
 
-No hay tests automatizados por ahora; el typecheck es la única verificación en CI local.
+No hay tests automatizados por ahora; typecheck + lint son la verificación local.
 
 ## 7. Documentación relacionada
 
