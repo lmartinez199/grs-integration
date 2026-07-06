@@ -520,7 +520,7 @@ function DayGroup({
               isOpen && "rotate-90",
             )}
           />
-          <span className="truncate text-sm font-semibold capitalize text-(--color-primary)">
+          <span className="truncate text-sm font-semibold text-(--color-primary)">
             {group.label}
           </span>
           <span className="ml-1 flex shrink-0 items-center gap-1.5 text-xs text-(--color-muted-foreground)">

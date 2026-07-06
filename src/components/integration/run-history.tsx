@@ -16,6 +16,24 @@ export function runStatusVariant(
       : "destructive";
 }
 
+/** Estado de la corrida en español para mostrar en el badge. */
+export function runStatusLabel(status: IntegrationRunStatus): string {
+  return status === "skipped" ? "omitido" : status;
+}
+
+/** Claves de contadores conocidas del backend → etiqueta en español. */
+const COUNT_LABELS: Record<string, string> = {
+  created: "Creados",
+  updated: "Actualizados",
+  skipped: "Omitidos",
+  processed: "Procesados",
+  results: "Resultados",
+  events: "Pruebas",
+  groups: "Grupos",
+  athletes: "Atletas",
+  clubs: "Clubes",
+};
+
 /** Línea de tiempo de las últimas corridas (más reciente arriba). */
 export function RunHistory({ runs }: { runs?: IntegrationRun[] }) {
   if (!runs?.length) return null;
@@ -40,12 +58,12 @@ export function RunHistory({ runs }: { runs?: IntegrationRun[] }) {
                 variant={runStatusVariant(run.status)}
                 className="text-[10px]"
               >
-                {run.status}
+                {runStatusLabel(run.status)}
               </Badge>
               {run.counts && Object.keys(run.counts).length > 0 && (
                 <span className="text-(--color-muted-foreground)">
                   {Object.entries(run.counts)
-                    .map(([k, v]) => `${humanizeKey(k)} ${v}`)
+                    .map(([k, v]) => `${COUNT_LABELS[k] ?? humanizeKey(k)} ${v}`)
                     .join(" · ")}
                 </span>
               )}

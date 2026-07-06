@@ -22,7 +22,7 @@ function step(r: SwmStageSummary, label: string): StepRunResult {
 }
 
 const requireMeet = (ctx: Ctx) =>
-  ctx.meetId ? null : "Pegá el meetId de SwimSystem.";
+  ctx.meetId ? null : "Pega el meetId de SwimSystem.";
 
 /**
  * Pasos del sync de natación (SwimSystem) en 3 grupos: «estructura» (esqueleto),
@@ -106,7 +106,7 @@ export function SwmSyncSteps({ meetId }: { meetId: string }) {
     <SetupSteps<Ctx>
       title="Sync por etapa"
       icon={<Database className="size-4 text-(--color-primary)" />}
-      description="Dispará el pull por etapa (orden de dependencia). Cada paso muestra su resumen y sus errores."
+      description="Dispara el pull por etapa (orden de dependencia). Cada paso muestra su resumen y sus errores."
       steps={STEPS}
       ctx={{ meetId }}
       results={results}
