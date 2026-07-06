@@ -10,11 +10,6 @@ export default tseslint.config(
   {
     files: ["src/**/*.{ts,tsx}"],
     rules: {
-      // ponytail: reglas del React Compiler apagadas — exigen refactors de
-      // patrones que hoy funcionan (setState-en-effect para reset de UI).
-      // Encenderlas cuando se adopte el compiler.
-      "react-hooks/set-state-in-effect": "off",
-      "react-hooks/purity": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },

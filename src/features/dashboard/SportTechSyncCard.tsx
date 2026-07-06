@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PersonStanding, Play, RefreshCw, Square } from "lucide-react";
 
@@ -30,7 +30,9 @@ export function SportTechSyncCard({
   provider: string;
   title: string;
 }) {
-  const [eventId, setEventId] = useState("");
+  // null = el usuario no ha tocado el input → se muestra el evento guardado.
+  // Si escribe (o borra), su valor manda; sin efectos de sincronización.
+  const [eventIdInput, setEventIdInput] = useState<string | null>(null);
 
   // Evento guardado de esta disciplina (1 por integración); pre-rellena el input.
   const integration = useQuery({
@@ -40,12 +42,7 @@ export function SportTechSyncCard({
     refetchInterval: SYNC_INTERVAL,
   });
   const savedEventId = readActiveEvent(integration.data?.externalIds ?? {})?.id ?? "";
-
-  useEffect(() => {
-    if (savedEventId && !eventId) setEventId(savedEventId);
-    // Solo cuando llega el valor guardado: si el usuario borra el campo, no re-llenar.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [savedEventId]);
+  const eventId = eventIdInput ?? savedEventId;
 
   const sync = useMutationWithToast({
     mutationFn: (id: string) => sportTechSyncEvent(id),
@@ -109,7 +106,7 @@ export function SportTechSyncCard({
         <Input
           placeholder="eventId de SportTech (UUID)"
           value={eventId}
-          onChange={(e) => setEventId(e.target.value)}
+          onChange={(e) => setEventIdInput(e.target.value)}
         />
         <Button type="submit" size="sm" icon={<RefreshCw />} loading={sync.isPending}>
           Sincronizar

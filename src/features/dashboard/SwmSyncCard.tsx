@@ -43,8 +43,10 @@ export function SwmSyncCard() {
   });
 
   const last = webhooks.data?.recent[0];
+  // Evaluado contra la hora del último fetch (puro en render); el query
+  // repollea cada SYNC_INTERVAL, así que se mantiene fresco.
   const webhookActive = last
-    ? Date.now() - last.timestamp < WEBHOOK_ACTIVE_WINDOW_MS
+    ? webhooks.dataUpdatedAt - last.timestamp < WEBHOOK_ACTIVE_WINDOW_MS
     : false;
 
   return (
