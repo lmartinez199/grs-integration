@@ -14,6 +14,15 @@ function formatDate(iso?: string): string {
   return dateFmt.format(new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
 }
 
+/**
+ * Arena no siempre expone startDate/endDate en current-event, pero el fullName
+ * los trae embebidos ("… - from 2026-07-01 to 2026-07-05").
+ */
+function datesFromFullName(fullName?: string): { start?: string; end?: string } {
+  const m = /from (\d{4}-\d{2}-\d{2}) to (\d{4}-\d{2}-\d{2})/.exec(fullName ?? "");
+  return m ? { start: m[1], end: m[2] } : {};
+}
+
 function ColorSwatch({ label, bg, fg }: { label: string; bg?: string; fg?: string }) {
   if (!bg) return null;
   return (
@@ -36,6 +45,9 @@ export function EventSummary({ event }: { event: ArenaSportEvent }) {
       ? "Por equipos"
       : "—";
   const sede = event.address || event.addressLocality || "—";
+  const fallback = datesFromFullName(event.fullName);
+  const startDate = event.startDate || fallback.start;
+  const endDate = event.endDate || fallback.end;
 
   return (
     <div className="space-y-4">
@@ -46,7 +58,7 @@ export function EventSummary({ event }: { event: ArenaSportEvent }) {
         <Fact
           icon={<CalendarRange className="size-4" aria-hidden />}
           label="Fechas"
-          value={`${formatDate(event.startDate)} – ${formatDate(event.endDate)}`}
+          value={`${formatDate(startDate)} – ${formatDate(endDate)}`}
         />
         <Fact
           icon={<Users className="size-4" aria-hidden />}
