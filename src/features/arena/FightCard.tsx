@@ -85,7 +85,7 @@ export function FightCard({ fight }: { fight: ArenaFight }) {
         <span className="truncate text-xs font-medium text-(--color-muted-foreground)">
           {fight.roundFriendlyName}
           {fight.displayOrderInRound ? ` · Pelea ${fight.displayOrderInRound}` : ""}
-          {fight.matName ? ` · ${fight.matName}` : ""}
+          {fight.matName ? ` · Área ${fight.matName}` : ""}
         </span>
         <div className="flex shrink-0 items-center gap-1.5">
           <StatusBadge fight={fight} />

@@ -75,7 +75,7 @@ export function SwmSyncCard() {
           />
           <DefinitionRow
             label="Última entrega"
-            value={last ? `${last.event ?? "—"} · ${fmt(last.timestamp)}` : "—"}
+            value={last ? `${fmt(last.timestamp)} · ${last.event ?? "—"}` : "—"}
           />
         </dl>
       )}

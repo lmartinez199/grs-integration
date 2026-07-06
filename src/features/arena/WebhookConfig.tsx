@@ -90,7 +90,8 @@ export function WebhookConfig() {
 
         {list.isError ? (
           <p role="alert" className="text-sm text-(--color-destructive)">
-            No se pudo consultar los webhooks (revisa la conexión con GRS).
+            No se pudo consultar los webhooks: el GRS no alcanzó a Arena. Revisa
+            la Base URL de WRE en Configuración y que Arena esté accesible.
           </p>
         ) : current ? (
           <div className="flex flex-wrap items-center gap-2">

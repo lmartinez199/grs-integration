@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataView } from "@/components/ui/data-view";
+import { RetryNotice } from "@/components/ui/retry-notice";
 import {
   Tabs,
   tabPanelId,
@@ -96,9 +97,11 @@ export function ArenaPage() {
           {event.isLoading ? (
             <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" aria-hidden />
           ) : event.isError || !event.data ? (
-            <p role="alert" className="text-sm text-(--color-destructive)">
-              No se pudo cargar el evento. Verifica la conexión y el eventCode en Configuración.
-            </p>
+            <RetryNotice
+              message="No se pudo cargar el evento. Verifica la conexión y el eventCode en Configuración."
+              onRetry={() => event.refetch()}
+              isRetrying={event.isFetching}
+            />
           ) : (
             <EventSummary event={event.data} />
           )}
@@ -117,9 +120,11 @@ export function ArenaPage() {
             {categories.isLoading ? (
               <Loader2 className="size-5 animate-spin text-(--color-muted-foreground)" aria-hidden />
             ) : categories.isError ? (
-              <p role="alert" className="text-sm text-(--color-destructive)">
-                Error al cargar categorías.
-              </p>
+              <RetryNotice
+                message="Error al cargar categorías."
+                onRetry={() => categories.refetch()}
+                isRetrying={categories.isFetching}
+              />
             ) : (
               <CategoryList
                 categories={categories.data ?? []}

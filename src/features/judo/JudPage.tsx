@@ -119,6 +119,14 @@ export function JudPage() {
                             )}
                           >
                             {c.name}
+                            {/* El name del GRS repite "GENERAL · M/W"; lo que
+                                distingue las filas es el código del sport-event
+                                (el sufijo lleva el peso, ej. 14A1640). */}
+                            {c.sportEvent && (
+                              <span className="ml-1.5 font-normal text-(--color-muted-foreground)">
+                                {c.sportEvent}
+                              </span>
+                            )}
                           </span>
                           <span className="flex shrink-0 items-center gap-2">
                             <span className="text-xs text-(--color-muted-foreground)">
@@ -142,6 +150,7 @@ export function JudPage() {
                 {selected ? (
                   <span className="ml-2 text-sm font-normal text-(--color-muted-foreground)">
                     {selected.name}
+                    {selected.sportEvent ? ` · ${selected.sportEvent}` : ""}
                   </span>
                 ) : null}
               </CardTitle>
