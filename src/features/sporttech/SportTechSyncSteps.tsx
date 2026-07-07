@@ -73,6 +73,18 @@ const STEPS: SetupStep<Ctx>[] = [
     },
   },
   {
+    key: "start-lists",
+    badge: "3",
+    label: "Start-lists",
+    desc: "Inscritos por unit (individual, aparato y equipo). Requiere grupos.",
+    group: "entidades",
+    requires: requireEvent,
+    run: async (ctx) => {
+      const r = await sportTechSyncStage(ctx.eventId, "start-lists");
+      return step(r, `${r.startLists ?? 0} listas`);
+    },
+  },
+  {
     key: "results",
     label: "Resultados",
     desc: "Marcas, estado de unit (Frame.State) y medallero (individual y por equipo).",
