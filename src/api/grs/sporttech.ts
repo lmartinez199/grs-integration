@@ -12,7 +12,8 @@ export type SportTechStage =
   | "participants"
   | "groups"
   | "results"
-  | "start-lists";
+  | "start-lists"
+  | "awards";
 
 export const SPORTTECH_STAGES: { stage: SportTechStage; label: string }[] = [
   { stage: "structure", label: "Estructura" },
@@ -20,6 +21,7 @@ export const SPORTTECH_STAGES: { stage: SportTechStage; label: string }[] = [
   { stage: "groups", label: "Grupos" },
   { stage: "results", label: "Resultados" },
   { stage: "start-lists", label: "Start-lists" },
+  { stage: "awards", label: "Medallas" },
 ];
 
 /** Resumen del pull completo de un evento. */
