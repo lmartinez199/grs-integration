@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { Swords } from "lucide-react";
 
 import { login } from "@/api/grs/auth";
 import { useAuth } from "@/stores/auth.store";
@@ -58,9 +57,7 @@ export function LoginPage() {
     <div className="flex h-full items-center justify-center p-6">
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center text-center">
-          <div className="mb-2 flex size-12 items-center justify-center rounded-full bg-(--color-primary)/10">
-            <Swords className="size-6 text-(--color-primary)" />
-          </div>
+          <img src="/win2tec.svg" alt="" className="mb-2 size-12 rounded-xl" />
           <CardTitle className="text-xl">Integración GRS</CardTitle>
           <CardDescription>Inicia sesión en el GRS para continuar</CardDescription>
         </CardHeader>
