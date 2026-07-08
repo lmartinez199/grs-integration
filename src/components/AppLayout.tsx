@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Swords, Hand, Timer, Target, Waves, PersonStanding, SlidersHorizontal, LogOut, Sun, Moon, Zap } from "lucide-react";
+import { LayoutDashboard, Swords, Hand, Timer, Target, Waves, PersonStanding, SlidersHorizontal, LogOut, Sun, Moon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/stores/auth.store";
@@ -47,7 +47,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     <div className="flex h-full">
       <aside className="flex w-60 shrink-0 flex-col border-r bg-(--color-card)">
         <div className="flex h-14 items-center gap-2 border-b px-4">
-          <Zap className="size-5 text-(--color-primary)" />
+          <img src="/win2tec.svg" alt="" className="size-6 rounded-md" />
           <span className="font-semibold">Integración GRS</span>
         </div>
 
