@@ -28,39 +28,6 @@ const connectionsSchema = z.object({
   language: z.string().min(2, "Mínimo 2 caracteres"),
 });
 
-type PresetValues = Pick<
-  Settings,
-  "grsBaseUrl" | "zempoBaseUrl" | "athBaseUrl" | "language"
->;
-
-/**
- * Entornos precargados para alternar rápido mientras se prueba (URLs + idioma;
- * NO toca las API keys). Lo guardado en Ajustes siempre pisa al `.env`, así que
- * el switch vive acá y no en variables de entorno.
- */
-const ENV_PRESETS: { key: string; label: string; values: PresetValues }[] = [
-  {
-    key: "local",
-    label: "Local",
-    values: {
-      grsBaseUrl: "http://localhost:3010/api",
-      zempoBaseUrl: "http://localhost:3001/zempo",
-      athBaseUrl: "http://localhost:3005/api/ath",
-      language: "por",
-    },
-  },
-  {
-    key: "dev",
-    label: "Dev remoto",
-    values: {
-      grsBaseUrl: "https://devovrs.srv.win2tec.es/b",
-      zempoBaseUrl: "https://jud-integration-zempo.srv.win2tec.es/zempo",
-      athBaseUrl: "https://ath-microservice.srv.win2tec.es/api/ath",
-      language: "eng",
-    },
-  },
-];
-
 export function ConnectionsCard() {
   const settings = useSettings();
   const update = useSettings((s) => s.update);
@@ -68,8 +35,6 @@ export function ConnectionsCard() {
   const {
     register,
     handleSubmit,
-    reset,
-    getValues,
     formState: { errors, isSubmitting },
   } = useForm<Settings>({
     resolver: zodResolver(connectionsSchema),
@@ -87,17 +52,6 @@ export function ConnectionsCard() {
     await update(values);
     toast.success("Conexiones guardadas");
   }
-
-  /** Aplica y GUARDA el preset (URLs + idioma); las API keys quedan como están. */
-  async function applyPreset(preset: (typeof ENV_PRESETS)[number]) {
-    reset({ ...getValues(), ...preset.values });
-    await update(preset.values);
-    toast.success(`Entorno ${preset.label} aplicado`);
-  }
-
-  const activePreset = ENV_PRESETS.find(
-    (p) => p.values.grsBaseUrl === settings.grsBaseUrl,
-  )?.key;
 
   const testZempo = useMutation({
     mutationFn: zempoHealth,
@@ -118,21 +72,6 @@ export function ConnectionsCard() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Label>Entorno</Label>
-            {ENV_PRESETS.map((p) => (
-              <Button
-                key={p.key}
-                type="button"
-                size="sm"
-                variant={activePreset === p.key ? "default" : "outline"}
-                onClick={() => void applyPreset(p)}
-              >
-                {p.label}
-              </Button>
-            ))}
-          </div>
-
           <Field label="GRS — Base URL (incluye /api)" error={errors.grsBaseUrl?.message}>
             <Input {...register("grsBaseUrl")} placeholder="http://localhost:3010/api" />
           </Field>

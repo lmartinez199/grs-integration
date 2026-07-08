@@ -23,8 +23,9 @@ const env = import.meta.env;
 
 /**
  * Defaults por entorno: provienen del `.env` (variables VITE_*) y, si no
- * están definidas, caen a localhost. Estos valores solo se usan la primera
- * vez; lo que el operador guarde en Ajustes los sobrescribe (plugin-store).
+ * están definidas, caen a localhost. En PRODUCCIÓN solo se usan la primera
+ * vez (lo que el operador guarde en Ajustes los sobrescribe, plugin-store);
+ * en DEV el `.env` manda siempre (ver `envDefined` en `hydrate`).
  */
 export const DEFAULT_SETTINGS: Settings = {
   grsBaseUrl: env.VITE_GRS_BASE_URL ?? "http://localhost:3010/api",
@@ -50,6 +51,23 @@ if (env.PROD) {
   }
 }
 
+/**
+ * Keys presentes (no vacías) en el `.env`. En DEV estas pisan lo persistido:
+ * el entorno lo gobierna el `.env` (alternar local ↔ dev remoto = editar
+ * `.env.development`/`.env.local`; Vite reinicia solo). Las API keys u otras
+ * keys que el `.env` no define siguen saliendo de lo guardado en Ajustes.
+ */
+function envDefined(): Partial<Settings> {
+  const out: Partial<Settings> = {};
+  if (env.VITE_GRS_BASE_URL) out.grsBaseUrl = env.VITE_GRS_BASE_URL;
+  if (env.VITE_ZEMPO_BASE_URL) out.zempoBaseUrl = env.VITE_ZEMPO_BASE_URL;
+  if (env.VITE_ATH_BASE_URL) out.athBaseUrl = env.VITE_ATH_BASE_URL;
+  if (env.VITE_ZEMPO_API_KEY) out.zempoApiKey = env.VITE_ZEMPO_API_KEY;
+  if (env.VITE_ATH_API_KEY) out.athApiKey = env.VITE_ATH_API_KEY;
+  if (env.VITE_LANGUAGE) out.language = env.VITE_LANGUAGE;
+  return out;
+}
+
 interface SettingsState extends Settings {
   hydrated: boolean;
   hydrate: () => Promise<void>;
@@ -61,7 +79,10 @@ export const useSettings = create<SettingsState>((set, get) => ({
   hydrated: false,
   hydrate: async () => {
     const saved = await readPersisted<Partial<Settings>>(PERSIST_KEY);
-    set({ ...DEFAULT_SETTINGS, ...saved, hydrated: true });
+    // Precedencia: en DEV manda el `.env` (para eso está); en el build de
+    // producción manda lo que el operador guardó en Ajustes (sin rebuild).
+    const envOverride = env.DEV ? envDefined() : {};
+    set({ ...DEFAULT_SETTINGS, ...saved, ...envOverride, hydrated: true });
   },
   update: async (patch) => {
     const next = { ...getSettingsSnapshot(get), ...patch };
