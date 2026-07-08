@@ -25,7 +25,11 @@ function baseUrl(service: Service): string {
   const s = settingsSnapshot();
   const url =
     service === "grs" ? s.grsBaseUrl : service === "zempo" ? s.zempoBaseUrl : s.athBaseUrl;
-  return url.replace(/\/+$/, "");
+  const clean = url.replace(/\/+$/, "");
+  // zempo sirve todo bajo /zempo; si la URL configurada no lo trae, lo añadimos
+  // para no depender de que el operador lo escriba. Idempotente.
+  if (service === "zempo" && !/\/zempo$/.test(clean)) return `${clean}/zempo`;
+  return clean;
 }
 
 function authHeaders(service: Service): Record<string, string> {
