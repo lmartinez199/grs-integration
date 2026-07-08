@@ -87,15 +87,23 @@ const STEPS: SetupStep<Ctx>[] = [
   {
     key: "results",
     label: "Resultados",
-    desc: "Marcas, estado de unit (Frame.State) y medallero (individual y por equipo).",
+    desc: "Marcas y estado de unit (Frame.State). No genera medallas.",
     group: "resultados",
     requires: requireEvent,
     run: async (ctx) => {
       const r = await sportTechSyncStage(ctx.eventId, "results");
-      return step(
-        r,
-        `${r.results ?? 0} units con marca · ${r.awards ?? 0} medallas`,
-      );
+      return step(r, `${r.results ?? 0} units con marca`);
+    },
+  },
+  {
+    key: "awards",
+    label: "Medallas",
+    desc: "Genera el medallero por ranking (individual y por equipo). Correr cuando los resultados estén oficiales.",
+    group: "resultados",
+    requires: requireEvent,
+    run: async (ctx) => {
+      const r = await sportTechSyncStage(ctx.eventId, "awards");
+      return step(r, `${r.awards ?? 0} medallas`);
     },
   },
 ];
