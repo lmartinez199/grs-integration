@@ -5,6 +5,7 @@ import { RefreshCw, Layers, CalendarClock } from "lucide-react";
 import * as ath from "@/api/ath";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 import { DataView } from "@/components/ui/data-view";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScheduleList } from "./ScheduleList";
@@ -105,11 +106,11 @@ function SchedulesCard() {
           {dates.length > 0 && (
             <div className="flex w-64 max-w-full flex-col gap-1">
               <Label htmlFor={dateFilterId} className="text-xs">Filtrar por fecha</Label>
-              <select
+              <Select
                 id={dateFilterId}
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="flex h-9 w-full rounded-md border bg-(--color-background) px-3 text-sm text-(--color-foreground) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-ring)"
+                className="w-full"
               >
                 <option value="">Todas las fechas ({all.length})</option>
                 {dates.map((d) => (
@@ -117,7 +118,7 @@ function SchedulesCard() {
                     {formatDateOption(d)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           )}
           <Button size="sm" variant="outline" onClick={() => q.refetch()} icon={<RefreshCw />} loading={q.isFetching}>

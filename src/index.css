@@ -113,6 +113,13 @@ summary {
   filter: brightness(0) invert(1);
 }
 
+/* Desplegables de <select>: las <option> no heredan el fondo del control,
+   así que sin esto el popup sale con el fondo nativo claro en tema oscuro. */
+select option {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
 /* Respeta la preferencia de movimiento reducido (accesibilidad). */
 @media (prefers-reduced-motion: reduce) {
   *,

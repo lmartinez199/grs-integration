@@ -14,6 +14,7 @@ import { ActionButton } from "@/components/ui/action-button";
 import { RetryNotice } from "@/components/ui/retry-notice";
 import { DefinitionRow } from "@/components/ui/definition-row";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ReconcileUnitsCheckbox } from "./ReconcileUnitsCheckbox";
 
 export function AthLoopSection() {
   const status = useQuery({
@@ -36,7 +37,6 @@ export function AthLoopSection() {
   // Filtros opcionales para el sync manual (vacío = defaults del backend).
   const dateId = useId();
   const hourId = useId();
-  const reconcileId = useId();
   const [date, setDate] = useState("");
   const [hour, setHour] = useState("");
   // Opt-in: incluir setup-units en el loop (elimina units huérfanas). Apagado
@@ -136,23 +136,11 @@ export function AthLoopSection() {
               </div>
             </div>
 
-            <label htmlFor={reconcileId} className="flex items-start gap-2 text-sm">
-              <input
-                id={reconcileId}
-                type="checkbox"
-                className="mt-0.5 size-4 shrink-0 accent-(--color-primary)"
-                checked={reconcileUnits}
-                disabled={active}
-                onChange={(e) => setReconcileUnits(e.target.checked)}
-              />
-              <span>
-                Incluir sincronización de units
-                <span className="block text-xs text-(--color-muted-foreground)">
-                  Refleja ajustes del proveedor eliminando units huérfanas (cada 5 min). Borra
-                  datos: actívalo solo si confías en los cambios del programa.
-                </span>
-              </span>
-            </label>
+            <ReconcileUnitsCheckbox
+              checked={reconcileUnits}
+              disabled={active}
+              onChange={setReconcileUnits}
+            />
 
             <div className="flex flex-wrap gap-2">
               <Button size="sm" onClick={() => start.mutate({ reconcileUnits })} disabled={active || start.isPending}>

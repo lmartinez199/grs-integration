@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Play, Square, RefreshCw, Timer } from "lucide-react";
 
@@ -12,6 +12,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { RetryNotice } from "@/components/ui/retry-notice";
 import { SyncCard } from "@/components/ui/sync-card";
 import { DefinitionRow } from "@/components/ui/definition-row";
+import { ReconcileUnitsCheckbox } from "@/features/ath/ReconcileUnitsCheckbox";
 
 export function AthSyncCard() {
   const status = useQuery({
@@ -37,7 +38,6 @@ export function AthSyncCard() {
 
   // Opt-in: incluir setup-units en el loop (elimina huérfanas). Apagado por
   // defecto porque BORRA — solo activar si se confía en los ajustes del proveedor.
-  const reconcileId = useId();
   const [reconcileUnits, setReconcileUnits] = useState(false);
 
   const data = status.data;
@@ -90,23 +90,11 @@ export function AthSyncCard() {
           </p>
         )}
 
-        <label htmlFor={reconcileId} className="flex items-start gap-2 text-sm">
-          <input
-            id={reconcileId}
-            type="checkbox"
-            className="mt-0.5 size-4 shrink-0 accent-(--color-primary)"
-            checked={reconcileUnits}
-            disabled={active}
-            onChange={(e) => setReconcileUnits(e.target.checked)}
-          />
-          <span>
-            Incluir sincronización de units
-            <span className="block text-xs text-(--color-muted-foreground)">
-              Refleja ajustes del proveedor eliminando units huérfanas (cada 5 min). Borra
-              datos: actívalo solo si confías en los cambios del programa.
-            </span>
-          </span>
-        </label>
+        <ReconcileUnitsCheckbox
+          checked={reconcileUnits}
+          disabled={active}
+          onChange={setReconcileUnits}
+        />
 
         <div className="flex flex-wrap gap-2">
           <Button
