@@ -1,4 +1,5 @@
 import { type IntegrationEventRef } from "@/api/grs/integrations";
+import { Select } from "@/components/ui/select";
 
 /** Etiqueta legible de un evento (etiqueta + UUID corto, o solo el UUID). */
 function eventLabel(e: IntegrationEventRef): string {
@@ -37,17 +38,13 @@ export function ActiveEventSelector({
       <span className="text-sm text-(--color-muted-foreground)">
         {noun} activo:
       </span>
-      <select
-        value={activeId}
-        onChange={(e) => onSetActive(e.target.value)}
-        className="rounded-md border border-(--color-border) bg-transparent px-2 py-1 text-sm"
-      >
+      <Select value={activeId} onChange={(e) => onSetActive(e.target.value)}>
         {usable.map((e) => (
           <option key={e.id} value={e.id}>
             {eventLabel(e)}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   );
 }

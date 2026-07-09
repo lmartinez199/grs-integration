@@ -10,7 +10,9 @@ import { useArcoStore } from "@/stores/arco.store";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { DataView } from "@/components/ui/data-view";
+import { tableClass, theadRowClass, thClass, tbodyRowClass, tdClass } from "@/components/ui/table-view";
 import { RetryNotice } from "@/components/ui/retry-notice";
+import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const TYPE_LABEL: Record<string, string> = {
@@ -59,18 +61,18 @@ export function ArcoMonitor() {
         <CardContent className="flex min-h-0 flex-1 flex-col gap-3">
           <div className="flex w-56 max-w-full shrink-0 flex-col gap-1">
             <Label htmlFor={filterId} className="text-xs">Filtrar por tipo</Label>
-            <select
+            <Select
               id={filterId}
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="flex h-9 w-full rounded-md border bg-(--color-background) px-3 text-sm text-(--color-foreground) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-ring)"
+              className="w-full"
             >
               {TYPE_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
                   {o.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {documents.isError ? (
@@ -85,13 +87,13 @@ export function ArcoMonitor() {
             </p>
           ) : (
             <div className="min-h-0 flex-1 overflow-auto">
-              <table className="w-full text-sm">
+              <table className={tableClass}>
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-(--color-muted-foreground)">
-                    <th scope="col" className="py-1.5 pr-2 font-medium">Fecha</th>
-                    <th scope="col" className="py-1.5 pr-2 font-medium">Tipo</th>
-                    <th scope="col" className="py-1.5 pr-2 font-medium">Competición</th>
-                    <th scope="col" className="py-1.5 pr-3 font-medium">Documento</th>
+                  <tr className={theadRowClass}>
+                    <th scope="col" className={thClass}>Fecha</th>
+                    <th scope="col" className={thClass}>Tipo</th>
+                    <th scope="col" className={thClass}>Competición</th>
+                    <th scope="col" className={thClass}>Documento</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -103,20 +105,21 @@ export function ArcoMonitor() {
                         onClick={() => setSelectedId(doc.id)}
                         aria-current={isSel}
                         className={cn(
-                          "cursor-pointer border-t border-(--color-border) transition-colors hover:bg-(--color-muted)/50",
+                          tbodyRowClass,
+                          "cursor-pointer transition-colors hover:bg-(--color-muted)/50",
                           isSel && "bg-(--color-primary)/10",
                         )}
                       >
-                        <td className="py-1.5 pr-2 tabular-nums text-(--color-muted-foreground)">
+                        <td className={cn(tdClass, "tabular-nums text-(--color-muted-foreground)")}>
                           {formatDateTime(doc.date)}
                         </td>
-                        <td className="py-1.5 pr-2">
+                        <td className={tdClass}>
                           <Badge variant="secondary">
                             {TYPE_LABEL[doc.documentType] ?? doc.documentType}
                           </Badge>
                         </td>
-                        <td className="py-1.5 pr-2 font-medium">{doc.competitionCode}</td>
-                        <td className="truncate py-1.5 pr-3 font-mono text-xs">{doc.documentCode}</td>
+                        <td className={cn(tdClass, "font-medium")}>{doc.competitionCode}</td>
+                        <td className={cn(tdClass, "truncate font-mono text-xs")}>{doc.documentCode}</td>
                       </tr>
                     );
                   })}

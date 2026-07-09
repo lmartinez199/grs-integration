@@ -30,6 +30,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import { toast } from "@/components/ui/toast";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { StartList } from "./StartList";
@@ -270,9 +271,6 @@ function dateKey(iso: string): string {
 type StatusFilter = "all" | "withList" | "pending" | "live";
 type GenderFilter = "all" | "M" | "F";
 
-const selectClass =
-  "flex h-9 rounded-md border bg-(--color-background) px-3 text-sm text-(--color-foreground) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-ring)";
-
 function FilterBar({
   search,
   setSearch,
@@ -303,27 +301,25 @@ function FilterBar({
           className="h-9 pl-8"
         />
       </div>
-      <select
+      <Select
         value={status}
         onChange={(e) => setStatus(e.target.value as StatusFilter)}
-        className={selectClass}
         aria-label="Filtrar por estado"
       >
         <option value="all">Todos los estados</option>
         <option value="withList">Con start list</option>
         <option value="pending">Pendientes de enviar</option>
         <option value="live">En curso</option>
-      </select>
-      <select
+      </Select>
+      <Select
         value={gender}
         onChange={(e) => setGender(e.target.value as GenderFilter)}
-        className={selectClass}
         aria-label="Filtrar por sexo"
       >
         <option value="all">Ambos sexos</option>
         <option value="M">Masculino</option>
         <option value="F">Femenino</option>
-      </select>
+      </Select>
       <span className="ml-auto text-xs text-(--color-muted-foreground)">
         {shown === total ? `${total} pruebas` : `${shown} de ${total}`}
       </span>

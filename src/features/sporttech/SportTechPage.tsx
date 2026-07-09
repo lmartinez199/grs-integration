@@ -22,6 +22,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataView } from "@/components/ui/data-view";
 import { Input } from "@/components/ui/input";
+import { tableClass, theadRowClass, thClass, tbodyRowClass, tdClass } from "@/components/ui/table-view";
+import { cn } from "@/lib/utils";
 import {
   Tabs,
   tabPanelId,
@@ -356,22 +358,19 @@ function CompetitionCard({ comp }: { comp: SportTechInspectCompetition }) {
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className={tableClass}>
             <thead>
-              <tr className="border-b border-(--color-border) text-left text-xs text-(--color-muted-foreground)">
-                <th className="py-1.5 pr-3 font-medium">Fase</th>
-                <th className="py-1.5 pr-3 font-medium">Prueba</th>
-                <th className="py-1.5 pr-3 font-medium">RSC</th>
-                <th className="py-1.5 pr-3 font-medium">Catálogo</th>
+              <tr className={theadRowClass}>
+                <th className={thClass}>Fase</th>
+                <th className={thClass}>Prueba</th>
+                <th className={thClass}>RSC</th>
+                <th className={thClass}>Catálogo</th>
               </tr>
             </thead>
             <tbody>
               {comp.units.map((u) => (
-                <tr
-                  key={u.unitCode}
-                  className="border-b border-(--color-border)/50 last:border-0"
-                >
-                  <td className="py-1.5 pr-3">
+                <tr key={u.unitCode} className={tbodyRowClass}>
+                  <td className={tdClass}>
                     {u.phaseName}{" "}
                     <span className="text-xs text-(--color-muted-foreground)">
                       ({u.phaseCode})
@@ -382,14 +381,14 @@ function CompetitionCard({ comp }: { comp: SportTechInspectCompetition }) {
                       </Badge>
                     )}
                   </td>
-                  <td className="py-1.5 pr-3">
+                  <td className={tdClass}>
                     {u.eventName}{" "}
                     <span className="text-xs text-(--color-muted-foreground)">
                       ({u.sportEventCode})
                     </span>
                   </td>
-                  <td className="py-1.5 pr-3 font-mono text-xs">{u.unitCode}</td>
-                  <td className="py-1.5 pr-3">
+                  <td className={cn(tdClass, "font-mono text-xs")}>{u.unitCode}</td>
+                  <td className={tdClass}>
                     {u.known ? (
                       <Badge variant="success">en catálogo</Badge>
                     ) : (

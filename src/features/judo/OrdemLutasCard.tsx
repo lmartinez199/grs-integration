@@ -11,6 +11,7 @@ import { groupFightOrderByArea } from "@/lib/domain/zempo";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 import {
   Card,
   CardContent,
@@ -56,16 +57,15 @@ export function OrdemLutasCard({ codigo }: { codigo: string }) {
             onChange={(e) => setDia(e.target.value)}
             aria-label="Día"
           />
-          <select
+          <Select
             value={turno}
             onChange={(e) => setTurno(e.target.value)}
             aria-label="Turno"
-            className="h-9 rounded-md border border-(--color-input) bg-transparent px-3 text-sm"
           >
             <option value="">Todos los turnos</option>
             <option value="matutino">Matutino</option>
             <option value="vespertino">Vespertino</option>
-          </select>
+          </Select>
           <Input
             placeholder="Área / tatami (opcional)"
             value={area}
