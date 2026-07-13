@@ -30,8 +30,14 @@ export function IntegrationInfoRows({
   // Solo judo la trae: zempo separa individual y equipos en 2 códigos.
   const activeTeam = readActiveTeamEvent(data.externalIds);
   const pollMs = data.pollIntervalMs ?? 0;
-  // Providers del runner: activo = flag Iniciar/Detener. Arena (cron propio): poll>0.
-  const runnerManaged = ["sporttech-gar", "sporttech-gry", "swimsystem"].includes(provider);
+  // Providers del runner: activo = flag Iniciar/Detener. Judo (scheduler propio
+  // vía jud-integration): poll>0.
+  const runnerManaged = [
+    "sporttech-gar",
+    "sporttech-gry",
+    "swimsystem",
+    "arena",
+  ].includes(provider);
   const autoOn = runnerManaged ? data.enabled && !!data.autoSyncEnabled : pollMs > 0;
   const seconds = Math.round((pollMs > 0 ? pollMs : 300_000) / 1000);
 
