@@ -151,6 +151,10 @@ function ArenaFields({ ids, onChange }: {
           onChange={(e) => onChange({ ...ids, baseUrl: e.target.value })}
           placeholder="https://arena.example.com"
         />
+        <p className="text-xs text-(--color-muted-foreground)">
+          En eventos con túnel ngrok, el sentinel actualiza esta URL solo — no
+          hace falta editarla a mano.
+        </p>
       </div>
       <div className="space-y-1">
         <Label htmlFor="arena-eventCode">Código de evento (eventCode)</Label>
