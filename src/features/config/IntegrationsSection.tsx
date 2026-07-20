@@ -137,6 +137,33 @@ function JudoFields({ ids, onChange }: {
   );
 }
 
+/** "hace 2 min" / "hace 3 h" a partir de un ISO string. */
+function timeAgo(iso: string, now: number): string {
+  const mins = Math.round((now - new Date(iso).getTime()) / 60_000);
+  if (mins < 1) return "hace instantes";
+  if (mins < 60) return `hace ${mins} min`;
+  return `hace ${Math.floor(mins / 60)} h ${mins % 60} min`;
+}
+
+/** Estado del túnel reportado por el sentinel (tunnelStatus/tunnelLastSeenAt). */
+function TunnelBadge({ ids }: { ids: Record<string, unknown> }) {
+  const [now] = useState(() => Date.now());
+  const lastSeen = typeof ids.tunnelLastSeenAt === "string" ? ids.tunnelLastSeenAt : null;
+  if (!lastSeen) return null;
+  // ponytail: "online" solo si el último reporte es reciente; sin heartbeat
+  // periódico del sentinel, un online viejo se degrada a "sin señal".
+  const STALE_MIN = 10;
+  const stale = now - new Date(lastSeen).getTime() > STALE_MIN * 60_000;
+  const online = ids.tunnelStatus === "online" && !stale;
+  return (
+    <p className={`text-xs ${online ? "text-(--color-success)" : "text-(--color-warning)"}`}>
+      {online
+        ? `Túnel online — último reporte ${timeAgo(lastSeen, now)}`
+        : `Túnel sin señal (${String(ids.tunnelStatus ?? "?")}) — último reporte ${timeAgo(lastSeen, now)}`}
+    </p>
+  );
+}
+
 function ArenaFields({ ids, onChange }: {
   ids: Record<string, unknown>;
   onChange: (next: Record<string, unknown>) => void;
@@ -151,6 +178,7 @@ function ArenaFields({ ids, onChange }: {
           onChange={(e) => onChange({ ...ids, baseUrl: e.target.value })}
           placeholder="https://arena.example.com"
         />
+        <TunnelBadge ids={ids} />
         <p className="text-xs text-(--color-muted-foreground)">
           En eventos con túnel ngrok, el sentinel actualiza esta URL solo — no
           hace falta editarla a mano.
