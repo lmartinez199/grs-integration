@@ -31,3 +31,7 @@ dist-ssr
 
 # graphify knowledge graph (generated locally, mantenido por git hooks)
 graphify-out/
+
+# Tauri updater: la llave PRIVADA de firma NUNCA se versiona (la pública va en
+# tauri.conf.json). Ver docs/auto-update.md.
+*.key
