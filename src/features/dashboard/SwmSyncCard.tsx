@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { RefreshCw, Waves } from "lucide-react";
+import { Play, RefreshCw, Square, Waves } from "lucide-react";
 
 import { swmHealth, swmSyncMeet, swmWebhookLog } from "@/api/grs/swimsystem";
+import { getIntegration, setIntegrationAutoSync } from "@/api/grs/integrations";
 import { SYNC_INTERVAL } from "@/lib/constants";
 import { useMutationWithToast } from "@/hooks/useMutationWithToast";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +33,13 @@ export function SwmSyncCard() {
     queryFn: () => swmWebhookLog(1),
     refetchInterval: SYNC_INTERVAL,
   });
+  // Mismo queryKey que IntegrationInfoRows (react-query deduplica): de aquí sale
+  // `autoSyncEnabled` para gatear los botones Iniciar/Detener.
+  const integration = useQuery({
+    queryKey: ["integrations", "swimsystem"],
+    queryFn: () => getIntegration("swimsystem"),
+    retry: false,
+  });
 
   const sync = useMutationWithToast({
     mutationFn: (id: string) => swmSyncMeet(id),
@@ -41,6 +49,18 @@ export function SwmSyncCard() {
       ["swm", "webhooks"],
     ],
   });
+  const start = useMutationWithToast({
+    mutationFn: () => setIntegrationAutoSync("swimsystem", true),
+    successMsg: "Auto-sync de natación (SWM) activada",
+    invalidateKeys: [["integrations", "swimsystem"]],
+  });
+  const stop = useMutationWithToast({
+    mutationFn: () => setIntegrationAutoSync("swimsystem", false),
+    successMsg: "Auto-sync de natación (SWM) detenida",
+    invalidateKeys: [["integrations", "swimsystem"]],
+  });
+
+  const autoOn = !!integration.data?.autoSyncEnabled;
 
   const last = webhooks.data?.recent[0];
   // Evaluado contra la hora del último fetch (puro en render); el query
@@ -57,6 +77,8 @@ export function SwmSyncCard() {
         <StatusBadge loading={health.isLoading} error={health.isError}>
           {webhookActive ? (
             <Badge variant="success">webhook activo</Badge>
+          ) : autoOn ? (
+            <Badge variant="success">auto-sync activo</Badge>
           ) : (
             <Badge variant="secondary">sin actividad</Badge>
           )}
@@ -84,6 +106,26 @@ export function SwmSyncCard() {
 
       <IntegrationInfoRows provider="swimsystem" eventLabel="Meet activo" />
 
+      <div className="flex flex-wrap gap-2">
+        <Button
+          size="sm"
+          icon={<Play />}
+          onClick={() => start.mutate()}
+          disabled={autoOn || start.isPending}
+        >
+          Iniciar
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          icon={<Square />}
+          onClick={() => stop.mutate()}
+          disabled={!autoOn || stop.isPending}
+        >
+          Detener
+        </Button>
+      </div>
+
       <form
         className="flex gap-2"
         onSubmit={(e) => {
@@ -96,7 +138,7 @@ export function SwmSyncCard() {
           value={meetId}
           onChange={(e) => setMeetId(e.target.value)}
         />
-        <Button type="submit" size="sm" icon={<RefreshCw />} loading={sync.isPending}>
+        <Button type="submit" size="sm" variant="secondary" icon={<RefreshCw />} loading={sync.isPending}>
           Sincronizar
         </Button>
       </form>
