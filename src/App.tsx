@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useAuth } from "@/stores/auth.store";
 import { useSettings } from "@/stores/settings.store";
 import { useTheme } from "@/stores/theme.store";
+import { checkForUpdates } from "@/lib/updater";
 import { AppLayout } from "@/components/AppLayout";
 import { LoginPage } from "@/features/auth/LoginPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
@@ -37,6 +38,11 @@ export default function App() {
       setReady(true),
     );
   }, [hydrateAuth, hydrateSettings, hydrateTheme]);
+
+  // Auto-actualización al arranque (no-op fuera de Tauri).
+  useEffect(() => {
+    void checkForUpdates();
+  }, []);
 
   if (!ready) {
     return (
