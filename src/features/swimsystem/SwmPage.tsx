@@ -31,6 +31,7 @@ import {
   type TabItem,
 } from "@/components/ui/tabs";
 
+import { SwmNovedades } from "./SwmNovedades";
 import { SwmSyncSteps } from "./SwmSyncSteps";
 
 const TABS: TabItem[] = [
@@ -117,6 +118,9 @@ export function SwmPage() {
             aria-labelledby={tabTriggerId("estado")}
             className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2"
           >
+            <div className="lg:col-span-2">
+              <SwmNovedades meetId={id} />
+            </div>
             <Card>
               <CardHeader className="flex-row items-center justify-between space-y-0">
                 <CardTitle>Estado de la integración</CardTitle>
