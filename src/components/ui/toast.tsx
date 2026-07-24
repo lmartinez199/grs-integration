@@ -15,6 +15,21 @@ export const toast = {
     sileo.error({ title: message, description }),
   info: (message: string, description?: string) =>
     sileo.info({ title: message, description }),
+  /**
+   * Notificación persistente (no se auto-descarta) con un botón de acción.
+   * Devuelve el id para descartarla con `toast.dismiss` cuando la acción corra.
+   */
+  action: (
+    message: string,
+    opts: { description?: string; buttonTitle: string; onClick: () => void },
+  ) =>
+    sileo.action({
+      title: message,
+      description: opts.description,
+      duration: null,
+      button: { title: opts.buttonTitle, onClick: opts.onClick },
+    }),
+  dismiss: (id: string) => sileo.dismiss(id),
 };
 
 /** Contenedor de notificaciones; sincroniza el tema con el de la app. */
