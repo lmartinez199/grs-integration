@@ -89,12 +89,23 @@ const STEPS: SetupStep<Ctx>[] = [
   {
     key: "results",
     label: "Resultados",
-    desc: "Marcas, tiempos y medallero.",
+    desc: "Marcas, tiempos y ranking. No reparte medallas.",
     group: "resultados",
     requires: requireMeet,
     run: async (ctx) => {
       const r = await swmSyncStage(ctx.meetId, "results");
       return step(r, `${r.results ?? 0} resultados`);
+    },
+  },
+  {
+    key: "awards",
+    label: "Medallero",
+    desc: "Reparte las medallas. Reescribe el medallero completo: dispáralo cuando las pruebas ya estén definidas.",
+    group: "resultados",
+    requires: requireMeet,
+    run: async (ctx) => {
+      const r = await swmSyncStage(ctx.meetId, "awards");
+      return step(r, `${r.awards ?? 0} medallas`);
     },
   },
 ];

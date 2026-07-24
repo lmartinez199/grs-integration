@@ -134,6 +134,11 @@ export const swmSyncMeet = (meetId: string) =>
  * Etapas del sync (espejo de los endpoints granulares de grs-backend, patrón
  * ATH). Tienen orden de dependencia: structure → participants → start-lists →
  * results. Cada etapa es idempotente y re-asegura la estructura que necesita.
+ *
+ * `awards` va aparte a propósito: es la ÚNICA vía que crea medallas (ni el pull
+ * completo, ni `results`, ni los webhooks las tocan) y reescribe el medallero de
+ * cada competencia entera, así que se dispara a mano cuando las provas ya están
+ * definidas.
  */
 export type SwmStage =
   | "organisations"
@@ -141,7 +146,8 @@ export type SwmStage =
   | "participants"
   | "groups"
   | "start-lists"
-  | "results";
+  | "results"
+  | "awards";
 
 export const SWM_STAGES: { stage: SwmStage; label: string }[] = [
   { stage: "organisations", label: "1 · Organizaciones" },
@@ -150,6 +156,7 @@ export const SWM_STAGES: { stage: SwmStage; label: string }[] = [
   { stage: "groups", label: "4 · Grupos (relevos)" },
   { stage: "start-lists", label: "5 · Start-lists" },
   { stage: "results", label: "6 · Resultados" },
+  { stage: "awards", label: "7 · Medallero" },
 ];
 
 /** Resumen de una etapa individual del sync (contadores parciales). */
@@ -161,6 +168,7 @@ export interface SwmStageSummary {
   events?: number;
   groups?: number;
   results?: number;
+  awards?: number;
   /** Fallos de datos de la etapa (vacío si todo salió bien). */
   errors: string[];
 }
