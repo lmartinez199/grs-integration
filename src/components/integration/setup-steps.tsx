@@ -31,6 +31,8 @@ export interface StepSummary {
   updated?: number;
   skipped: number;
   errors: string[];
+  /** Motivos informativos de una corrida sin trabajo (la etapa no aplica al evento). */
+  notices?: string[];
   /**
    * Resumen legible que REEMPLAZA la línea genérica de conteos (cuando el sync
    * tiene métricas propias, p. ej. gimnasia: "14 units · 7 conjuntos · 24 medallas").
@@ -130,6 +132,12 @@ export function SetupSteps<Ctx>({
         if (s.errors.length > 0) {
           toast.error(`${step.label}: ${s.errors.length} con error`);
           return false;
+        }
+        // Una etapa que no aplica al evento no es un fallo, pero tampoco un "listo":
+        // el motivo va en el toast para que el operador sepa por qué salió en ceros.
+        if (s.notices?.length) {
+          toast.info(`${step.label}: ${s.notices[0]}`);
+          return true;
         }
         toast.success(
           s.label
@@ -309,6 +317,14 @@ function StepResultLine({ result }: { result: StepResult }) {
           `${s.created} creados${s.updated ? ` · ${s.updated} actualizados` : ""} · ${s.processed} procesados${s.skipped ? ` · ${s.skipped} omitidos` : ""}`}
         {hasError ? ` · ${s.errors.length} con error` : ""}
       </p>
+
+      {s.notices?.length ? (
+        <ul className="list-disc space-y-0.5 pl-5 text-xs text-(--color-muted-foreground)">
+          {s.notices.map((n, i) => (
+            <li key={i}>{n}</li>
+          ))}
+        </ul>
+      ) : null}
 
       {hasError ? (
         <div className="text-xs">
