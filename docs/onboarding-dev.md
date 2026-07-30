@@ -178,6 +178,10 @@ pnpm exec tsc --noEmit  # solo typecheck
 pnpm lint               # ESLint (JS/TS recomendadas + hooks de React + convenciones del proyecto)
 ```
 
+El build de producción (y el instalador que publica el release) hornea las URLs de
+`.env.production` — el único `.env*` versionado —, así que la app descargada arranca
+apuntando a **dev**, no a localhost. Los defaults localhost solo aplican en `tauri dev`.
+
 No hay tests automatizados por ahora; typecheck + lint son la verificación local.
 
 ## 7. Documentación relacionada

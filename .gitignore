@@ -15,8 +15,10 @@ dist-ssr
 # TypeScript: cache de build incremental (composite/project references)
 *.tsbuildinfo
 
-# Variables de entorno: no se versionan (incluye .example/.development/.production).
+# Variables de entorno: no se versionan, salvo .env.production (URLs de dev que
+# se hornean en el instalador; no lleva secretos).
 .env*
+!.env.production
 
 # Editor directories and files
 .vscode/*
