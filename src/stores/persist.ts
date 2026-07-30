@@ -1,8 +1,9 @@
 import { load, type Store } from "@tauri-apps/plugin-store";
 
 /**
- * Acceso perezoso al store cifrado en disco de Tauri (plugin-store).
- * Un único archivo `grs-desktop.json` guarda settings y sesión.
+ * Acceso perezoso al store en disco de Tauri (plugin-store). Un único archivo
+ * `grs-desktop.json` guarda settings y sesión — JSON plano, sin cifrar: las API
+ * keys quedan legibles en `%APPDATA%\<identifier>\`.
  */
 let storePromise: Promise<Store> | null = null;
 

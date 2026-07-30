@@ -68,6 +68,26 @@ function envDefined(): Partial<Settings> {
   return out;
 }
 
+const URL_KEYS = ["grsBaseUrl", "zempoBaseUrl", "athBaseUrl"] as const;
+
+const esLocal = (url?: string) =>
+  !!url && (url.includes("localhost") || url.includes("127.0.0.1"));
+
+/**
+ * Auto-arreglo para las instalaciones <= v0.4.0, que se distribuían apuntando a
+ * localhost: si el store trae una URL local en un build de producción es basura
+ * de esa época (no hay backend local en la máquina de un operador), así que se
+ * descarta y vuelve a mandar el default del build. Sin esto, `grs-desktop.json`
+ * gana para siempre y ni reinstalar lo arregla.
+ * ponytail: se limpia en cada arranque, no se reescribe el archivo — el próximo
+ * guardado en Ajustes lo persiste ya limpio.
+ */
+function sinLocalhost(saved: Partial<Settings>): Partial<Settings> {
+  const out = { ...saved };
+  for (const key of URL_KEYS) if (esLocal(out[key])) delete out[key];
+  return out;
+}
+
 interface SettingsState extends Settings {
   hydrated: boolean;
   hydrate: () => Promise<void>;
@@ -78,7 +98,8 @@ export const useSettings = create<SettingsState>((set, get) => ({
   ...DEFAULT_SETTINGS,
   hydrated: false,
   hydrate: async () => {
-    const saved = await readPersisted<Partial<Settings>>(PERSIST_KEY);
+    const persisted = await readPersisted<Partial<Settings>>(PERSIST_KEY);
+    const saved = env.PROD && persisted ? sinLocalhost(persisted) : persisted;
     // Precedencia: en DEV manda el `.env` (para eso está); en el build de
     // producción manda lo que el operador guardó en Ajustes (sin rebuild).
     const envOverride = env.DEV ? envDefined() : {};
